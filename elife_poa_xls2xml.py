@@ -134,6 +134,7 @@ if __name__ == "__main__":
 	# create an article object
 	uri = doi2uri(doi)
 	article = eLifePOA(uri, title)
+	article.abstract = abstract
 
 	# add authors to the article
 	for author in authors:
