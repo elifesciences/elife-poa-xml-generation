@@ -99,7 +99,6 @@ class eLife2XML(object):
                 self.orcid.set("content-type", "orcid")
                 self.orcid.set("""xlink-href""", contributor.orcid) # TODO: figure out why we can't set ':' within an attribute name
 
-            print contributor.affiliations
             for affiliation in contributor.affiliations:
                 self.aff = SubElement(self.contrib, "aff")
 
@@ -186,10 +185,11 @@ class eLifePOA():
     """
     contributors = [] 
 
-    def __init__(self, doi):
+    def __init__(self, doi, title):
         self.articleType = "research-article"
         self.doi = doi 
         self.contributors = [] 
+        self.title = title 
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -235,7 +235,8 @@ if __name__ == '__main__':
 
     # test article 
     doi = "http://dx.doi.org/http://dx.doi.org/10.7554/eLife.00929"
-    newArticle = eLifePOA(doi)
+    title = "The Test Title"
+    newArticle = eLifePOA(doi, title)
 
     newArticle.add_contributor(auth1)
     newArticle.add_contributor(auth2)
