@@ -45,12 +45,17 @@ class eLife2XML(object):
         self.build(self.root, poa_article)
 
     def build(self, root, poa_article):
-        self.set_frontmatter(self.root)
-        self.set_contrib_group(self.root, poa_article)
+        self.set_frontmatter(self.root, poa_article)
+        # self.set_title(self.root, poa_article)
 
-    def set_frontmatter(self, parent):
+
+    def set_frontmatter(self, parent, poa_article):
         self.front = SubElement(parent, 'front')
         self.set_journal_meta(self.front)
+        self.set_contrib_group(self.front, poa_article)
+
+    # def set_title(self, parent, poa_article):
+
 
     def set_journal_meta(self, parent):
         """
@@ -190,6 +195,7 @@ class eLifePOA():
         self.doi = doi 
         self.contributors = [] 
         self.title = title 
+        self.abstract = ""
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
