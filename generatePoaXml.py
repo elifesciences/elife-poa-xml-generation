@@ -48,14 +48,23 @@ class eLife2XML(object):
         self.set_frontmatter(self.root, poa_article)
         # self.set_title(self.root, poa_article)
 
-
     def set_frontmatter(self, parent, poa_article):
         self.front = SubElement(parent, 'front')
         self.set_journal_meta(self.front)
-        self.set_contrib_group(self.front, poa_article)
+        self.set_article_meta(self.front, poa_article)        
 
-    # def set_title(self, parent, poa_article):
-
+    def set_article_meta(self, parent, poa_article):
+        self.article_meta = SubElement(parent, "article-meta")
+        #
+        self.title_group = SubElement(parent, "title-group")
+        self.title = SubElement(self.title_group, "title")
+        self.title.text = poa_article.title 
+        #
+        self.set_contrib_group(parent, poa_article)
+        #
+        self.set_abstract = SubElement(parent, "abstract")
+        self.set_para = SubElement(self.set_abstract, "p")
+        self.set_para.text = poa_article.abstract
 
     def set_journal_meta(self, parent):
         """
