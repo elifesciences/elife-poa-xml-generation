@@ -88,10 +88,15 @@ class eLife2XML(object):
         print self.root
 
     def prettyXML(self):
+        doctype = minidom.getDOMImplementation('').createDocumentType(
+            'article', '-//NLM//DTD Journal Archiving and Interchange DTD v3.0 20080202//EN',
+            'http://dtd.nlm.nih.gov/archiving/3.0/archivearticle3.dtd')
+
         rough_string = ElementTree.tostring(self.root, 'utf-8')
         reparsed = minidom.parseString(rough_string)
+        if doctype is not None:
+            reparsed.insertBefore(doctype, reparsed.documentElement)
         return reparsed.toprettyxml(indent="\t")
-
 
 class ContributorAffiliation():
     phone = None
