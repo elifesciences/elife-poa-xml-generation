@@ -21,6 +21,9 @@ class eLife2XML(object):
         # set the boiler plate values
         self.journal_id_types = ["nlm-ta", "hwp", "publisher-id"]
         self.elife_journal_id = "eLife"
+        self.elife_journal_title = "eLife"
+        self.elife_epub_issn = "2050-084X"
+        self.elife_publisher_name = "eLife Sciences Publications, Ltd"
 
         #TODO: set the doctype here too 
         self.root.set('article-type', structure.articleType)
@@ -43,10 +46,22 @@ class eLife2XML(object):
         take boiler plate values from the init of the calss 
         """
         self.journal_meta = SubElement(parent, "journal-meta")
+
+        # journal-id
         for journal_id_type in self.journal_id_types:
             self.journal_id = SubElement(self.journal_meta, "journal_id") 
             self.journal_id.text = self.elife_journal_id 
             self.journal_id.set("journal-id-type", journal_id_type) 
+
+        # title-group
+        self.issn = SubElement(parent, "issn")
+        self.issn.text = self.elife_epub_issn
+        self.issn.set("pub-type", "epub")
+
+        # publisher
+        self.publisher = SubElement(parent, "publisher")
+        self.publisher_name = SubElement(self.publisher, "publisher_name")
+        self.publisher_name.text = self.elife_publisher_name
 
     def printXML(self):
         print self.root
@@ -59,13 +74,10 @@ class eLife2XML(object):
 class eLifePOA():
     def __init__(self):
         self.articleType = "research-article"
-        self.journalTitle = "eLife"
-
 
 # test the aritcle class
 print "testing the article class"
 newArticle = eLifePOA()
-print newArticle.journalTitle 
 
 # test the XML generator 
 eXML = eLife2XML(newArticle)
