@@ -194,55 +194,57 @@ class eLifePOA():
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
 
+if __name__ == '__main__':
 
-# test affiliations 
-aff1 = ContributorAffiliation()
-aff1.department = "Editorial Department"
-aff1.institution = "eLife"
-aff1.city = "Cambridge"
-aff1.country = "UK"
-aff1.email = "m.harrsion@elifesciecnes.org"
+    # test affiliations 
+    aff1 = ContributorAffiliation()
+    aff1.department = "Editorial Department"
+    aff1.institution = "eLife"
+    aff1.city = "Cambridge"
+    aff1.country = "UK"
+    aff1.email = "m.harrsion@elifesciecnes.org"
 
-aff2 = ContributorAffiliation()
-aff2.department = "Coffe House"
-aff2.institution = "hipster"
-aff2.city = "London"
-aff2.country = "UK"
-aff2.email = "m.harrsion@elifesciecnes.org"
+    aff2 = ContributorAffiliation()
+    aff2.department = "Coffe House"
+    aff2.institution = "hipster"
+    aff2.city = "London"
+    aff2.country = "UK"
+    aff2.email = "m.harrsion@elifesciecnes.org"
 
-aff3 = ContributorAffiliation()
-aff3.department = "Coffe House"
-aff3.institution = "hipster"
-aff3.city = "London"
-aff3.country = "UK"
-aff3.email = "i.mulvany@elifesciences.org"
-
-
-# test authors 
-auth1 = eLifePOSContributor("author", "Harrison", "Melissa")
-auth1.auth_id = "029323as"
-auth1.corresp = True
-auth1.orcid = "this is an orcid"
-auth1.set_affiliation(aff1)
-auth1.set_affiliation(aff2)
-
-auth2 = eLifePOSContributor("author", "Mulvany", "Ian")
-auth2.auth_id = "ANOTHER_ID_2"
-auth2.corresp = True
-auth2.set_affiliation(aff3)
+    aff3 = ContributorAffiliation()
+    aff3.department = "Coffe House"
+    aff3.institution = "hipster"
+    aff3.city = "London"
+    aff3.country = "UK"
+    aff3.email = "i.mulvany@elifesciences.org"
 
 
-# test article 
-doi = "http://dx.doi.org/http://dx.doi.org/10.7554/eLife.00929"
-newArticle = eLifePOA(doi)
+    # test authors 
+    auth1 = eLifePOSContributor("author", "Harrison", "Melissa")
+    auth1.auth_id = "029323as"
+    auth1.corresp = True
+    auth1.orcid = "this is an orcid"
+    auth1.set_affiliation(aff1)
+    auth1.set_affiliation(aff2)
 
-newArticle.add_contributor(auth1)
-newArticle.add_contributor(auth2)
+    auth2 = eLifePOSContributor("author", "Mulvany", "Ian")
+    auth2.auth_id = "ANOTHER_ID_2"
+    auth2.corresp = True
+    auth2.set_affiliation(aff3)
 
 
-# test the XML generator 
-eXML = eLife2XML(newArticle)
-prettyXML = eXML.prettyXML()
-print prettyXML
+    # test article 
+    doi = "http://dx.doi.org/http://dx.doi.org/10.7554/eLife.00929"
+    newArticle = eLifePOA(doi)
+
+    newArticle.add_contributor(auth1)
+    newArticle.add_contributor(auth2)
+
+    # test the XML generator 
+    eXML = eLife2XML(newArticle)
+    prettyXML = eXML.prettyXML()
+    print prettyXML
+
+
 
 
