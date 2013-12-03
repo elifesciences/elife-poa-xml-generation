@@ -53,16 +53,17 @@ class eLife2XML(object):
         self.set_journal_meta(self.front)
         self.set_article_meta(self.front, poa_article)        
 
+
     def set_article_meta(self, parent, poa_article):
         self.article_meta = SubElement(parent, "article-meta")
         #
-        self.title_group = SubElement(parent, "title-group")
-        self.title = SubElement(self.title_group, "title")
+        self.title_group = SubElement(self.article_meta, "title-group")
+        self.title = SubElement(self.title_group, "article-title")
         self.title.text = poa_article.title 
         #
-        self.set_contrib_group(parent, poa_article)
+        self.set_contrib_group(self.article_meta, poa_article)
         #
-        self.set_abstract = SubElement(parent, "abstract")
+        self.set_abstract = SubElement(self.article_meta, "abstract")
         self.set_para = SubElement(self.set_abstract, "p")
         self.set_para.text = poa_article.abstract
 
@@ -74,7 +75,7 @@ class eLife2XML(object):
 
         # journal-id
         for journal_id_type in self.journal_id_types:
-            self.journal_id = SubElement(self.journal_meta, "journal_id") 
+            self.journal_id = SubElement(self.journal_meta, "journal-id") 
             self.journal_id.text = self.elife_journal_id 
             self.journal_id.set("journal-id-type", journal_id_type) 
 
@@ -85,11 +86,11 @@ class eLife2XML(object):
 
         # publisher
         self.publisher = SubElement(parent, "publisher")
-        self.publisher_name = SubElement(self.publisher, "publisher_name")
+        self.publisher_name = SubElement(self.publisher, "publisher-name")
         self.publisher_name.text = self.elife_publisher_name
 
     def set_contrib_group(self, parent, poa_article):
-        self.contrib_group = SubElement(parent, "contrib_group")
+        self.contrib_group = SubElement(parent, "contrib-group")
 
         for contributor in poa_article.contributors:
             self.contrib = SubElement(self.contrib_group, "contrib")
@@ -100,7 +101,7 @@ class eLife2XML(object):
             if contributor.equal_contrib == True:
                 self.contrib.set("equal_contrib", "yes")
             if contributor.auth_id:
-                self.contrib.set("auth_id", contributor.auth_id)
+                self.contrib.set("auth-id", contributor.auth_id)
 
             self.name = SubElement(self.contrib, "name")
             self.surname = SubElement(self.name, "surname")
