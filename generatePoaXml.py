@@ -106,7 +106,7 @@ class eLife2XML(object):
             self.name = SubElement(self.contrib, "name")
             self.surname = SubElement(self.name, "surname")
             self.surname.text = contributor.surname
-            self.given_name = SubElement(self.name, "given-name")
+            self.given_name = SubElement(self.name, "given-names")
             self.given_name.text = contributor.given_name
 
             if contributor.orcid:
