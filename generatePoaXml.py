@@ -80,12 +80,12 @@ class eLife2XML(object):
             self.journal_id.set("journal-id-type", journal_id_type) 
 
         # title-group
-        self.issn = SubElement(parent, "issn")
+        self.issn = SubElement(self.journal_meta, "issn")
         self.issn.text = self.elife_epub_issn
         self.issn.set("pub-type", "epub")
 
         # publisher
-        self.publisher = SubElement(parent, "publisher")
+        self.publisher = SubElement(self.journal_meta, "publisher")
         self.publisher_name = SubElement(self.publisher, "publisher-name")
         self.publisher_name.text = self.elife_publisher_name
 
