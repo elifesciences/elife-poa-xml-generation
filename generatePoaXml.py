@@ -56,6 +56,21 @@ class eLife2XML(object):
 
     def set_article_meta(self, parent, poa_article):
         self.article_meta = SubElement(parent, "article-meta")
+        
+        # article-id pub-id-type="manuscript"
+        if poa_article.manuscript:
+            pub_id_type = "manuscript"
+            self.article_id = SubElement(self.article_meta, "article-id") 
+            self.article_id.text = `int(poa_article.manuscript)`
+            self.article_id.set("pub-type-id", pub_id_type) 
+        
+        # article-id pub-id-type="doi"
+        if poa_article.doi:
+            pub_id_type = "doi"
+            self.article_id = SubElement(self.article_meta, "article-id") 
+            self.article_id.text = poa_article.doi
+            self.article_id.set("pub-type-id", pub_id_type) 
+        
         #
         self.title_group = SubElement(self.article_meta, "title-group")
         self.title = SubElement(self.title_group, "article-title")
@@ -206,6 +221,7 @@ class eLifePOA():
         self.contributors = [] 
         self.title = title 
         self.abstract = ""
+        self.manuscript = None
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)

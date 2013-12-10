@@ -79,7 +79,8 @@ if __name__ == "__main__":
 
 	# Let's be super pragmatic and lift the core article data from the first data row, be fast now! 
 	first_row = data_rows[0]
-	# 
+	#
+	manuscript = get_cell_value("ms_no", col_names, first_row)
 	doi = get_cell_value("doi", col_names, first_row)
 	title = get_cell_value("ms_title", col_names, first_row)
 	abstract = get_cell_value("abstract", col_names, first_row)
@@ -135,6 +136,7 @@ if __name__ == "__main__":
 	uri = doi2uri(doi)
 	article = eLifePOA(uri, title)
 	article.abstract = abstract
+	article.manuscript = manuscript
 
 	# add authors to the article
 	for author in authors:
