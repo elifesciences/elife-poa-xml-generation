@@ -15,6 +15,7 @@ The goal is to have a functioning pipeline in place to delivery XML to HW before
 ## Project dependencies
 
 	$ pip install elementtree  
+	$ pip install xlrd
 	$ pip install http://svn.effbot.org/public/elementtree-1.3/  
 
 ## Project outline 
@@ -30,7 +31,7 @@ The goal is to have a functioning pipeline in place to delivery XML to HW before
 - `elife_poa_xls2xml.py` hard codes reading `sample-xls-input/eLife_query_tool_508.xls` and generates output XML. Includes helper functions for reading from an XLS file, imports classes for XML modelling from `generatePoaXml.py`     
 - `generatePoaXml.py` set of classes for modelling the output XML  
 - `parseXls.py` toy example for reading from and XLS file, not used  
-- `validate.py` toy example of generating a validation script, not used  
+- `validate.py` toy example of generating a validation script, this file is not complete, and does not run.  
 
 #### Generating XML from and XLS file
 
