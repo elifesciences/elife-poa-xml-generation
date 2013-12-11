@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE article
-  PUBLIC '-//NLM//DTD Journal Archiving and Interchange DTD v3.0 20080202//EN'
+  PUBLIC "-//NLM//DTD Journal Archiving and Interchange DTD v3.0 20080202//EN"
   "archivearticle3.dtd">
-<article article-type="research-article">
+<article article-type="research-article" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink">
   <front>
     <journal-meta>
       <journal-id journal-id-type="nlm-ta">elife</journal-id>
@@ -51,20 +51,12 @@
             <email>jon.smith@elifesciences.org</email>
           </aff>
         </contrib>
-        <contrib contrib-type="author" corresp="yes" id="author-398" equal-contrib="yes">
+        <contrib contrib-type="author" corresp="yes" id="author-398">
           <name>
             <surname>Harrison</surname>
             <given-names>Melissa</given-names>
           </name>
           <aff>
-            <addr-line>
-              <named-content content-type="department">Maternity</named-content>
-            </addr-line>
-            <institution>Maternity Leave</institution>
-            <addr-line>
-              <named-content content-type="city">London</named-content>
-            </addr-line>
-            <country>United Kingdom</country>
           <email>m.harrison@elifesciences.org</email>
           </aff>
         </contrib>
@@ -73,19 +65,6 @@
             <surname>Gilbert</surname>
             <given-names>James</given-names>
           </name>
-          <aff>
-            <addr-line>
-              <named-content content-type="department">Support</named-content>
-            </addr-line>
-            <institution>eLife</institution>
-            <addr-line>
-              <named-content content-type="city">Cambridge</named-content>
-            </addr-line>
-            <country>United Kingdom</country>
-            <phone>44 (o)1223 370155</phone>
-            <fax></fax>
-            <email>j.gilbert@elifesciences.org</email>
-          </aff>
         </contrib>
         <contrib contrib-type="author" corresp="yes" id="author-401">
           <name>
@@ -93,16 +72,6 @@
             <given-names>Detlef</given-names>
           </name>
           <aff>
-            <addr-line>
-              <named-content content-type="department">Developmental Biology</named-content>
-            </addr-line>
-            <institution>Max Planck Institute for Developmental Biology</institution>
-            <addr-line>
-              <named-content content-type="city">T&#x00FC;bingen</named-content>
-            </addr-line>
-            <country>Germany</country>
-            <phone></phone>
-            <fax></fax>
             <email>d.weigel@elifesciences.org</email>
           </aff>
         </contrib>
@@ -127,8 +96,6 @@
       <pub-date pub-type="epub">
         <year>2013</year>
       </pub-date>
-      <volume>0</volume>
-      <issue>0</issue>
       <elocation-id>929</elocation-id>
       <history>
         <date date-type="received">
@@ -154,7 +121,8 @@
       </permissions>
     <abstract><p>Test abstract</p></abstract>
   <kwd-group kwd-group-type="research-organism">
-        <kwd>E. coli</kwd>
+        <title>Research organism</title>
+          <kwd>E. coli</kwd>
       </kwd-group>
        </article-meta>
        </front>
