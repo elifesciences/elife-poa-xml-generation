@@ -46,8 +46,6 @@
               <named-content content-type="city">Cambridge</named-content>
             </addr-line>
             <country>United Kingdom</country>
-            <phone></phone>
-            <fax></fax>
             <email>jon.smith@elifesciences.org</email>
           </aff>
         </contrib>
