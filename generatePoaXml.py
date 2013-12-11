@@ -266,7 +266,7 @@ if __name__ == '__main__':
 
 
     # test article 
-    doi = "http://dx.doi.org/http://dx.doi.org/10.7554/eLife.00929"
+    doi = "http://dx.doi.org/10.7554/eLife.00929"
     title = "The Test Title"
     newArticle = eLifePOA(doi, title)
 
