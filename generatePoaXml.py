@@ -128,7 +128,7 @@ class eLife2XML(object):
             if contributor.orcid:
                 self.orcid = SubElement(self.contrib, "uri")
                 self.orcid.set("content-type", "orcid")
-                self.orcid.set("xlink:href", contributor.orcid) # TODO: figure out why we can't set ':' within an attribute name
+                self.orcid.set("xlink:href", contributor.orcid)
 
             for affiliation in contributor.affiliations:
                 self.aff = SubElement(self.contrib, "aff")
