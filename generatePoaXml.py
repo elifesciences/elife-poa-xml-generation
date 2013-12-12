@@ -83,6 +83,18 @@ class eLife2XML(object):
         self.set_para = SubElement(self.set_abstract, "p")
         self.set_para.text = poa_article.abstract
 
+    def set_journal_title_group(self, parent):
+        """
+        take boiler plate values from the init of the class 
+        """
+        
+        # journal-title-group
+        self.journal_title_group = SubElement(parent, "journal-title-group")
+
+        # journal-title
+        self.journal_title = SubElement(self.journal_title_group, "journal-title")
+        self.journal_title.text = self.elife_journal_title 
+
     def set_journal_meta(self, parent):
         """
         take boiler plate values from the init of the calss 
@@ -94,6 +106,9 @@ class eLife2XML(object):
             self.journal_id = SubElement(self.journal_meta, "journal-id") 
             self.journal_id.text = self.elife_journal_id 
             self.journal_id.set("journal-id-type", journal_id_type) 
+
+        #
+        self.set_journal_title_group(self.journal_meta)
 
         # title-group
         self.issn = SubElement(self.journal_meta, "issn")
