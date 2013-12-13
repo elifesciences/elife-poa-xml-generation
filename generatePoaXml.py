@@ -189,7 +189,7 @@ class eLife2XML(object):
            self.date.set("date-type", date_type)
            day = SubElement(self.date, "day")
            day.text = str(date.date.tm_mday).zfill(2)
-           month = SubElement(self.date, "year")
+           month = SubElement(self.date, "month")
            month.text = str(date.date.tm_mon).zfill(2)
            year = SubElement(self.date, "year")
            year.text = str(date.date.tm_year)
