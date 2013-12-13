@@ -79,6 +79,9 @@ class eLife2XML(object):
         #
         self.set_contrib_group(self.article_meta, poa_article)
         #
+        if poa_article.license:
+            self.set_permissions(self.article_meta, poa_article)
+        #
         self.set_abstract = SubElement(self.article_meta, "abstract")
         self.set_para = SubElement(self.set_abstract, "p")
         self.set_para.text = poa_article.abstract
@@ -119,6 +122,54 @@ class eLife2XML(object):
         self.publisher = SubElement(self.journal_meta, "publisher")
         self.publisher_name = SubElement(self.publisher, "publisher-name")
         self.publisher_name.text = self.elife_publisher_name
+
+    def set_license(self, parent, poa_article):
+        self.license = SubElement(parent, "license")
+        self.license.set("license-type", poa_article.license.license_type)
+        self.license.set("xlink:href", poa_article.license.href)
+        
+        self.license_p = SubElement(self.license, "license-p")
+        self.license_p.text = poa_article.license.p1
+        
+        ext_link = SubElement(self.license_p, "ext-link")
+        ext_link.set("ext-link-type", "uri")
+        ext_link.set("xlink:href", poa_article.license.href)
+        ext_link.text = poa_article.license.name
+        ext_link.tail = poa_article.license.p2
+
+    def set_copyright(self, parent, poa_article):
+        if len(poa_article.contributors) > 2:
+            contributor = poa_article.contributors[0]
+            copyright_holder = contributor.surname + " et al"
+        elif len(poa_article.contributors) == 2:
+            contributor1 = poa_article.contributors[0]
+            contributor2 = poa_article.contributors[1]
+            copyright_holder = contributor1.surname + " & " + contributor2.surname
+        elif len(poa_article.contributors) == 1:
+            contributor = poa_article.contributors[0]
+            copyright_holder = contributor.surname
+        else:
+            copyright_holder = ""
+            
+        # copyright-statement
+        copyright_year = 2013 # TODO integrate with article dates from a different branch
+        copyright_statement = u'Copyright \u00a9 ' + str(copyright_year) + ", " + copyright_holder
+        self.copyright_statement = SubElement(parent, "copyright-statement")
+        self.copyright_statement.text = copyright_statement
+        
+        # copyright-year
+        self.copyright_year = SubElement(parent, "copyright-year")
+        self.copyright_year.text = str(copyright_year)
+        
+        # copyright-holder
+        self.copyright_holder = SubElement(parent, "copyright_holder")
+        self.copyright_holder.text = copyright_holder
+    
+    def set_permissions(self, parent, poa_article):
+        self.permissions = SubElement(parent, "permissions")
+        if poa_article.license.copyright is True:
+            self.set_copyright(self.permissions, poa_article)
+        self.set_license(self.permissions, poa_article)
 
     def set_contrib_group(self, parent, poa_article):
         self.contrib_group = SubElement(parent, "contrib-group")
@@ -197,7 +248,7 @@ class eLife2XML(object):
         reparsed = minidom.parseString(rough_string)
         if doctype:
             reparsed.insertBefore(doctype, reparsed.documentElement)
-        return reparsed.toprettyxml(indent="\t", encoding = encoding)
+        return reparsed.toprettyxml(indent="\t")
 
 class ContributorAffiliation():
     phone = None
@@ -230,6 +281,45 @@ class eLifePOSContributor():
     def set_affiliation(self, affiliation):
         self.affiliations.append(affiliation)
 
+
+class eLifeLicense():
+    """
+    License with some eLife preset values by license_id
+    """
+    
+    license_id = None
+    license_type = None
+    copyright = False
+    href = None
+    name = None
+    p1 = None
+    p2 = None
+    
+    def __init__(self, license_id = None):
+        if license_id:
+            self.init_by_license_id(license_id)
+        
+    def init_by_license_id(self, license_id):
+        """
+        For license_id value, set the license properties
+        """
+        if int(license_id) == 1:
+            self.license_id = license_id
+            self.license_type = "open-access"
+            self.copyright = True
+            self.href = "http://creativecommons.org/licenses/by/3.0/"
+            self.name = "Creative Commons Attribution License"
+            self.p1 = "This article is distributed under the terms of the "
+            self.p2 = ", which permits unrestricted use and redistribution provided that the original author and source are credited."
+        elif int(license_id) == 2:
+            self.license_id = license_id
+            self.license_type = "open-access"
+            self.copyright = False
+            self.href = "http://creativecommons.org/publicdomain/zero/1.0/"
+            self.name = "Creative Commons CC0"
+            self.p1 = "This is an open-access article, free of all copyright, and may be freely reproduced, distributed, transmitted, modified, built upon, or otherwise used by anyone for any lawful purpose. The work is made available under the "
+            self.p2 = " public domain dedication."
+
 class eLifePOA():
     """
     We include some boiler plate in the init, namely articleType
@@ -243,6 +333,7 @@ class eLifePOA():
         self.title = title 
         self.abstract = ""
         self.manuscript = None
+        self.license = None
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -285,6 +376,7 @@ if __name__ == '__main__':
     auth2.corresp = True
     auth2.set_affiliation(aff3)
 
+    license = eLifeLicense(1)
 
     # test article 
     doi = "http://dx.doi.org/10.7554/eLife.00929"
@@ -293,6 +385,8 @@ if __name__ == '__main__':
 
     newArticle.add_contributor(auth1)
     newArticle.add_contributor(auth2)
+    
+    newArticle.license = license
 
     # test the XML generator 
     eXML = eLife2XML(newArticle)
