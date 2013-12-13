@@ -4,6 +4,7 @@ from collections import namedtuple
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from xml.etree import ElementTree
 from xml.dom import minidom
+import time
 
 """
 create classes to represent affiliations, authors and papers.
@@ -34,6 +35,7 @@ class eLife2XML(object):
 
         # set the boiler plate values
         self.journal_id_types = ["nlm-ta", "hwp", "publisher-id"]
+        self.date_types = ["accepted", "received"]
         self.elife_journal_id = "eLife"
         self.elife_journal_title = "eLife"
         self.elife_epub_issn = "2050-084X"
@@ -78,6 +80,11 @@ class eLife2XML(object):
         self.title.text = poa_article.title 
         #
         self.set_contrib_group(self.article_meta, poa_article)
+        #
+        self.set_pub_date(self.article_meta, poa_article, "epub")
+        #
+        if poa_article.dates:
+            self.set_history(self.article_meta, poa_article)
         #
         self.set_abstract = SubElement(self.article_meta, "abstract")
         self.set_para = SubElement(self.set_abstract, "p")
@@ -165,6 +172,36 @@ class eLife2XML(object):
                     self.email = SubElement(self.aff, "email")
                     self.email.text = affiliation.email
 
+    def set_pub_date(self, parent, poa_article, pub_type):
+        # pub-date pub-type = pub_type
+        date = poa_article.get_date(pub_type)
+        if date:
+            self.pub_date = SubElement(parent, "pub-date")
+            self.pub_date.set("pub-type", pub_type)
+            year = SubElement(self.pub_date, "year")
+            year.text = str(date.date.tm_year)
+
+    def set_date(self, parent, poa_article, date_type):
+        # date date-type = date_type
+        date = poa_article.get_date(date_type)
+        if date:
+           self.date = SubElement(parent, "date")
+           self.date.set("date-type", date_type)
+           day = SubElement(self.date, "day")
+           day.text = str(date.date.tm_mday).zfill(2)
+           month = SubElement(self.date, "year")
+           month.text = str(date.date.tm_mon).zfill(2)
+           year = SubElement(self.date, "year")
+           year.text = str(date.date.tm_year)
+
+    def set_history(self, parent, poa_article):
+        self.history = SubElement(parent, "history")
+        
+        for date_type in self.date_types:
+            date = poa_article.get_date(date_type)
+            if date:
+                self.set_date(self.history, poa_article, date_type)
+
     def printXML(self):
         print self.root
 
@@ -210,6 +247,17 @@ class eLifePOSContributor():
     def set_affiliation(self, affiliation):
         self.affiliations.append(affiliation)
 
+class eLifeDate():
+    """
+    A struct_time date and a date_type
+    """
+    
+    def __init__(self, date_type, date):
+        self.date_type = date_type
+        # Date as a time.struct_time
+        self.date = date
+
+
 class eLifePOA():
     """
     We include some boiler plate in the init, namely articleType
@@ -223,9 +271,21 @@ class eLifePOA():
         self.title = title 
         self.abstract = ""
         self.manuscript = None
+        self.dates = None
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
+
+    def add_date(self, date):
+        if not self.dates:
+            self.dates = {}
+        self.dates[date.date_type] = date
+        
+    def get_date(self, date_type):
+        try:
+            return self.dates[date_type]
+        except (KeyError, TypeError):
+            return None
 
 if __name__ == '__main__':
 
@@ -265,15 +325,26 @@ if __name__ == '__main__':
     auth2.corresp = True
     auth2.set_affiliation(aff3)
 
+    # dates
+    t = time.strptime("2013-10-03", "%Y-%m-%d")
+    date_epub = eLifeDate("epub", t)
+    date_accepted = eLifeDate("accepted", t)
+    date_received = eLifeDate("received", t)
 
     # test article 
     doi = "http://dx.doi.org/10.7554/eLife.00929"
     title = "The Test Title"
+    abstract = "Test abstract"
     newArticle = eLifePOA(doi, title)
+    newArticle.abstract = abstract
 
     newArticle.add_contributor(auth1)
     newArticle.add_contributor(auth2)
-
+    
+    newArticle.add_date(date_epub)
+    newArticle.add_date(date_accepted)
+    newArticle.add_date(date_received)
+    
     # test the XML generator 
     eXML = eLife2XML(newArticle)
     prettyXML = eXML.prettyXML()
