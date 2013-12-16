@@ -159,7 +159,14 @@ class eLife2XML(object):
             copyright_holder = ""
             
         # copyright-statement
-        copyright_year = 2013 # TODO integrate with article dates from a different branch
+        copyright_year = ""
+        date = poa_article.get_date("license")
+        if not date:
+            # if no license date specified, use the article accepted date
+            date = poa_article.get_date("accepted")
+        if date:
+            copyright_year = date.date.tm_year
+            
         copyright_statement = u'Copyright \u00a9 ' + str(copyright_year) + ", " + copyright_holder
         self.copyright_statement = SubElement(parent, "copyright-statement")
         self.copyright_statement.text = copyright_statement
@@ -441,6 +448,9 @@ if __name__ == '__main__':
     date_epub = eLifeDate("epub", t)
     date_accepted = eLifeDate("accepted", t)
     date_received = eLifeDate("received", t)
+    # copyright date as the license date
+    t_license = time.strptime("2013-10-03", "%Y-%m-%d")
+    date_license = eLifeDate("license", t_license)
     license = eLifeLicense(1)
 
     # test article 
@@ -456,6 +466,7 @@ if __name__ == '__main__':
     newArticle.add_date(date_epub)
     newArticle.add_date(date_accepted)
     newArticle.add_date(date_received)
+    newArticle.add_date(date_license)
     
     newArticle.license = license
 
