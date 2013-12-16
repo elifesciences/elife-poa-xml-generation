@@ -248,7 +248,7 @@ class eLife2XML(object):
         reparsed = minidom.parseString(rough_string)
         if doctype:
             reparsed.insertBefore(doctype, reparsed.documentElement)
-        return reparsed.toprettyxml(indent="\t")
+        return reparsed.toprettyxml(indent="\t", encoding = encoding)
 
 class ContributorAffiliation():
     phone = None
