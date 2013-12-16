@@ -62,7 +62,7 @@ class eLife2XML(object):
         if poa_article.manuscript:
             pub_id_type = "manuscript"
             self.article_id = SubElement(self.article_meta, "article-id") 
-            self.article_id.text = `int(poa_article.manuscript)`
+            self.article_id.text = str(int(poa_article.manuscript)).zfill(5)
             self.article_id.set("pub-type-id", pub_id_type) 
         
         # article-id pub-id-type="doi"
