@@ -126,25 +126,27 @@ def index_table_on_article_id(table_type):
 # 	return article_author_index
 
 def index_authors_on_article_id():
-	"""
-	as we are going to be doing a lot of looking up authors by 
-	author_id and manuscript_id, 
-	so we are going to make a dict of dicts indexed on manuscript is and then author id 
-	"""
-	table_type = "authors"
-	col_names = get_xls_col_names(table_type)
-	author_table = index_table_on_article_id(table_type)
+	return index_table_on_article_id("authors")
 
-	article_ids = author_table.keys()
-	article_author_index = {} # this is the key item we will return our of this function 
-	for article_id in article_ids:
-		rows = author_table[article_id]
-		author_index =  defaultdict(list)
-		for row in rows:
-			author_id = get_cell_value("poa_a_id", col_names, row)
-			author_index[author_id] = row 
-		article_author_index[article_id] = author_index
-	return article_author_index
+	# """
+	# as we are going to be doing a lot of looking up authors by 
+	# author_id and manuscript_id, 
+	# so we are going to make a dict of dicts indexed on manuscript is and then author id 
+	# """
+	# table_type = "authors"
+	# col_names = get_xls_col_names(table_type)
+	# author_table = index_table_on_article_id(table_type)
+
+	# article_ids = author_table.keys()
+	# article_author_index = {} # this is the key item we will return our of this function 
+	# for article_id in article_ids:
+	# 	rows = author_table[article_id]
+	# 	author_index =  defaultdict(list)
+	# 	for row in rows:
+	# 		author_id = get_cell_value("poa_a_id", col_names, row)
+	# 		author_index[author_id] = row 
+	# 	article_author_index[article_id] = author_index
+	# return article_author_index
 
 def index_subjects_on_article_id():
 	return index_table_on_article_id("subjects")
@@ -156,6 +158,32 @@ def index_manuscript_on_article_id():
 	return index_table_on_article_id("manuscript")
 
 ##functions for abstracting calls to specific data entries 
+
+def get_article_attributes(article_id, attribute_type, attribute_label):
+	attributes = []
+	attribute_index = index_table_on_article_id(attribute_type)
+	col_names = get_xls_col_names(attribute_type)
+	attribute_rows = attribute_index[article_id]
+	for attribute_row in attribute_rows:
+		attributes.append(get_cell_value(attribute_label ,col_names, attribute_row))
+	return attributes
+
+def get_subjects(article_id):
+	subjects = []
+	subject_index = index_subjects_on_article_id()
+	col_names = get_xls_col_names("subjects")
+	subject_rows = subject_index[article_id]
+	for subject_row in subject_rows:
+		subjects.append(get_cell_value("poa_s_subjectarea" ,col_names, subject_row))
+	return subjects
+
+def get_title(article_id):
+	titles = get_article_attributes(article_id, "manuscript", "poa_m_title")
+	return titles 
+
+def get_abstracts(article_id):
+	abstracts = get_article_attributes(article_id, "manuscript", "poa_m_abstract")
+	return abstracts  
 
 ## conversion functions
 def doi2uri(doi):
@@ -184,11 +212,20 @@ if __name__ == "__main__":
 	# print authors[authors.keys()[-1]]
 	# print authors.keys()[-1]
 	# print authors.keys()
-	article_author_index = index_authors_on_article_id()
-	subject_index = index_subjects_on_article_id()
-	received_index = index_received_on_article_id()
-	manuscript_index = index_manuscript_on_article_id()
-	print article_author_index[1856.0][9026.0]
+	# article_author_index = index_authors_on_article_id()
+	# subject_index = index_subjects_on_article_id()
+	# received_index = index_received_on_article_id()
+	# manuscript_index = index_manuscript_on_article_id()
+	# print article_author_index[1856.0][9026.0]
+
+	subjects = get_subjects(1856.0)
+	print subjects
+
+	title = get_title(1856.0)
+	print title 
+
+	abstracts = get_abstracts(1856.0)
+	print abstracts
 
 	#1856.0 9026.0
 	# # Let's be super pragmatic and lift the core article data from the first data row, be fast now! 
