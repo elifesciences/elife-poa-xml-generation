@@ -128,7 +128,6 @@ def index_table_on_article_id(table_type):
 def index_authors_on_article_id():
 	return index_table_on_article_id("authors")
 
-
 def index_authors_on_author_id():
 	# """
 	# as we are going to be doing a lot of looking up authors by 
@@ -257,6 +256,86 @@ def get_author_position(article_id, author_id):
 def get_author_email(article_id, author_id):
 	email = get_author_attribute(article_id, author_id, "poa_a_email")
 	return email 
+
+def get_author_contrib_type(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_type_cde")
+	return attribute 
+
+def get_author_dual_corresponding(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_dual_corr")
+	return attribute 
+
+def get_author_dual_corresponding(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_dual_corr")
+	return attribute 
+
+def get_author_last_name(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_last_nm")
+	return attribute 
+
+def get_author_first_name(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_first_nm")
+	return attribute 
+
+def get_author_middle_name(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_middle_nm")
+	return attribute 
+
+def get_author_organisation(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_organization")
+	return attribute 
+
+def get_author_department(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_department")
+	return attribute 
+
+def get_author_addr1(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_addr1")
+	return attribute 
+
+def get_author_addr2(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_addr2")
+	return attribute 
+
+def get_author_addr3(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_addr3")
+	return attribute 
+
+def get_author_city(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_city")
+	return attribute 
+
+def get_author_zip(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_zip")
+	return attribute 
+
+def get_author_country(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_country")
+	return attribute 
+
+def get_author_state(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_state")
+	return attribute 
+
+def get_author_tel(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_tel")
+	return attribute 
+
+def get_author_alt_tel(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_tel_alt1")
+	return attribute 
+
+def get_author_alt_tel2(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_tel_alt2")
+	return attribute 
+
+def get_author_fax(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_fax")
+	return attribute 
+
+def get_author_job_title(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, "poa_a_job_title")
+	return attribute 
 
 ## conversion functions
 def doi2uri(doi):
