@@ -182,7 +182,7 @@ class eLife2XML(object):
         self.copyright_year.text = str(copyright_year)
         
         # copyright-holder
-        self.copyright_holder = SubElement(parent, "copyright_holder")
+        self.copyright_holder = SubElement(parent, "copyright-holder")
         self.copyright_holder.text = copyright_holder
     
     def set_permissions(self, parent, poa_article):
