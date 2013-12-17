@@ -140,12 +140,16 @@ class eLife2XML(object):
                 self.contrib.set("equal_contrib", "yes")
             if contributor.auth_id:
                 self.contrib.set("auth-id", contributor.auth_id)
-
-            self.name = SubElement(self.contrib, "name")
-            self.surname = SubElement(self.name, "surname")
-            self.surname.text = contributor.surname
-            self.given_name = SubElement(self.name, "given-names")
-            self.given_name.text = contributor.given_name
+                
+            if contributor.collab:
+                self.collab = SubElement(self.contrib, "collab")
+                self.collab.text = contributor.collab
+            else:
+                self.name = SubElement(self.contrib, "name")
+                self.surname = SubElement(self.name, "surname")
+                self.surname.text = contributor.surname
+                self.given_name = SubElement(self.name, "given-names")
+                self.given_name.text = contributor.given_name
 
             if contributor.orcid:
                 self.orcid = SubElement(self.contrib, "uri")
@@ -257,12 +261,14 @@ class eLifePOSContributor():
 
     auth_id = None
     orcid = None
+    collab = None
 
-    def __init__(self, contrib_type, surname, given_name):
+    def __init__(self, contrib_type, surname, given_name, collab = None):
         self.contrib_type = contrib_type
         self.surname = surname
         self.given_name = given_name
         self.affiliations = []
+        self.collab = collab
 
     def set_affiliation(self, affiliation):
         self.affiliations.append(affiliation)
@@ -344,6 +350,10 @@ if __name__ == '__main__':
     auth2.auth_id = "ANOTHER_ID_2"
     auth2.corresp = True
     auth2.set_affiliation(aff3)
+    
+    # group collab author
+    auth3 = eLifePOSContributor("author", None, None, "eLife author group")
+    auth3.auth_id = "groupAu1"
 
     # dates
     t = time.strptime("2013-10-03", "%Y-%m-%d")
@@ -360,6 +370,7 @@ if __name__ == '__main__':
 
     newArticle.add_contributor(auth1)
     newArticle.add_contributor(auth2)
+    newArticle.add_contributor(auth3)
     
     newArticle.add_date(date_epub)
     newArticle.add_date(date_accepted)
