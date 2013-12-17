@@ -243,13 +243,20 @@ def get_author_ids(article_id):
 	author_ids = get_article_attributes(article_id, "authors", "poa_a_id")
 	return author_ids
 
-def get_author_position(article_id, author_id):
+def get_author_attribute(article_id, author_id, attribute_name):
 	article_author_index = index_authors_on_author_id()
 	data_row = article_author_index[article_id][author_id]
 	col_names = get_xls_col_names("authors")
-	author_position = get_cell_value("poa_a_seq", col_names, data_row)
-	return author_position
+	attribute = get_cell_value(attribute_name, col_names, data_row)
+	return attribute
 
+def get_author_position(article_id, author_id):
+	position = get_author_attribute(article_id, author_id, "poa_a_seq")
+	return position
+
+def get_author_email(article_id, author_id):
+	email = get_author_attribute(article_id, author_id, "poa_a_email")
+	return email 
 
 ## conversion functions
 def doi2uri(doi):
@@ -303,7 +310,8 @@ if __name__ == "__main__":
 
 	for author_id in author_ids:
 		author_postion = get_author_position(test_article_id, author_id)
-		print author_postion
+		email = get_author_email(test_article_id, author_id)
+		print author_postion, email 
 
 
 	#1856.0 9026.0
