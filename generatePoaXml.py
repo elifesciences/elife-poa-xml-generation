@@ -5,6 +5,7 @@ from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from xml.etree import ElementTree
 from xml.dom import minidom
 import time
+import re
 
 """
 create classes to represent affiliations, authors and papers.
@@ -234,7 +235,7 @@ class eLife2XML(object):
         reparsed = minidom.parseString(rough_string)
         if doctype:
             reparsed.insertBefore(doctype, reparsed.documentElement)
-        return reparsed.toprettyxml(indent="\t", encoding = encoding)
+        return reparsed.toprettyxml(indent="\t")
 
 class ContributorAffiliation():
     phone = None
@@ -307,25 +308,38 @@ class eLifePOA():
         except (KeyError, TypeError):
             return None
 
+def repl(m):
+    # Convert hex to int to unicode character
+    chr_code = int(m.group(1), 16)
+    return unichr(chr_code)
+
+def entity_to_unicode(s):
+    """
+    Quick convert unicode HTML entities to unicode characters
+    using a regular expression replacement
+    """
+    s = re.sub(r"&#x(....);", repl, s)
+    return s
+
 if __name__ == '__main__':
 
     # test affiliations 
     aff1 = ContributorAffiliation()
-    aff1.department = "Editorial Department"
+    aff1.department = entity_to_unicode("Edit&#x00F3;ri&#x00E1;l Dep&#x00E1;rtment")
     aff1.institution = "eLife"
     aff1.city = "Cambridge"
     aff1.country = "UK"
     aff1.email = "m.harrsion@elifesciecnes.org"
 
     aff2 = ContributorAffiliation()
-    aff2.department = "Coffe House"
+    aff2.department = entity_to_unicode("Coffe Ho&#x00FC;se")
     aff2.institution = "hipster"
     aff2.city = "London"
     aff2.country = "UK"
     aff2.email = "m.harrsion@elifesciecnes.org"
 
     aff3 = ContributorAffiliation()
-    aff3.department = "Coffe House"
+    aff3.department = entity_to_unicode("Coffe Ho&#x00FC;se")
     aff3.institution = "hipster"
     aff3.city = "London"
     aff3.country = "UK"
