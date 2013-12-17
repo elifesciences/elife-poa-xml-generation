@@ -297,7 +297,7 @@ class eLife2XML(object):
         reparsed = minidom.parseString(rough_string)
         if doctype:
             reparsed.insertBefore(doctype, reparsed.documentElement)
-        return reparsed.toprettyxml(indent="\t")
+        return reparsed.toprettyxml(indent="\t", encoding = encoding)
 
 class ContributorAffiliation():
     phone = None
@@ -429,7 +429,7 @@ if __name__ == '__main__':
 
     # test affiliations 
     aff1 = ContributorAffiliation()
-    aff1.department = entity_to_unicode("Edit&#x00F3;ri&#x00E1;l Dep&#x00E1;rtment")
+    aff1.department = entity_to_unicode("Edit&#x00F3;ri&#x00E1;l&#x2212;Dep&#x00E1;rtment")
     aff1.institution = "eLife"
     aff1.city = "Cambridge"
     aff1.country = "UK"
