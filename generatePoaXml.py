@@ -480,10 +480,12 @@ if __name__ == '__main__':
 
     # test article 
     doi = "http://dx.doi.org/10.7554/eLife.00929"
+    manuscript = 929
     title = "The Test Title"
     abstract = "Test abstract"
     newArticle = eLifePOA(doi, title)
     newArticle.abstract = abstract
+    newArticle.manuscript = manuscript
 
     newArticle.add_contributor(auth1)
     newArticle.add_contributor(auth2)
