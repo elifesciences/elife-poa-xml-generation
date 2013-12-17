@@ -83,7 +83,6 @@ def get_cell_value(col_name, col_names, row):
 	cell_value = row[position]
 	return cell_value
 
-
 def index_table_on_article_id(table_type):
 	"""
 	return a dict of the XLS file keyed on article_id 
@@ -105,6 +104,26 @@ def index_table_on_article_id(table_type):
 		# print article_id, author_id 
 	return article_index 
 
+# def index_property_on_article_id(table_type, property_id):
+# 	"""
+# 	as we are going to be doing a lot of looking up authors by 
+# 	author_id and manuscript_id, 
+# 	so we are going to make a dict of dicts indexed on manuscript is and then author id 
+# 	"""
+# 	table_type = table_type
+# 	col_names = get_xls_col_names(table_type)
+# 	author_table = index_table_on_article_id(table_type)
+
+# 	article_ids = author_table.keys()
+# 	article_author_index = {} # this is the key item we will return our of this function 
+# 	for article_id in article_ids:
+# 		rows = author_table[article_id]
+# 		author_index =  defaultdict(list)
+# 		for row in rows:
+# 			author_id = get_cell_value(property_id, col_names, row)
+# 			author_index[author_id] = row 
+# 		article_author_index[article_id] = author_index
+# 	return article_author_index
 
 def index_authors_on_article_id():
 	"""
@@ -126,6 +145,15 @@ def index_authors_on_article_id():
 			author_index[author_id] = row 
 		article_author_index[article_id] = author_index
 	return article_author_index
+
+def index_subjects_on_article_id():
+	return index_table_on_article_id("subjects")
+
+def index_received_on_article_id():
+	return index_table_on_article_id("received")
+
+def index_manuscript_on_article_id():
+	return index_table_on_article_id("manuscript")
 
 ##functions for abstracting calls to specific data entries 
 
@@ -157,6 +185,9 @@ if __name__ == "__main__":
 	# print authors.keys()[-1]
 	# print authors.keys()
 	article_author_index = index_authors_on_article_id()
+	subject_index = index_subjects_on_article_id()
+	received_index = index_received_on_article_id()
+	manuscript_index = index_manuscript_on_article_id()
 	print article_author_index[1856.0][9026.0]
 
 	#1856.0 9026.0
