@@ -128,25 +128,28 @@ def index_table_on_article_id(table_type):
 def index_authors_on_article_id():
 	return index_table_on_article_id("authors")
 
+
+def index_authors_on_author_id():
 	# """
 	# as we are going to be doing a lot of looking up authors by 
 	# author_id and manuscript_id, 
 	# so we are going to make a dict of dicts indexed on manuscript is and then author id 
 	# """
-	# table_type = "authors"
-	# col_names = get_xls_col_names(table_type)
-	# author_table = index_table_on_article_id(table_type)
+	table_type = "authors"
+	col_names = get_xls_col_names(table_type)
+	author_table = index_authors_on_article_id()
 
-	# article_ids = author_table.keys()
-	# article_author_index = {} # this is the key item we will return our of this function 
-	# for article_id in article_ids:
-	# 	rows = author_table[article_id]
-	# 	author_index =  defaultdict(list)
-	# 	for row in rows:
-	# 		author_id = get_cell_value("poa_a_id", col_names, row)
-	# 		author_index[author_id] = row 
-	# 	article_author_index[article_id] = author_index
-	# return article_author_index
+	article_ids = author_table.keys()
+	article_author_index = {} # this is the key item we will return our of this function 
+	for article_id in article_ids:
+		rows = author_table[article_id]
+		author_index =  defaultdict()
+		for row in rows:
+			#author_index = {}
+			author_id = get_cell_value("poa_a_id", col_names, row)
+			author_index[author_id] = row 
+		article_author_index[article_id] = author_index
+	return article_author_index
 
 def index_subjects_on_article_id():
 	return index_table_on_article_id("subjects")
@@ -160,6 +163,9 @@ def index_manuscript_on_article_id():
 ##functions for abstracting calls to specific data entries 
 
 def get_article_attributes(article_id, attribute_type, attribute_label):
+	"""
+
+	"""
 	attributes = []
 	attribute_index = index_table_on_article_id(attribute_type)
 	col_names = get_xls_col_names(attribute_type)
@@ -168,22 +174,82 @@ def get_article_attributes(article_id, attribute_type, attribute_label):
 		attributes.append(get_cell_value(attribute_label ,col_names, attribute_row))
 	return attributes
 
+# subjects table
+
 def get_subjects(article_id):
-	subjects = []
-	subject_index = index_subjects_on_article_id()
-	col_names = get_xls_col_names("subjects")
-	subject_rows = subject_index[article_id]
-	for subject_row in subject_rows:
-		subjects.append(get_cell_value("poa_s_subjectarea" ,col_names, subject_row))
+	subjects = get_article_attributes(article_id, "subjects", "poa_s_subjectarea")
 	return subjects
+
+# licence table
+
+def get_licence(article_id):
+	licence_id = get_article_attributes(article_id, "licence", "poa_l_license_id")[0]
+	return licence_id
+
+# manuscript table
 
 def get_title(article_id):
 	titles = get_article_attributes(article_id, "manuscript", "poa_m_title")
-	return titles 
+	title = titles[0]
+	return title
 
-def get_abstracts(article_id):
+def get_abstract(article_id):
 	abstracts = get_article_attributes(article_id, "manuscript", "poa_m_abstract")
-	return abstracts  
+	abstract = abstracts[0]
+	return abstract
+
+def get_doi(article_id):
+	doi = get_article_attributes(article_id, "manuscript", "poa_m_doi")[0]
+	return doi 
+
+def get_accepted_date(article_id):
+	accepted_date = get_article_attributes(article_id, "manuscript", "poa_m_accepted_dt")[0]
+	return accepted_date
+
+def get_me_last_nm(article_id):
+	me_last_nm = get_article_attributes(article_id, "manuscript", "poa_m_me_last_nm")[0]
+	return me_last_nm
+
+def get_me_first_nm(article_id):
+	me_first_nm = get_article_attributes(article_id, "manuscript", "poa_m_me_first_nm")[0]
+	return me_first_nm
+
+def get_me_middle_nm(article_id):
+	me_middle_nm = get_article_attributes(article_id, "manuscript", "poa_m_me_middle_nm")[0]
+	return me_middle_nm
+
+def get_me_org(article_id):
+	me_org = get_article_attributes(article_id, "manuscript", "poa_m_me_organization")[0]
+	return me_org 
+
+def get_me_department(article_id):
+	me_department = get_article_attributes(article_id, "manuscript", "poa_m_me_department")[0]
+	return me_department
+
+def get_me_country(article_id):
+	me_country = get_article_attributes(article_id, "manuscript", "poa_m_me_country")[0]
+	return me_country
+	"poa_m_me_country"	
+
+def get_ethics(article_id):
+	"""
+	needs a bit of refinement owing to serilaising of data by EJP
+	"""
+	ethics = get_article_attributes(article_id, "manuscript", "poa_m_ethics_note")[0]
+	return ethics 
+
+# authors table
+def get_author_ids(article_id):
+	author_ids = get_article_attributes(article_id, "authors", "poa_a_id")
+	return author_ids
+
+def get_author_position(article_id, author_id):
+	article_author_index = index_authors_on_author_id()
+	data_row = article_author_index[article_id][author_id]
+	col_names = get_xls_col_names("authors")
+	author_position = get_cell_value("poa_a_seq", col_names, data_row)
+	return author_position
+
 
 ## conversion functions
 def doi2uri(doi):
@@ -218,14 +284,27 @@ if __name__ == "__main__":
 	# manuscript_index = index_manuscript_on_article_id()
 	# print article_author_index[1856.0][9026.0]
 
-	subjects = get_subjects(1856.0)
+	test_article_id = 1856.0
+
+	subjects = get_subjects(test_article_id)
 	print subjects
 
-	title = get_title(1856.0)
+	title = get_title(test_article_id)
 	print title 
 
-	abstracts = get_abstracts(1856.0)
+	abstracts = get_abstract(test_article_id)
 	print abstracts
+
+	licence_id = get_licence(test_article_id)
+	print licence_id
+
+	author_ids = get_author_ids(test_article_id)
+	print author_ids
+
+	for author_id in author_ids:
+		author_postion = get_author_position(test_article_id, author_id)
+		print author_postion
+
 
 	#1856.0 9026.0
 	# # Let's be super pragmatic and lift the core article data from the first data row, be fast now! 
