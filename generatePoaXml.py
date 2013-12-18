@@ -73,8 +73,10 @@ class eLife2XML(object):
             pub_id_type = "doi"
             self.article_id = SubElement(self.article_meta, "article-id") 
             self.article_id.text = poa_article.doi
-            self.article_id.set("pub-type-id", pub_id_type) 
+            self.article_id.set("pub-type-id", pub_id_type)
         
+        # article-categories
+        self.set_article_categories(self.article_meta, poa_article)
         #
         self.title_group = SubElement(self.article_meta, "title-group")
         self.title = SubElement(self.title_group, "article-title")
@@ -250,6 +252,25 @@ class eLife2XML(object):
                     self.email = SubElement(self.aff, "email")
                     self.email.text = affiliation.email
 
+    def set_article_categories(self, parent, poa_article):
+        # article-categories
+        if poa_article.get_display_channel() or len(poa_article.article_categories) > 0:
+            self.article_categories = SubElement(parent, "article-categories")
+            
+            if poa_article.get_display_channel():
+                # subj-group subj-group-type="display-channel"
+                subj_group = SubElement(self.article_categories, "subj-group")
+                subj_group.set("subj-group-type", "display-channel")
+                subject = SubElement(subj_group, "subject")
+                subject.text = poa_article.get_display_channel()
+            
+            for article_category in poa_article.article_categories:
+                # subj-group subj-group-type="heading"
+                subj_group = SubElement(self.article_categories, "subj-group")
+                subj_group.set("subj-group-type", "heading")
+                subject = SubElement(subj_group, "subject")
+                subject.text = article_category
+
     def set_pub_date(self, parent, poa_article, pub_type):
         # pub-date pub-type = pub_type
         date = poa_article.get_date(pub_type)
@@ -297,7 +318,7 @@ class eLife2XML(object):
         reparsed = minidom.parseString(rough_string)
         if doctype:
             reparsed.insertBefore(doctype, reparsed.documentElement)
-        return reparsed.toprettyxml(indent="\t")
+        return reparsed.toprettyxml(indent="\t", encoding = encoding)
 
 class ContributorAffiliation():
     phone = None
@@ -397,6 +418,7 @@ class eLifePOA():
         self.manuscript = None
         self.dates = None
         self.license = None
+        self.article_categories = []
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -411,6 +433,15 @@ class eLifePOA():
             return self.dates[date_type]
         except (KeyError, TypeError):
             return None
+        
+    def get_display_channel(self):
+        # display-channel string relates to the articleType
+        if self.articleType == "research-article":
+            return "Research article"
+        return None
+    
+    def add_article_category(self, article_category):
+        self.article_categories.append(article_category)
 
 def repl(m):
     # Convert hex to int to unicode character
@@ -494,6 +525,8 @@ if __name__ == '__main__':
     newArticle.add_date(date_license)
     
     newArticle.license = license
+    
+    newArticle.add_article_category("Cell biology")
 
     # test the XML generator 
     eXML = eLife2XML(newArticle)
