@@ -600,7 +600,7 @@ if __name__ == '__main__':
     abstract = "Test abstract"
     newArticle = eLifePOA(doi, title)
     newArticle.abstract = abstract
-    newArticle.conflict_default = "The authors have declared that no competing interests exist"
+    newArticle.conflict_default = None
     
     newArticle.add_ethic("Human subjects: The eLife IRB approved our study")
     newArticle.add_ethic("Animal experimentation: This study was performed in strict accordance with the recommendations in the Guide for the Care and Use of Laboratory Animals of the National Institutes of Health. All of the animals were handled according to approved institutional animal care and use committee (IACUC) protocols (#08-133) of the University of Arizona. The protocol was approved by the Committee on the Ethics of Animal Experiments of the University of Minnesota (Permit Number: 27-2956).")
