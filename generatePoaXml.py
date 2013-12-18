@@ -52,12 +52,58 @@ class eLife2XML(object):
     def build(self, root, poa_article):
         self.set_frontmatter(self.root, poa_article)
         # self.set_title(self.root, poa_article)
+        self.set_backmatter(self.root, poa_article)
 
     def set_frontmatter(self, parent, poa_article):
         self.front = SubElement(parent, 'front')
         self.set_journal_meta(self.front)
         self.set_article_meta(self.front, poa_article)        
 
+    def set_backmatter(self, parent, poa_article):
+        self.back = SubElement(parent, 'back')
+        if poa_article.has_contributor_conflict() or poa_article.conflict_default:
+            self.set_fn_group_competing_interest(self.back, poa_article)
+        if len(poa_article.ethics) > 0:
+            self.set_fn_group_ethics_information(self.back, poa_article)
+     
+    def set_fn_group_competing_interest(self, parent, poa_article):
+        self.competing_interest = SubElement(parent, "fn-group")
+        self.competing_interest.set("content-type", "competing-interest")
+        title = SubElement(self.competing_interest, "title")
+        title.text = "Competing interest"
+        
+        conflict_count = 0
+        for contributor in poa_article.contributors:
+            if contributor.conflict:
+                id = "conf" + str(conflict_count + 1)
+                fn = SubElement(self.competing_interest, "fn")
+                fn.set("fn-type", "conflict")
+                fn.set("id", id)
+                p = SubElement(fn, "p")
+                p.text = contributor.given_name + " " + contributor.surname + ", "
+                p.text = p.text + contributor.conflict
+                # increment
+                conflict_count = conflict_count + 1
+        # default when no conflicts
+        if conflict_count == 0 and poa_article.conflict_default:
+            id = "conf1"
+            fn = SubElement(self.competing_interest, "fn")
+            fn.set("fn-type", "conflict")
+            fn.set("id", id)
+            p = SubElement(fn, "p")
+            p.text = poa_article.conflict_default
+
+    def set_fn_group_ethics_information(self, parent, poa_article):
+        self.competing_interest = SubElement(parent, "fn-group")
+        self.competing_interest.set("content-type", "ethics-information")
+        title = SubElement(self.competing_interest, "title")
+        title.text = "Ethics"
+        
+        for ethic in poa_article.ethics:
+            fn = SubElement(self.competing_interest, "fn")
+            fn.set("fn-type", "other")
+            p = SubElement(fn, "p")
+            p.text = ethic
 
     def set_article_meta(self, parent, poa_article):
         self.article_meta = SubElement(parent, "article-meta")
@@ -360,6 +406,7 @@ class eLifePOSContributor():
     auth_id = None
     orcid = None
     collab = None
+    conflict = None
 
     def __init__(self, contrib_type, surname, given_name, collab = None):
         self.contrib_type = contrib_type
@@ -370,6 +417,9 @@ class eLifePOSContributor():
 
     def set_affiliation(self, affiliation):
         self.affiliations.append(affiliation)
+        
+    def set_conflict(self, conflict):
+        self.conflict = conflict
 
 class eLifeDate():
     """
@@ -438,6 +488,8 @@ class eLifePOA():
         self.dates = None
         self.license = None
         self.article_categories = []
+        self.conflict_default = None
+        self.ethics = []
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -464,6 +516,16 @@ class eLifePOA():
     
     def add_article_category(self, article_category):
         self.article_categories.append(article_category)
+        
+    def has_contributor_conflict(self):
+        # Return True if any contributors have a conflict
+        for contributor in self.contributors:
+            if contributor.conflict:
+                return True
+        return False
+    
+    def add_ethic(self, ethic):
+        self.ethics.append(ethic)
 
 def repl(m):
     # Convert hex to int to unicode character
@@ -510,6 +572,7 @@ if __name__ == '__main__':
     auth1.orcid = "this is an orcid"
     auth1.set_affiliation(aff1)
     auth1.set_affiliation(aff2)
+    auth1.set_conflict("eLife staff")
 
     auth2 = eLifePOSContributor("author", "Mulvany", "Ian")
     auth2.auth_id = "ANOTHER_ID_2"
@@ -537,6 +600,10 @@ if __name__ == '__main__':
     abstract = "Test abstract"
     newArticle = eLifePOA(doi, title)
     newArticle.abstract = abstract
+    newArticle.conflict_default = None
+    
+    newArticle.add_ethic("Human subjects: The eLife IRB approved our study")
+    newArticle.add_ethic("Animal experimentation: This study was performed in strict accordance with the recommendations in the Guide for the Care and Use of Laboratory Animals of the National Institutes of Health. All of the animals were handled according to approved institutional animal care and use committee (IACUC) protocols (#08-133) of the University of Arizona. The protocol was approved by the Committee on the Ethics of Animal Experiments of the University of Minnesota (Permit Number: 27-2956).")
 
     newArticle.manuscript = manuscript
     newArticle.add_research_organism("E. coli")
