@@ -29,6 +29,8 @@ Currently we have the following groups of data:
 We should split our helper functions across these groups of data, and we should make the call
 based on the documet manuscript number. 
 
+TODO: parse out the handling editor information
+TODO: parse out the ethics information 
 
 """
 
@@ -42,7 +44,36 @@ XLS_FILES = 	{"authors" : "poa_author_v1.01.xls",
 				 "received" : "poa_received.01.xls",
 				 "subjects" : "poa_subject_area_v1.01.xls"}
 
-def set_xls_path(path_type):
+COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
+					"subject_areas" : "poa_s_subjectarea",
+					"licence_id" : "poa_l_license_id",
+					"title" : "poa_m_title",
+					"title" : "poa_m_title",
+					"abstract" : "poa_m_abstract",
+					"doi" : "poa_m_doi",
+					"accepted_date" : "poa_m_accepted_dt",
+					"editor_last_name" : "poa_m_me_last_nm",
+					"editor_first_name" : "poa_m_me_first_nm",
+					"editor_middle_name" : "poa_m_me_middle_nm",
+					"editor_organization" : "poa_m_me_organization", 
+					"editor_department" : "poa_m_me_department", 
+					"editor_country" : "poa_m_me_country",
+					"ethics" : "poa_m_ethics_note",
+					"author_id" : "poa_a_id",
+					"email" : "poa_a_email",
+					"author_type" : "poa_a_type_cde",
+					"dual_corresponding" : "poa_a_dual_corr",
+					"author_last_name": "poa_a_last_nm",
+					"author_first_name": "poa_a_first_nm",
+					"author_middle_name" : "poa_a_middle_nm",
+					"author_organisation" : "poa_a_organization",
+					"author_department" : "poa_a_department",
+					"author_city" : "poa_a_city", 
+					"author_country" : "poa_a_country",
+					"author_state" : "poa_a_state"
+				  }
+
+def get_xls_path(path_type):
 	"""
 	sets the location of the path to the author xls file 
 	returns the path 
@@ -55,7 +86,7 @@ def set_xls_path(path_type):
 
 ## general functions for getting data from the XLS file
 def get_xls_sheet(table_type):
-	path = set_xls_path(table_type)	
+	path = get_xls_path(table_type)	
 	wb = xlrd.open_workbook(path)
 	sheet = wb.sheet_by_index(0)
 	return sheet 
@@ -90,7 +121,7 @@ def index_table_on_article_id(table_type):
 	the name of the manuscript number column is hard wired in this function. 
 	"""
 
-	path = set_xls_path(table_type)
+	path = get_xls_path(table_type)
 
 	# get the data and the row of colnames 
 	data_rows = get_xls_data_rows(table_type)
@@ -104,27 +135,6 @@ def index_table_on_article_id(table_type):
 		# print article_id, author_id 
 	return article_index 
 
-# def index_property_on_article_id(table_type, property_id):
-# 	"""
-# 	as we are going to be doing a lot of looking up authors by 
-# 	author_id and manuscript_id, 
-# 	so we are going to make a dict of dicts indexed on manuscript is and then author id 
-# 	"""
-# 	table_type = table_type
-# 	col_names = get_xls_col_names(table_type)
-# 	author_table = index_table_on_article_id(table_type)
-
-# 	article_ids = author_table.keys()
-# 	article_author_index = {} # this is the key item we will return our of this function 
-# 	for article_id in article_ids:
-# 		rows = author_table[article_id]
-# 		author_index =  defaultdict(list)
-# 		for row in rows:
-# 			author_id = get_cell_value(property_id, col_names, row)
-# 			author_index[author_id] = row 
-# 		article_author_index[article_id] = author_index
-# 	return article_author_index
-
 def index_authors_on_article_id():
 	return index_table_on_article_id("authors")
 
@@ -132,19 +142,18 @@ def index_authors_on_author_id():
 	# """
 	# as we are going to be doing a lot of looking up authors by 
 	# author_id and manuscript_id, 
-	# so we are going to make a dict of dicts indexed on manuscript is and then author id 
+	# so we are going to make a dict of dicts indexed on manuscript id and then author id 
 	# """
 	table_type = "authors"
 	col_names = get_xls_col_names(table_type)
 	author_table = index_authors_on_article_id()
 
 	article_ids = author_table.keys()
-	article_author_index = {} # this is the key item we will return our of this function 
+	article_author_index = {}  # this is the key item we will return our of this function 
 	for article_id in article_ids:
 		rows = author_table[article_id]
 		author_index =  defaultdict()
 		for row in rows:
-			#author_index = {}
 			author_id = get_cell_value("poa_a_id", col_names, row)
 			author_index[author_id] = row 
 		article_author_index[article_id] = author_index
@@ -162,9 +171,6 @@ def index_manuscript_on_article_id():
 ##functions for abstracting calls to specific data entries 
 
 def get_article_attributes(article_id, attribute_type, attribute_label):
-	"""
-
-	"""
 	attributes = []
 	attribute_index = index_table_on_article_id(attribute_type)
 	col_names = get_xls_col_names(attribute_type)
@@ -176,70 +182,69 @@ def get_article_attributes(article_id, attribute_type, attribute_label):
 # subjects table
 
 def get_subjects(article_id):
-	subjects = get_article_attributes(article_id, "subjects", "poa_s_subjectarea")
+	subjects = get_article_attributes(article_id, "subjects", COLUMN_HEADINGS["subject_areas"])
 	return subjects
 
 # licence table
 
 def get_licence(article_id):
-	licence_id = get_article_attributes(article_id, "licence", "poa_l_license_id")[0]
+	licence_id = get_article_attributes(article_id, "licence", COLUMN_HEADINGS["licence_id"])[0]
 	return licence_id
 
 # manuscript table
 
 def get_title(article_id):
-	titles = get_article_attributes(article_id, "manuscript", "poa_m_title")
+	titles = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["title"])
 	title = titles[0]
 	return title
 
 def get_abstract(article_id):
-	abstracts = get_article_attributes(article_id, "manuscript", "poa_m_abstract")
+	abstracts = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["abstract"])
 	abstract = abstracts[0]
 	return abstract
 
 def get_doi(article_id):
-	doi = get_article_attributes(article_id, "manuscript", "poa_m_doi")[0]
+	doi = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["doi"])[0]
 	return doi 
 
 def get_accepted_date(article_id):
-	accepted_date = get_article_attributes(article_id, "manuscript", "poa_m_accepted_dt")[0]
+	accepted_date = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["accepted_date"])[0]
 	return accepted_date
 
 def get_me_last_nm(article_id):
-	me_last_nm = get_article_attributes(article_id, "manuscript", "poa_m_me_last_nm")[0]
+	me_last_nm = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_last_name"])[0]
 	return me_last_nm
 
 def get_me_first_nm(article_id):
-	me_first_nm = get_article_attributes(article_id, "manuscript", "poa_m_me_first_nm")[0]
+	me_first_nm = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_first_name"])[0]
 	return me_first_nm
 
 def get_me_middle_nm(article_id):
-	me_middle_nm = get_article_attributes(article_id, "manuscript", "poa_m_me_middle_nm")[0]
+	me_middle_nm = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_middle_name"])[0]
 	return me_middle_nm
 
 def get_me_org(article_id):
-	me_org = get_article_attributes(article_id, "manuscript", "poa_m_me_organization")[0]
+	me_org = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_organization"])[0]
 	return me_org 
 
 def get_me_department(article_id):
-	me_department = get_article_attributes(article_id, "manuscript", "poa_m_me_department")[0]
+	me_department = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_department"])[0]
 	return me_department
 
 def get_me_country(article_id):
-	me_country = get_article_attributes(article_id, "manuscript", "poa_m_me_country")[0]
+	me_country = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["country"])[0]
 	return me_country
-	"poa_m_me_country"	
 
 def get_ethics(article_id):
 	"""
 	needs a bit of refinement owing to serilaising of data by EJP
 	"""
-	ethics = get_article_attributes(article_id, "manuscript", "poa_m_ethics_note")[0]
+	ethics = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["ethics"])[0]
 	return ethics 
 
 # authors table
 def get_author_ids(article_id):
-	author_ids = get_article_attributes(article_id, "authors", "poa_a_id")
+	author_ids = get_article_attributes(article_id, "authors", COLUMN_HEADINGS["author_id"])
 	return author_ids
 
 def get_author_attribute(article_id, author_id, attribute_name):
@@ -250,96 +255,55 @@ def get_author_attribute(article_id, author_id, attribute_name):
 	return attribute
 
 def get_author_position(article_id, author_id):
-	position = get_author_attribute(article_id, author_id, "poa_a_seq")
-	return position
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_position"])
+	return attribute
 
 def get_author_email(article_id, author_id):
-	email = get_author_attribute(article_id, author_id, "poa_a_email")
-	return email 
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["email"])
+	return attribute 
 
 def get_author_contrib_type(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_type_cde")
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_type"])
 	return attribute 
 
 def get_author_dual_corresponding(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_dual_corr")
-	return attribute 
-
-def get_author_dual_corresponding(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_dual_corr")
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["dual_corresponding"])
 	return attribute 
 
 def get_author_last_name(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_last_nm")
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_last_name"])
 	return attribute 
 
 def get_author_first_name(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_first_nm")
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_first_name"])
 	return attribute 
 
 def get_author_middle_name(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_middle_nm")
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_middle_name"])
 	return attribute 
 
 def get_author_organisation(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_organization")
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_organisation"])
 	return attribute 
 
 def get_author_department(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_department")
-	return attribute 
-
-def get_author_addr1(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_addr1")
-	return attribute 
-
-def get_author_addr2(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_addr2")
-	return attribute 
-
-def get_author_addr3(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_addr3")
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_department"])
 	return attribute 
 
 def get_author_city(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_city")
-	return attribute 
-
-def get_author_zip(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_zip")
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_city"])
 	return attribute 
 
 def get_author_country(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_country")
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_country"])
 	return attribute 
 
 def get_author_state(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_state")
-	return attribute 
-
-def get_author_tel(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_tel")
-	return attribute 
-
-def get_author_alt_tel(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_tel_alt1")
-	return attribute 
-
-def get_author_alt_tel2(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_tel_alt2")
-	return attribute 
-
-def get_author_fax(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_fax")
-	return attribute 
-
-def get_author_job_title(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, "poa_a_job_title")
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_state"])
 	return attribute 
 
 ## conversion functions
 def doi2uri(doi):
-	""
 	uri = "http://dx.doi.org/" + doi
 	return uri 
 
