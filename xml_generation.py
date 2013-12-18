@@ -88,7 +88,7 @@ def build_xml_for_article(article_id):
 
 if __name__ == "__main__":
 	# get a list of active article numbers 
-	article_ids = index_manuscript_on_article_id().keys()
+	article_ids = index_authors_on_article_id().keys()
 
 	for article_id in article_ids:
 		try: 

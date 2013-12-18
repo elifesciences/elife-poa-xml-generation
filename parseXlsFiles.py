@@ -179,23 +179,8 @@ def index_authors_on_author_id():
 		article_author_index[article_id] = author_index
 	return article_author_index
 
-@memoize
-def index_subjects_on_article_id():
-	return index_table_on_article_id("subjects")
-
-@memoize
-def index_received_on_article_id():
-	return index_table_on_article_id("received")
-
-@memoize
-def index_manuscript_on_article_id():
-	return index_table_on_article_id("manuscript")
-
-@memoize
-def index_organisims_on_article_id():
-	return index_table_on_article_id("organisims")
-
 ##functions for abstracting calls to specific data entries 
+@memoize 
 def get_article_attributes(article_id, attribute_type, attribute_label):
 	attributes = []
 	attribute_index = index_table_on_article_id(attribute_type)
