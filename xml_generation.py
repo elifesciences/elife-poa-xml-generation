@@ -55,32 +55,34 @@ def build_xml_for_article(article_id):
 	author_ids = get_author_ids(article_id)
 	for author_id in author_ids:
 
-		# create affilication infromation for author, need to know 
-		# if they are corresponding or not 
+		author_type = "author"
+		first_name = get_author_first_name(article_id, author_id)			
+		last_name = get_author_last_name(article_id, author_id)	
+
+		author = eLifePOSContributor(author_type, last_name, first_name)
+		affiliation = ContributorAffiliation()
+
 		department = get_author_department(article_id, author_id)
 		institution = get_author_organisation(article_id, author_id)
 		country = get_author_country(article_id, author_id)
 		city = get_author_city(article_id, author_id)
-		email = get_author_email(article_id, author_id)
 
-		affiliation = ContributorAffiliation()
 		affiliation.department = department
 		affiliation.institution = institution
 		affiliation.city = city
 		affiliation.country = country
-		affiliation.email = email 
 
 		contrib_type = get_author_contrib_type(article_id, author_id)
-		first_name = get_author_first_name(article_id, author_id)			
-		last_name = get_author_last_name(article_id, author_id)	
+		if contrib_type == "Corresponding Author":
+			email = get_author_email(article_id, author_id)
+			affiliation.email = email 
+		
+		if contrib_type == "Corresponding Author":
+			author.corresp = True
 
-		author = eLifePOSContributor(contrib_type, last_name, first_name)		
 		author.auth_id = `int(author_id)`
-		author.corresp = True
 		author.set_affiliation(affiliation)
-
 		article.add_contributor(author)
-
 
 	article_xml = eLife2XML(article)
 	return article_xml
@@ -94,7 +96,7 @@ if __name__ == "__main__":
 		try: 
 			xml = build_xml_for_article(article_id)
 			print "xml built for ", article_id
-			# print xml.prettyXML()
+			print xml.prettyXML()
 		except:
 			print "xml build failed for", article_id
  
