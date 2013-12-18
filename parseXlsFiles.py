@@ -36,13 +36,13 @@ TODO: parse out the ethics information
 
 ROWS_WITH_COLNAMES = 3
 DATA_START_ROW = 4
-XLS_PATH = "/Users/ian/Dropbox/code/private-code/poa-xls-files/ejp_queries_v1.01/"
+XLS_PATH = "/Users/ian/Dropbox/code/private-code/poa-xls-files/ejp_queries_v1.04/"
 ## set location of xls files 
-XLS_FILES = 	{"authors" : "poa_author_v1.01.xls",
-				 "licence" : "poa_license_v1.01.xls",
-				 "manuscript" : "poa_manuscript_v1.01.xls",
-				 "received" : "poa_received.01.xls",
-				 "subjects" : "poa_subject_area_v1.01.xls"}
+XLS_FILES = 	{"authors" : "poa_author_v1.04.xls",
+				 "licence" : "poa_license_v1.04.xls",
+				 "manuscript" : "poa_manuscript_v1.04.xls",
+				 "received" : "poa_received.04.xls",
+				 "subjects" : "poa_subject_area_v1.04.xls"}
 
 COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"subject_areas" : "poa_s_subjectarea",
@@ -73,6 +73,18 @@ COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"author_state" : "poa_a_state"
 				  }
 
+def memoize(f):
+    """ Memoization decorator for functions taking one or more arguments. """
+    class memodict(dict):
+        def __init__(self, f):
+            self.f = f
+        def __call__(self, *args):
+            return self[args]
+        def __missing__(self, key):
+            ret = self[key] = self.f(*key)
+            return ret
+    return memodict(f)
+
 def get_xls_path(path_type):
 	"""
 	sets the location of the path to the author xls file 
@@ -85,17 +97,20 @@ def get_xls_path(path_type):
 	return path 
 
 ## general functions for getting data from the XLS file
+@memoize
 def get_xls_sheet(table_type):
 	path = get_xls_path(table_type)	
 	wb = xlrd.open_workbook(path)
 	sheet = wb.sheet_by_index(0)
 	return sheet 
 
+@memoize
 def get_xls_col_names(table_type):
 	sheet = get_xls_sheet(table_type)
 	col_names = sheet.row_values(ROWS_WITH_COLNAMES)
 	return col_names	
 
+@memoize
 def get_xls_data_rows(table_type):
 	sheet = get_xls_sheet(table_type)
 	rows = []
@@ -114,6 +129,7 @@ def get_cell_value(col_name, col_names, row):
 	cell_value = row[position]
 	return cell_value
 
+@memoize
 def index_table_on_article_id(table_type):
 	"""
 	return a dict of the XLS file keyed on article_id 
@@ -135,9 +151,11 @@ def index_table_on_article_id(table_type):
 		# print article_id, author_id 
 	return article_index 
 
+@memoize
 def index_authors_on_article_id():
 	return index_table_on_article_id("authors")
 
+@memoize
 def index_authors_on_author_id():
 	# """
 	# as we are going to be doing a lot of looking up authors by 
@@ -159,17 +177,19 @@ def index_authors_on_author_id():
 		article_author_index[article_id] = author_index
 	return article_author_index
 
+@memoize
 def index_subjects_on_article_id():
 	return index_table_on_article_id("subjects")
 
+@memoize
 def index_received_on_article_id():
 	return index_table_on_article_id("received")
 
+@memoize
 def index_manuscript_on_article_id():
 	return index_table_on_article_id("manuscript")
 
 ##functions for abstracting calls to specific data entries 
-
 def get_article_attributes(article_id, attribute_type, attribute_label):
 	attributes = []
 	attribute_index = index_table_on_article_id(attribute_type)
