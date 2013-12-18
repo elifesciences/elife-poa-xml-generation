@@ -51,13 +51,16 @@ class eLife2XML(object):
     def build(self, root, poa_article):
         self.set_frontmatter(self.root, poa_article)
         # self.set_title(self.root, poa_article)
+        self.set_backmatter(self.root, poa_article)
 
     def set_frontmatter(self, parent, poa_article):
         self.front = SubElement(parent, 'front')
         self.set_journal_meta(self.front)
         self.set_article_meta(self.front, poa_article)        
 
-
+    def set_backmatter(self, parent, poa_article):
+        self.front = SubElement(parent, 'back')
+     
     def set_article_meta(self, parent, poa_article):
         self.article_meta = SubElement(parent, "article-meta")
         
@@ -297,7 +300,7 @@ class eLife2XML(object):
         reparsed = minidom.parseString(rough_string)
         if doctype:
             reparsed.insertBefore(doctype, reparsed.documentElement)
-        return reparsed.toprettyxml(indent="\t")
+        return reparsed.toprettyxml(indent="\t", encoding = encoding)
 
 class ContributorAffiliation():
     phone = None
