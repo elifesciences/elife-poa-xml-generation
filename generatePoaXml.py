@@ -60,7 +60,8 @@ class eLife2XML(object):
 
     def set_backmatter(self, parent, poa_article):
         self.back = SubElement(parent, 'back')
-        self.set_fn_group_competing_interest(self.back, poa_article)
+        if poa_article.has_contributor_conflict() or poa_article.conflict_default:
+            self.set_fn_group_competing_interest(self.back, poa_article)
      
     def set_fn_group_competing_interest(self, parent, poa_article):
         self.competing_interest = SubElement(parent, "fn-group")
@@ -81,13 +82,13 @@ class eLife2XML(object):
                 # increment
                 conflict_count = conflict_count + 1
         # default when no conflicts
-        if conflict_count == 0:
+        if conflict_count == 0 and poa_article.conflict_default:
             id = "conf1"
             fn = SubElement(self.competing_interest, "fn")
             fn.set("fn-type", "conflict")
             fn.set("id", id)
             p = SubElement(fn, "p")
-            p.text = "The authors have declared that no competing interests exist"
+            p.text = poa_article.conflict_default
 
     def set_article_meta(self, parent, poa_article):
         self.article_meta = SubElement(parent, "article-meta")
@@ -432,6 +433,7 @@ class eLifePOA():
         self.manuscript = None
         self.dates = None
         self.license = None
+        self.conflict_default = None
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -446,6 +448,13 @@ class eLifePOA():
             return self.dates[date_type]
         except (KeyError, TypeError):
             return None
+        
+    def has_contributor_conflict(self):
+        # Return True if any contributors have a conflict
+        for contributor in self.contributors:
+            if contributor.conflict:
+                return True
+        return False
 
 def repl(m):
     # Convert hex to int to unicode character
@@ -519,6 +528,7 @@ if __name__ == '__main__':
     abstract = "Test abstract"
     newArticle = eLifePOA(doi, title)
     newArticle.abstract = abstract
+    newArticle.conflict_default = "The authors have declared that no competing interests exist"
 
     newArticle.add_contributor(auth1)
     newArticle.add_contributor(auth2)
