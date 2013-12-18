@@ -62,6 +62,8 @@ class eLife2XML(object):
         self.back = SubElement(parent, 'back')
         if poa_article.has_contributor_conflict() or poa_article.conflict_default:
             self.set_fn_group_competing_interest(self.back, poa_article)
+        if len(poa_article.ethics) > 0:
+            self.set_fn_group_ethics_information(self.back, poa_article)
      
     def set_fn_group_competing_interest(self, parent, poa_article):
         self.competing_interest = SubElement(parent, "fn-group")
@@ -89,6 +91,18 @@ class eLife2XML(object):
             fn.set("id", id)
             p = SubElement(fn, "p")
             p.text = poa_article.conflict_default
+
+    def set_fn_group_ethics_information(self, parent, poa_article):
+        self.competing_interest = SubElement(parent, "fn-group")
+        self.competing_interest.set("content-type", "ethics-information")
+        title = SubElement(self.competing_interest, "title")
+        title.text = "Ethics"
+        
+        for ethic in poa_article.ethics:
+            fn = SubElement(self.competing_interest, "fn")
+            fn.set("fn-type", "other")
+            p = SubElement(fn, "p")
+            p.text = ethic
 
     def set_article_meta(self, parent, poa_article):
         self.article_meta = SubElement(parent, "article-meta")
@@ -434,6 +448,7 @@ class eLifePOA():
         self.dates = None
         self.license = None
         self.conflict_default = None
+        self.ethics = []
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -455,6 +470,9 @@ class eLifePOA():
             if contributor.conflict:
                 return True
         return False
+    
+    def add_ethic(self, ethic):
+        self.ethics.append(ethic)
 
 def repl(m):
     # Convert hex to int to unicode character
@@ -529,6 +547,9 @@ if __name__ == '__main__':
     newArticle = eLifePOA(doi, title)
     newArticle.abstract = abstract
     newArticle.conflict_default = "The authors have declared that no competing interests exist"
+    
+    newArticle.add_ethic("Human subjects: The eLife IRB approved our study")
+    newArticle.add_ethic("Animal experimentation: This study was performed in strict accordance with the recommendations in the Guide for the Care and Use of Laboratory Animals of the National Institutes of Health. All of the animals were handled according to approved institutional animal care and use committee (IACUC) protocols (#08-133) of the University of Arizona. The protocol was approved by the Committee on the Ethics of Animal Experiments of the University of Minnesota (Permit Number: 27-2956).")
 
     newArticle.add_contributor(auth1)
     newArticle.add_contributor(auth2)
