@@ -18,7 +18,7 @@ Currently we have the following groups of data:
 
 	author
 
-	licence
+	license
 
 	manuscript 
 
@@ -39,7 +39,7 @@ DATA_START_ROW = 4
 XLS_PATH = "/Users/ian/Dropbox/code/private-code/poa-xls-files/ejp_queries_v1.04/"
 ## set location of xls files 
 XLS_FILES = 	{"authors" : "poa_author_v1.04.xls",
-				 "licence" : "poa_license_v1.04.xls",
+				 "license" : "poa_license_v1.04.xls",
 				 "manuscript" : "poa_manuscript_v1.04.xls",
 				 "received" : "poa_received.04.xls",
 				 "subjects" : "poa_subject_area_v1.04.xls",
@@ -47,8 +47,7 @@ XLS_FILES = 	{"authors" : "poa_author_v1.04.xls",
 
 COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"subject_areas" : "poa_s_subjectarea",
-					"licence_id" : "poa_l_license_id",
-					"title" : "poa_m_title",
+					"license_id" : "poa_l_license_id",
 					"title" : "poa_m_title",
 					"abstract" : "poa_m_abstract",
 					"doi" : "poa_m_doi",
@@ -56,7 +55,7 @@ COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"editor_last_name" : "poa_m_me_last_nm",
 					"editor_first_name" : "poa_m_me_first_nm",
 					"editor_middle_name" : "poa_m_me_middle_nm",
-					"editor_organization" : "poa_m_me_organization", 
+					"editor_organisation" : "poa_m_me_organization", 
 					"editor_department" : "poa_m_me_department", 
 					"editor_country" : "poa_m_me_country",
 					"ethics" : "poa_m_ethics_note",
@@ -72,8 +71,8 @@ COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"author_city" : "poa_a_city", 
 					"author_country" : "poa_a_country",
 					"author_state" : "poa_a_state",
-					"organisims" : "poa_ro_researchorganism"
-				  }
+					"organisms" : "poa_ro_researchorganism"
+				}
 
 def memoize(f):
     """ Memoization decorator for functions taking one or more arguments. """
@@ -196,17 +195,17 @@ def get_subjects(article_id):
 	subjects = get_article_attributes(article_id, "subjects", COLUMN_HEADINGS["subject_areas"])
 	return subjects
 
-# organisims table
+# organisms table
 
-def get_organisims(article_id):
-	subjects = get_article_attributes(article_id, "organisims", COLUMN_HEADINGS["organisims"])
+def get_organisms(article_id):
+	subjects = get_article_attributes(article_id, "organisms", COLUMN_HEADINGS["organisims"])
 	return subjects
 
-# licence table
+# license table
 
-def get_licence(article_id):
-	licence_id = get_article_attributes(article_id, "licence", COLUMN_HEADINGS["licence_id"])[0]
-	return licence_id
+def get_license(article_id):
+	license_id = get_article_attributes(article_id, "license", COLUMN_HEADINGS["license_id"])[0]
+	return license_id
 
 # manuscript table
 
@@ -241,7 +240,7 @@ def get_me_middle_nm(article_id):
 	return me_middle_nm
 
 def get_me_org(article_id):
-	me_org = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_organization"])[0]
+	me_org = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_organisation"])[0]
 	return me_org 
 
 def get_me_department(article_id):
@@ -350,8 +349,8 @@ if __name__ == "__main__":
 	abstracts = get_abstract(test_article_id)
 	print abstracts
 
-	licence_id = get_licence(test_article_id)
-	print licence_id
+	license_id = get_license(test_article_id)
+	print license_id
 
 	author_ids = get_author_ids(test_article_id)
 	print author_ids
