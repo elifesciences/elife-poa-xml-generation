@@ -253,13 +253,23 @@ class eLife2XML(object):
                     self.email.text = affiliation.email
 
     def set_article_categories(self, parent, poa_article):
-        # subj-group subj-group-type="display-channel"
-        if poa_article.get_display_channel():
+        # article-categories
+        if poa_article.get_display_channel() or len(poa_article.article_categories) > 0:
             self.article_categories = SubElement(parent, "article-categories")
-            subj_group = SubElement(self.article_categories, "subj-group")
-            subj_group.set("subj-group-type", "display-channel")
-            subject = SubElement(subj_group, "subject")
-            subject.text = poa_article.get_display_channel()
+            
+            if poa_article.get_display_channel():
+                # subj-group subj-group-type="display-channel"
+                subj_group = SubElement(self.article_categories, "subj-group")
+                subj_group.set("subj-group-type", "display-channel")
+                subject = SubElement(subj_group, "subject")
+                subject.text = poa_article.get_display_channel()
+            
+            for article_category in poa_article.article_categories:
+                # subj-group subj-group-type="heading"
+                subj_group = SubElement(self.article_categories, "subj-group")
+                subj_group.set("subj-group-type", "heading")
+                subject = SubElement(subj_group, "subject")
+                subject.text = article_category
 
     def set_pub_date(self, parent, poa_article, pub_type):
         # pub-date pub-type = pub_type
@@ -408,6 +418,7 @@ class eLifePOA():
         self.manuscript = None
         self.dates = None
         self.license = None
+        self.article_categories = []
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -428,6 +439,9 @@ class eLifePOA():
         if self.articleType == "research-article":
             return "Research article"
         return None
+    
+    def add_article_category(self, article_category):
+        self.article_categories.append(article_category)
 
 def repl(m):
     # Convert hex to int to unicode character
@@ -511,6 +525,8 @@ if __name__ == '__main__':
     newArticle.add_date(date_license)
     
     newArticle.license = license
+    
+    newArticle.add_article_category("Cell biology")
 
     # test the XML generator 
     eXML = eLife2XML(newArticle)
