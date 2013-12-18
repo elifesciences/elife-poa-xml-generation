@@ -59,8 +59,36 @@ class eLife2XML(object):
         self.set_article_meta(self.front, poa_article)        
 
     def set_backmatter(self, parent, poa_article):
-        self.front = SubElement(parent, 'back')
+        self.back = SubElement(parent, 'back')
+        self.set_fn_group_competing_interest(self.back, poa_article)
      
+    def set_fn_group_competing_interest(self, parent, poa_article):
+        self.competing_interest = SubElement(parent, "fn-group")
+        self.competing_interest.set("content-type", "competing-interest")
+        title = SubElement(self.competing_interest, "title")
+        title.text = "Competing interest"
+        
+        conflict_count = 0
+        for contributor in poa_article.contributors:
+            if contributor.conflict:
+                id = "conf" + str(conflict_count + 1)
+                fn = SubElement(self.competing_interest, "fn")
+                fn.set("fn-type", "conflict")
+                fn.set("id", id)
+                p = SubElement(fn, "p")
+                p.text = contributor.given_name + " " + contributor.surname + ", "
+                p.text = p.text + contributor.conflict
+                # increment
+                conflict_count = conflict_count + 1
+        # default when no conflicts
+        if conflict_count == 0:
+            id = "conf1"
+            fn = SubElement(self.competing_interest, "fn")
+            fn.set("fn-type", "conflict")
+            fn.set("id", id)
+            p = SubElement(fn, "p")
+            p.text = "The authors have declared that no competing interests exist"
+
     def set_article_meta(self, parent, poa_article):
         self.article_meta = SubElement(parent, "article-meta")
         
@@ -324,6 +352,7 @@ class eLifePOSContributor():
     auth_id = None
     orcid = None
     collab = None
+    conflict = None
 
     def __init__(self, contrib_type, surname, given_name, collab = None):
         self.contrib_type = contrib_type
@@ -334,6 +363,9 @@ class eLifePOSContributor():
 
     def set_affiliation(self, affiliation):
         self.affiliations.append(affiliation)
+        
+    def set_conflict(self, conflict):
+        self.conflict = conflict
 
 class eLifeDate():
     """
@@ -460,6 +492,7 @@ if __name__ == '__main__':
     auth1.orcid = "this is an orcid"
     auth1.set_affiliation(aff1)
     auth1.set_affiliation(aff2)
+    auth1.set_conflict("eLife staff")
 
     auth2 = eLifePOSContributor("author", "Mulvany", "Ian")
     auth2.auth_id = "ANOTHER_ID_2"
