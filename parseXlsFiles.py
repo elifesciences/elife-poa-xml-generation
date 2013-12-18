@@ -42,7 +42,8 @@ XLS_FILES = 	{"authors" : "poa_author_v1.04.xls",
 				 "licence" : "poa_license_v1.04.xls",
 				 "manuscript" : "poa_manuscript_v1.04.xls",
 				 "received" : "poa_received.04.xls",
-				 "subjects" : "poa_subject_area_v1.04.xls"}
+				 "subjects" : "poa_subject_area_v1.04.xls",
+				 "organisims": "poa_research_organism_v1.04.xls"}
 
 COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"subject_areas" : "poa_s_subjectarea",
@@ -70,7 +71,8 @@ COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"author_department" : "poa_a_department",
 					"author_city" : "poa_a_city", 
 					"author_country" : "poa_a_country",
-					"author_state" : "poa_a_state"
+					"author_state" : "poa_a_state",
+					"organisims" : "poa_ro_researchorganism"
 				  }
 
 def memoize(f):
@@ -189,6 +191,10 @@ def index_received_on_article_id():
 def index_manuscript_on_article_id():
 	return index_table_on_article_id("manuscript")
 
+@memoize
+def index_organisims_on_article_id():
+	return index_table_on_article_id("organisims")
+
 ##functions for abstracting calls to specific data entries 
 def get_article_attributes(article_id, attribute_type, attribute_label):
 	attributes = []
@@ -203,6 +209,12 @@ def get_article_attributes(article_id, attribute_type, attribute_label):
 
 def get_subjects(article_id):
 	subjects = get_article_attributes(article_id, "subjects", COLUMN_HEADINGS["subject_areas"])
+	return subjects
+
+# organisims table
+
+def get_organisims(article_id):
+	subjects = get_article_attributes(article_id, "organisims", COLUMN_HEADINGS["organisims"])
 	return subjects
 
 # licence table

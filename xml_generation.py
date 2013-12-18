@@ -46,6 +46,11 @@ def build_xml_for_article(article_id):
 	for category in categories:
 		article.add_article_category(category)
 
+	# research organisim
+	research_organisims = get_organisims(article_id)
+	for research_organisim in research_organisims:
+		article.add_research_organism(research_organisim)
+
 	# author information 
 	author_ids = get_author_ids(article_id)
 	for author_id in author_ids:
@@ -87,8 +92,9 @@ if __name__ == "__main__":
 
 	for article_id in article_ids:
 		try: 
-			build_xml_for_article(article_id)
+			xml = build_xml_for_article(article_id)
 			print "xml built for ", article_id
+			# print xml.prettyXML()
 		except:
 			print "xml build failed for", article_id
  
