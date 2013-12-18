@@ -91,6 +91,9 @@ class eLife2XML(object):
             self.set_permissions(self.article_meta, poa_article)
         #
         self.set_abstract = SubElement(self.article_meta, "abstract")
+        #
+        if len(poa_article.research_organisms) > 0:
+            self.set_kwd_group_research_organism(self.article_meta, poa_article)
         self.set_para = SubElement(self.set_abstract, "p")
         self.set_para.text = poa_article.abstract
 
@@ -250,6 +253,16 @@ class eLife2XML(object):
                     self.email = SubElement(self.aff, "email")
                     self.email.text = affiliation.email
 
+    def set_kwd_group_research_organism(self, parent, poa_article):
+        # kwd-group kwd-group-type="research-organism"
+        self.kwd_group = SubElement(parent, "kwd-group")
+        self.kwd_group.set("kwd-group-type", "research-organism")
+        title = SubElement(self.kwd_group, "title")
+        title.text = "Research organism"
+        for research_organism in poa_article.research_organisms:
+            kwd = SubElement(self.kwd_group, "kwd")
+            kwd.text = research_organism
+
     def set_pub_date(self, parent, poa_article, pub_type):
         # pub-date pub-type = pub_type
         date = poa_article.get_date(pub_type)
@@ -297,7 +310,7 @@ class eLife2XML(object):
         reparsed = minidom.parseString(rough_string)
         if doctype:
             reparsed.insertBefore(doctype, reparsed.documentElement)
-        return reparsed.toprettyxml(indent="\t")
+        return reparsed.toprettyxml(indent="\t", encoding = encoding)
 
 class ContributorAffiliation():
     phone = None
@@ -394,12 +407,16 @@ class eLifePOA():
         self.contributors = [] 
         self.title = title 
         self.abstract = ""
+        self.research_organisms = []
         self.manuscript = None
         self.dates = None
         self.license = None
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
+
+    def add_research_organism(self, research_organism):
+        self.research_organisms.append(research_organism)
 
     def add_date(self, date):
         if not self.dates:
@@ -483,7 +500,10 @@ if __name__ == '__main__':
     abstract = "Test abstract"
     newArticle = eLifePOA(doi, title)
     newArticle.abstract = abstract
-
+    
+    newArticle.add_research_organism("E. coli")
+    newArticle.add_research_organism("Mouse")
+    
     newArticle.add_contributor(auth1)
     newArticle.add_contributor(auth2)
     newArticle.add_contributor(auth3)
