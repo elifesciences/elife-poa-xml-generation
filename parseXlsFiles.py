@@ -249,7 +249,7 @@ def get_me_department(article_id):
 	return me_department
 
 def get_me_country(article_id):
-	me_country = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["country"])[0]
+	me_country = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_country"])[0]
 	return me_country
 
 def get_ethics(article_id):

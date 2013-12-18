@@ -84,6 +84,28 @@ def build_xml_for_article(article_id):
 		author.set_affiliation(affiliation)
 		article.add_contributor(author)
 
+	# handling editor information 
+	author_type = "editor"
+
+	first_name = get_me_first_nm(article_id)
+	last_name = get_me_last_nm(article_id)	
+
+	editor = eLifePOSContributor(author_type, last_name, first_name)
+	affiliation = ContributorAffiliation()
+
+	department = get_me_department(article_id)
+	institution = get_me_org(article_id)
+	country = get_me_country(article_id)
+
+	affiliation.department = department
+	affiliation.institution = institution
+	affiliation.city = city
+	affiliation.country = country
+
+	# editor.auth_id = `int(author_id)`we have a me_id, but I need to determine whether that Id is the same as the relevent author id
+	editor.set_affiliation(affiliation)
+	article.add_contributor(editor)
+
 	article_xml = eLife2XML(article)
 	return article_xml
 
@@ -92,11 +114,13 @@ if __name__ == "__main__":
 	# get a list of active article numbers 
 	article_ids = index_authors_on_article_id().keys()
 
+
 	for article_id in article_ids:
+		# xml = build_xml_for_article(article_id)
 		try: 
 			xml = build_xml_for_article(article_id)
 			print "xml built for ", article_id
-			print xml.prettyXML()
+			# print xml.prettyXML()
 		except:
 			print "xml build failed for", article_id
  
