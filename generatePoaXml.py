@@ -460,7 +460,7 @@ if __name__ == '__main__':
 
     # test affiliations 
     aff1 = ContributorAffiliation()
-    aff1.department = entity_to_unicode("Edit&#x00F3;ri&#x00E1;l Dep&#x00E1;rtment")
+    aff1.department = entity_to_unicode("Edit&#x00F3;ri&#x00E1;l&#x2212;Dep&#x00E1;rtment")
     aff1.institution = "eLife"
     aff1.city = "Cambridge"
     aff1.country = "UK"
