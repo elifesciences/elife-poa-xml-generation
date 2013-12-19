@@ -27,8 +27,8 @@ def build_xml_for_article(article_id):
 	abstract = get_abstract(article_id)
 	article.abstract = abstract
 	#
-	licence_id = get_licence(article_id)
-	license = eLifeLicense(licence_id)
+	license_id = get_license(article_id)
+	license = eLifeLicense(license_id)
 	article.license = license
 	#
 	accepted_date = get_accepted_date(article_id)
@@ -37,7 +37,7 @@ def build_xml_for_article(article_id):
 	accepted = eLifeDate("accepted", t_accepted)
 	article.add_date(accepted)
 	#
-	# set the licence date to be the same as the accepted date
+	# set the license date to be the same as the accepted date
 	date_license = eLifeDate("license", t_accepted)
 	article.add_date(date_license)
 
@@ -55,7 +55,7 @@ def build_xml_for_article(article_id):
 	author_ids = get_author_ids(article_id)
 	for author_id in author_ids:
 
-		# create affilication informatoin for author, need to know 
+		# create affilication information for author, need to know 
 		# if they are corresponding or not 
 
 		affiliation = ContributorAffiliation()
