@@ -254,7 +254,7 @@ class eLife2XML(object):
             if contributor.equal_contrib == True:
                 self.contrib.set("equal_contrib", "yes")
             if contributor.auth_id:
-                self.contrib.set("id", contributor.auth_id)
+                self.contrib.set("id", "author-" + str(contributor.auth_id))
                 
             if contributor.collab:
                 self.collab = SubElement(self.contrib, "collab")
