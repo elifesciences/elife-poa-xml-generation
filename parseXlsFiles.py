@@ -43,7 +43,7 @@ XLS_FILES = 	{"authors" : "poa_author_v1.04.xls",
 				 "manuscript" : "poa_manuscript_v1.04.xls",
 				 "received" : "poa_received.04.xls",
 				 "subjects" : "poa_subject_area_v1.04.xls",
-				 "organisims": "poa_research_organism_v1.04.xls"}
+				 "organisms": "poa_research_organism_v1.04.xls"}
 
 COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"subject_areas" : "poa_s_subjectarea",
@@ -198,7 +198,7 @@ def get_subjects(article_id):
 # organisms table
 
 def get_organisms(article_id):
-	subjects = get_article_attributes(article_id, "organisms", COLUMN_HEADINGS["organisims"])
+	subjects = get_article_attributes(article_id, "organisms", COLUMN_HEADINGS["organisms"])
 	return subjects
 
 # license table
