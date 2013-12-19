@@ -198,8 +198,8 @@ def get_subjects(article_id):
 # organisms table
 
 def get_organisms(article_id):
-	subjects = get_article_attributes(article_id, "organisms", COLUMN_HEADINGS["organisms"])
-	return subjects
+	organisms = get_article_attributes(article_id, "organisms", COLUMN_HEADINGS["organisms"])
+	return organisms
 
 # license table
 
