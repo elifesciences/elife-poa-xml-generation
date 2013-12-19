@@ -248,13 +248,8 @@ def get_me_department(article_id):
 	return attribute
 
 def get_me_country(article_id):
-<<<<<<< HEAD
-	me_country = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_country"])[0]
-	return me_country
-=======
-	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["country"])[0]
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_country"])[0]
 	return attribute
->>>>>>> research-org
 
 def get_ethics(article_id):
 	"""
