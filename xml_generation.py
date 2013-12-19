@@ -96,6 +96,10 @@ def build_xml_for_article(article_id):
 	article_xml = eLife2XML(article)
 	return article_xml
 
+def write_xml(article_id, xml, dir = ''):
+	f = open(dir + 'elife' + str(int(article_id)).zfill(5) + '.xml', "wb")
+	f.write(xml.prettyXML())
+	f.close()
 
 if __name__ == "__main__":
 	# get a list of active article numbers 
@@ -106,6 +110,7 @@ if __name__ == "__main__":
 		# xml = build_xml_for_article(article_id)
 		try: 
 			xml = build_xml_for_article(article_id)
+			write_xml(article_id, xml, dir = 'tmp/')
 			print "xml built for ", article_id
 			# print xml.prettyXML()
 		except:
