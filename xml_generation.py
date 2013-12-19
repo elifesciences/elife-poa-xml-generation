@@ -86,7 +86,7 @@ def build_xml_for_article(article_id):
 	editor = eLifePOSContributor(author_type, last_name, first_name)
 	affiliation = ContributorAffiliation()
 	affiliation.department = get_me_department(article_id)
-	affiliation.institution = get_me_org(article_id)
+	affiliation.institution = get_me_institution(article_id)
 	affiliation.country = get_me_country(article_id)
 
 	# editor.auth_id = `int(author_id)`we have a me_id, but I need to determine whether that Id is the same as the relevent author id
