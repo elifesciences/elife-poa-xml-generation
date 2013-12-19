@@ -192,71 +192,71 @@ def get_article_attributes(article_id, attribute_type, attribute_label):
 # subjects table
 
 def get_subjects(article_id):
-	subjects = get_article_attributes(article_id, "subjects", COLUMN_HEADINGS["subject_areas"])
-	return subjects
+	attribute = get_article_attributes(article_id, "subjects", COLUMN_HEADINGS["subject_areas"])
+	return attribute
 
 # organisms table
 
 def get_organisms(article_id):
-	organisms = get_article_attributes(article_id, "organisms", COLUMN_HEADINGS["organisms"])
-	return organisms
+	attribute = get_article_attributes(article_id, "organisms", COLUMN_HEADINGS["organisms"])
+	return attribute
 
 # license table
 
 def get_license(article_id):
-	license_id = get_article_attributes(article_id, "license", COLUMN_HEADINGS["license_id"])[0]
-	return license_id
+	attribute = get_article_attributes(article_id, "license", COLUMN_HEADINGS["license_id"])[0]
+	return attribute
 
 # manuscript table
 
 def get_title(article_id):
-	titles = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["title"])
-	title = titles[0]
-	return title
+	attributes = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["title"])
+	attribute = attributes[0]
+	return attribute
 
 def get_abstract(article_id):
-	abstracts = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["abstract"])
-	abstract = abstracts[0]
-	return abstract
+	attributes = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["abstract"])
+	attribute = attributes[0]
+	return attribute
 
 def get_doi(article_id):
-	doi = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["doi"])[0]
-	return doi 
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["doi"])[0]
+	return attribute 
 
 def get_accepted_date(article_id):
-	accepted_date = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["accepted_date"])[0]
-	return accepted_date
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["accepted_date"])[0]
+	return attribute
 
 def get_me_last_nm(article_id):
-	me_last_nm = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_last_name"])[0]
-	return me_last_nm
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_last_name"])[0]
+	return attribute
 
 def get_me_first_nm(article_id):
-	me_first_nm = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_first_name"])[0]
-	return me_first_nm
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_first_name"])[0]
+	return attribute
 
 def get_me_middle_nm(article_id):
-	me_middle_nm = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_middle_name"])[0]
-	return me_middle_nm
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_middle_name"])[0]
+	return attribute
 
 def get_me_institution(article_id):
-	me_org = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_institution"])[0]
-	return me_org 
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_institution"])[0]
+	return attribute 
 
 def get_me_department(article_id):
-	me_department = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_department"])[0]
-	return me_department
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_department"])[0]
+	return attribute
 
 def get_me_country(article_id):
-	me_country = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["country"])[0]
-	return me_country
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["country"])[0]
+	return attribute
 
 def get_ethics(article_id):
 	"""
 	needs a bit of refinement owing to serilaising of data by EJP
 	"""
-	ethics = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["ethics"])[0]
-	return ethics 
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["ethics"])[0]
+	return attribute 
 
 # authors table
 def get_author_ids(article_id):
