@@ -57,19 +57,14 @@ def build_xml_for_article(article_id):
 
 		# create affilication infromation for author, need to know 
 		# if they are corresponding or not 
-		department = get_author_department(article_id, author_id)
-		institution = get_author_organisation(article_id, author_id)
-		country = get_author_country(article_id, author_id)
-		city = get_author_city(article_id, author_id)
-		email = get_author_email(article_id, author_id)
 
 		affiliation = ContributorAffiliation()
-		affiliation.department = department
-		affiliation.institution = institution
-		affiliation.city = city
-		affiliation.country = country
-		affiliation.email = email 
-
+		affiliation.department = get_author_department(article_id, author_id)
+		affiliation.institution = get_author_organisation(article_id, author_id)
+		affiliation.city = get_author_city(article_id, author_id)
+		affiliation.country = get_author_country(article_id, author_id)
+		affiliation.email = get_author_email(article_id, author_id)
+ 
 		contrib_type = get_author_contrib_type(article_id, author_id)
 		first_name = get_author_first_name(article_id, author_id)			
 		last_name = get_author_last_name(article_id, author_id)	
@@ -80,7 +75,6 @@ def build_xml_for_article(article_id):
 		author.set_affiliation(affiliation)
 
 		article.add_contributor(author)
-
 
 	article_xml = eLife2XML(article)
 	return article_xml
