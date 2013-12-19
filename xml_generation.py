@@ -55,7 +55,7 @@ def build_xml_for_article(article_id):
 	author_ids = get_author_ids(article_id)
 	for author_id in author_ids:
 
-		# create affilication infromation for author, need to know 
+		# create affilication informatoin for author, need to know 
 		# if they are corresponding or not 
 
 		affiliation = ContributorAffiliation()
