@@ -46,10 +46,10 @@ def build_xml_for_article(article_id):
 	for category in categories:
 		article.add_article_category(category)
 
-	# research organisim
-	research_organisims = get_organisims(article_id)
-	for research_organisim in research_organisims:
-		article.add_research_organism(research_organisim)
+	# research organism
+	research_organisms = get_organisms(article_id)
+	for research_organism in research_organisms:
+		article.add_research_organism(research_organism)
 
 	# author information 
 	author_ids = get_author_ids(article_id)
