@@ -79,6 +79,10 @@ def build_xml_for_article(article_id):
 			affiliation.email = get_author_email(article_id, author_id)
 			author.corresp = True
 
+		conflict = get_author_conflict(article_id, author_id)
+		if conflict.strip() != "":
+			author.set_conflict(conflict)
+
 		author.auth_id = `int(author_id)`
 		author.set_affiliation(affiliation)
 		article.add_contributor(author)

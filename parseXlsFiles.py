@@ -71,6 +71,7 @@ COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"author_city" : "poa_a_city", 
 					"author_country" : "poa_a_country",
 					"author_state" : "poa_a_state",
+					"author_conflict" : "poa_a_cmp",
 					"organisms" : "poa_ro_researchorganism"
 				}
 
@@ -316,6 +317,10 @@ def get_author_country(article_id, author_id):
 
 def get_author_state(article_id, author_id):
 	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_state"])
+	return attribute
+
+def get_author_conflict(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_conflict"])
 	return attribute 
 
 ## conversion functions
