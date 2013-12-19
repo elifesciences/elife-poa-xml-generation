@@ -60,7 +60,7 @@ def build_xml_for_article(article_id):
 
 		affiliation = ContributorAffiliation()
 		affiliation.department = get_author_department(article_id, author_id)
-		affiliation.institution = get_author_organisation(article_id, author_id)
+		affiliation.institution = get_author_institution(article_id, author_id)
 		affiliation.city = get_author_city(article_id, author_id)
 		affiliation.country = get_author_country(article_id, author_id)
 		affiliation.email = get_author_email(article_id, author_id)

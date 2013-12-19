@@ -55,7 +55,7 @@ COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"editor_last_name" : "poa_m_me_last_nm",
 					"editor_first_name" : "poa_m_me_first_nm",
 					"editor_middle_name" : "poa_m_me_middle_nm",
-					"editor_organisation" : "poa_m_me_organization", 
+					"editor_institution" : "poa_m_me_organization", 
 					"editor_department" : "poa_m_me_department", 
 					"editor_country" : "poa_m_me_country",
 					"ethics" : "poa_m_ethics_note",
@@ -66,7 +66,7 @@ COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"author_last_name": "poa_a_last_nm",
 					"author_first_name": "poa_a_first_nm",
 					"author_middle_name" : "poa_a_middle_nm",
-					"author_organisation" : "poa_a_organization",
+					"author_institution" : "poa_a_organization",
 					"author_department" : "poa_a_department",
 					"author_city" : "poa_a_city", 
 					"author_country" : "poa_a_country",
@@ -239,8 +239,8 @@ def get_me_middle_nm(article_id):
 	me_middle_nm = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_middle_name"])[0]
 	return me_middle_nm
 
-def get_me_org(article_id):
-	me_org = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_organisation"])[0]
+def get_me_institution(article_id):
+	me_org = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_institution"])[0]
 	return me_org 
 
 def get_me_department(article_id):
@@ -298,8 +298,8 @@ def get_author_middle_name(article_id, author_id):
 	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_middle_name"])
 	return attribute 
 
-def get_author_organisation(article_id, author_id):
-	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_organisation"])
+def get_author_institution(article_id, author_id):
+	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_institution"])
 	return attribute 
 
 def get_author_department(article_id, author_id):
