@@ -106,20 +106,20 @@ def build_xml_for_article(article_id):
 	return article_xml
 
 def write_xml(article_id, xml, dir = ''):
-	f = open(dir + 'elife' + str(int(article_id)).zfill(5) + '.xml', "wb")
+	f = open(dir + 'elife_poa_e' + str(int(article_id)).zfill(5) + '.xml', "wb")
 	f.write(xml.prettyXML())
 	f.close()
 
 if __name__ == "__main__":
 	# get a list of active article numbers 
 	article_ids = index_authors_on_article_id().keys()
-
+	TARGET_OUTPUT_DIR = "generated_xml_output/"
 
 	for article_id in article_ids:
 		# xml = build_xml_for_article(article_id)
 		try: 
 			xml = build_xml_for_article(article_id)
-			write_xml(article_id, xml, dir = 'tmp/')
+			write_xml(article_id, xml, dir = TARGET_OUTPUT_DIR)
 			print "xml built for ", article_id
 			# print xml.prettyXML()
 		except:
