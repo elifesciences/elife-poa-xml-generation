@@ -176,8 +176,11 @@ class eLife2XML(object):
 
         # journal-id
         for journal_id_type in self.journal_id_types:
-            self.journal_id = SubElement(self.journal_meta, "journal-id") 
-            self.journal_id.text = self.elife_journal_id 
+            self.journal_id = SubElement(self.journal_meta, "journal-id")
+            if journal_id_type == "nlm-ta":
+                self.journal_id.text = self.elife_journal_id.lower()
+            else:
+                self.journal_id.text = self.elife_journal_id 
             self.journal_id.set("journal-id-type", journal_id_type) 
 
         #
