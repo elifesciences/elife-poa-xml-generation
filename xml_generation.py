@@ -117,6 +117,7 @@ if __name__ == "__main__":
 
 	for article_id in article_ids:
 		# xml = build_xml_for_article(article_id)
+
 		try: 
 			xml = build_xml_for_article(article_id)
 			write_xml(article_id, xml, dir = TARGET_OUTPUT_DIR)
