@@ -41,6 +41,11 @@ def build_xml_for_article(article_id):
 	date_license = eLifeDate("license", t_accepted)
 	article.add_date(date_license)
 
+	# ethics
+	ethic = get_ethics(article_id)
+	if ethic:
+		article.add_ethic(ethic)
+
 	# categories
 	categories = get_subjects(article_id)
 	for category in categories:
@@ -73,6 +78,10 @@ def build_xml_for_article(article_id):
 			email = get_author_email(article_id, author_id)
 			affiliation.email = get_author_email(article_id, author_id)
 			author.corresp = True
+
+		conflict = get_author_conflict(article_id, author_id)
+		if conflict.strip() != "":
+			author.set_conflict(conflict)
 
 		author.auth_id = `int(author_id)`
 		author.set_affiliation(affiliation)
