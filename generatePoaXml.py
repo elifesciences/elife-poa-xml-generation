@@ -25,7 +25,6 @@ does pretty printing.
 """
 
 class eLife2XML(object):
-    root = Element('article')
 
     def __init__(self, poa_article):
         """
@@ -33,6 +32,7 @@ class eLife2XML(object):
         get the article type from the object passed in to the class
         set default values for items that are boilder plate for this XML 
         """
+        self.root = Element('article')
 
         # set the boiler plate values
         self.journal_id_types = ["nlm-ta", "hwp", "publisher-id"]
@@ -254,7 +254,7 @@ class eLife2XML(object):
             if contributor.equal_contrib == True:
                 self.contrib.set("equal_contrib", "yes")
             if contributor.auth_id:
-                self.contrib.set("id", contributor.auth_id)
+                self.contrib.set("id", "author-" + str(contributor.auth_id))
                 
             if contributor.collab:
                 self.collab = SubElement(self.contrib, "collab")
