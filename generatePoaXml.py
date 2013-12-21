@@ -37,6 +37,7 @@ class eLife2XML(object):
 
         # set the boiler plate values
         self.journal_id_types = ["nlm-ta", "hwp", "publisher-id"]
+        self.contrib_types = ["author", "editor"]
         self.date_types = ["accepted", "received"]
         self.elife_journal_id = "eLife"
         self.elife_journal_title = "eLife"
@@ -135,7 +136,8 @@ class eLife2XML(object):
         self.title = SubElement(self.title_group, "article-title")
         self.title.text = poa_article.title 
         #
-        self.set_contrib_group(self.article_meta, poa_article)
+        for contrib_type in self.contrib_types:
+            self.set_contrib_group(self.article_meta, poa_article, contrib_type)
         #
         self.set_pub_date(self.article_meta, poa_article, "epub")
         #
@@ -251,10 +253,19 @@ class eLife2XML(object):
             self.set_copyright(self.permissions, poa_article)
         self.set_license(self.permissions, poa_article)
 
-    def set_contrib_group(self, parent, poa_article):
+    def set_contrib_group(self, parent, poa_article, contrib_type = None):
+        # If contrib_type is None, all contributors will be added regardless of their type
         self.contrib_group = SubElement(parent, "contrib-group")
+        if contrib_type == "editor":
+            parent.set("content-type", "section")
+            self.contrib_group.set("contrib-type", contrib_type)
 
         for contributor in poa_article.contributors:
+            if contrib_type:
+                # Filter by contrib_type if supplied
+                if contributor.contrib_type != contrib_type:
+                    continue
+                
             self.contrib = SubElement(self.contrib_group, "contrib")
 
             self.contrib.set("contrib-type", contributor.contrib_type)
@@ -275,6 +286,10 @@ class eLife2XML(object):
                 self.given_name = SubElement(self.name, "given-names")
                 self.given_name.text = contributor.given_name
 
+            if contrib_type == "editor":
+                self.role = SubElement(self.contrib, "role")
+                self.role.text = "Reviewing editor"
+
             if contributor.orcid:
                 self.orcid = SubElement(self.contrib, "uri")
                 self.orcid.set("content-type", "orcid")
@@ -283,11 +298,12 @@ class eLife2XML(object):
             for affiliation in contributor.affiliations:
                 self.aff = SubElement(self.contrib, "aff")
 
-                if affiliation.department:
-                    self.addline = SubElement(self.aff, "addr-line")
-                    self.department = SubElement(self.addline, "named-content")
-                    self.department.set("content-type", "department")
-                    self.department.text = affiliation.department
+                if contrib_type != "editor":
+                    if affiliation.department:
+                        self.addline = SubElement(self.aff, "addr-line")
+                        self.department = SubElement(self.addline, "named-content")
+                        self.department.set("content-type", "department")
+                        self.department.text = affiliation.department
 
                 if affiliation.institution:
                     self.institution = SubElement(self.aff, "institution")
@@ -600,6 +616,11 @@ if __name__ == '__main__':
     auth2.corresp = True
     auth2.set_affiliation(aff3)
     
+    # test editor
+    ed1 = eLifePOSContributor("editor", "Harrison", "Melissa")
+    ed1.auth_id = "029323as"
+    ed1.set_affiliation(aff1)
+
     # group collab author
     auth3 = eLifePOSContributor("author", None, None, "eLife author group")
     auth3.auth_id = "groupAu1"
@@ -633,6 +654,7 @@ if __name__ == '__main__':
     newArticle.add_contributor(auth1)
     newArticle.add_contributor(auth2)
     newArticle.add_contributor(auth3)
+    newArticle.add_contributor(ed1)
     
     newArticle.add_date(date_epub)
     newArticle.add_date(date_accepted)
