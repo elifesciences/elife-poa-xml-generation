@@ -143,7 +143,7 @@ class eLife2XML(object):
         #
         if poa_article.manuscript:
             self.elocation_id  = SubElement(self.article_meta, "elocation-id")
-            self.elocation_id.text = str(poa_article.manuscript)
+            self.elocation_id.text = str(int(poa_article.manuscript))
         #
         if poa_article.dates:
             self.set_history(self.article_meta, poa_article)
