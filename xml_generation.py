@@ -37,6 +37,9 @@ def build_xml_for_article(article_id):
 	t_accepted = time.strptime(accepted_date.split()[0], "%Y-%m-%d")
 	accepted = eLifeDate("accepted", t_accepted)
 	article.add_date(accepted)
+	# Use accepted date as the received date
+	received = eLifeDate("received", t_accepted)
+	article.add_date(received)
 	#
 	# set the license date to be the same as the accepted date
 	date_license = eLifeDate("license", t_accepted)
