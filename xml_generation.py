@@ -45,6 +45,9 @@ def build_xml_for_article(article_id):
 	date_license = eLifeDate("license", t_accepted)
 	article.add_date(date_license)
 
+	# default conflict text
+	article.conflict_default = "The authors declare that no competing interests exist."
+
 	# ethics
 	ethic = get_ethics(article_id)
 	if ethic:

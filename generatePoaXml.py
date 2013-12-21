@@ -80,6 +80,15 @@ class eLife2XML(object):
         title.text = "Competing interest"
         
         conflict_count = 0
+        if poa_article.conflict_default:
+            # default for contributors with no conflicts
+            id = "conf1"
+            fn = SubElement(self.competing_interest, "fn")
+            fn.set("fn-type", "conflict")
+            fn.set("id", id)
+            p = SubElement(fn, "p")
+            p.text = poa_article.conflict_default
+            conflict_count = conflict_count + 1
         for contributor in poa_article.contributors:
             if contributor.conflict:
                 id = "conf" + str(conflict_count + 1)
@@ -91,14 +100,6 @@ class eLife2XML(object):
                 p.text = p.text + contributor.conflict
                 # increment
                 conflict_count = conflict_count + 1
-        # default when no conflicts
-        if conflict_count == 0 and poa_article.conflict_default:
-            id = "conf1"
-            fn = SubElement(self.competing_interest, "fn")
-            fn.set("fn-type", "conflict")
-            fn.set("id", id)
-            p = SubElement(fn, "p")
-            p.text = poa_article.conflict_default
 
     def set_fn_group_ethics_information(self, parent, poa_article):
         self.competing_interest = SubElement(parent, "fn-group")
@@ -645,7 +646,7 @@ if __name__ == '__main__':
     abstract = "Test abstract"
     newArticle = eLifePOA(doi, title)
     newArticle.abstract = abstract
-    newArticle.conflict_default = None
+    newArticle.conflict_default = "The authors declare that no competing interests exist."
     
     newArticle.add_ethic("Human subjects: The eLife IRB approved our study")
     newArticle.add_ethic("Animal experimentation: This study was performed in strict accordance with the recommendations in the Guide for the Care and Use of Laboratory Animals of the National Institutes of Health. All of the animals were handled according to approved institutional animal care and use committee (IACUC) protocols (#08-133) of the University of Arizona. The protocol was approved by the Committee on the Ethics of Animal Experiments of the University of Minnesota (Permit Number: 27-2956).")
