@@ -114,12 +114,12 @@ class eLife2XML(object):
     def set_article_meta(self, parent, poa_article):
         self.article_meta = SubElement(parent, "article-meta")
         
-        # article-id pub-id-type="manuscript"
+        # article-id pub-id-type="publisher-id" | pub-id-type="manuscript"
         if poa_article.manuscript:
-            pub_id_type = "manuscript"
-            self.article_id = SubElement(self.article_meta, "article-id") 
-            self.article_id.text = str(int(poa_article.manuscript)).zfill(5)
-            self.article_id.set("pub-id-type", pub_id_type) 
+            for pub_id_type in ["publisher-id", "manuscript"]:
+                self.article_id = SubElement(self.article_meta, "article-id") 
+                self.article_id.text = str(int(poa_article.manuscript)).zfill(5)
+                self.article_id.set("pub-id-type", pub_id_type) 
         
         # article-id pub-id-type="doi"
         if poa_article.doi:

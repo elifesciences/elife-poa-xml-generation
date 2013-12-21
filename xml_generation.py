@@ -26,6 +26,7 @@ def build_xml_for_article(article_id):
 	#
 	abstract = get_abstract(article_id)
 	article.abstract = abstract
+	article.manuscript = article_id
 	#
 	license_id = get_license(article_id)
 	license = eLifeLicense(license_id)
