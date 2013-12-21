@@ -21,8 +21,8 @@ TODO: add subjects
 def build_xml_for_article(article_id):
 	doi = get_doi(article_id)
 	title = get_title(article_id)
-	uri = doi2uri(doi)
-	article = eLifePOA(uri, title)
+	#uri = doi2uri(doi)
+	article = eLifePOA(doi, title)
 	#
 	abstract = get_abstract(article_id)
 	article.abstract = abstract

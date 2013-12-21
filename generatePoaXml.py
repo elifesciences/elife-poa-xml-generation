@@ -615,7 +615,7 @@ if __name__ == '__main__':
     license = eLifeLicense(1)
 
     # test article 
-    doi = "http://dx.doi.org/10.7554/eLife.00929"
+    doi = "10.7554/eLife.00929"
     manuscript = 929
     title = "The Test Title"
     abstract = "Test abstract"
