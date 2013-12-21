@@ -97,6 +97,7 @@ def build_xml_for_article(article_id):
 	last_name = get_me_last_nm(article_id)	
 
 	editor = eLifePOSContributor(author_type, last_name, first_name)
+	editor.auth_id = `int(get_me_id(article_id))`
 	affiliation = ContributorAffiliation()
 	affiliation.department = get_me_department(article_id)
 	affiliation.institution = get_me_institution(article_id)
