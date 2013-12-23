@@ -21,11 +21,12 @@ TODO: add subjects
 def build_xml_for_article(article_id):
 	doi = get_doi(article_id)
 	title = get_title(article_id)
-	uri = doi2uri(doi)
-	article = eLifePOA(uri, title)
+	#uri = doi2uri(doi)
+	article = eLifePOA(doi, title)
 	#
 	abstract = get_abstract(article_id)
 	article.abstract = abstract
+	article.manuscript = article_id
 	#
 	license_id = get_license(article_id)
 	license = eLifeLicense(license_id)
@@ -36,10 +37,16 @@ def build_xml_for_article(article_id):
 	t_accepted = time.strptime(accepted_date.split()[0], "%Y-%m-%d")
 	accepted = eLifeDate("accepted", t_accepted)
 	article.add_date(accepted)
+	# Use accepted date as the received date
+	received = eLifeDate("received", t_accepted)
+	article.add_date(received)
 	#
 	# set the license date to be the same as the accepted date
 	date_license = eLifeDate("license", t_accepted)
 	article.add_date(date_license)
+
+	# default conflict text
+	article.conflict_default = "The authors declare that no competing interests exist."
 
 	# ethics
 	ethic = get_ethics(article_id)
@@ -93,6 +100,7 @@ def build_xml_for_article(article_id):
 	last_name = get_me_last_nm(article_id)	
 
 	editor = eLifePOSContributor(author_type, last_name, first_name)
+	editor.auth_id = `int(get_me_id(article_id))`
 	affiliation = ContributorAffiliation()
 	affiliation.department = get_me_department(article_id)
 	affiliation.institution = get_me_institution(article_id)

@@ -52,6 +52,7 @@ COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"abstract" : "poa_m_abstract",
 					"doi" : "poa_m_doi",
 					"accepted_date" : "poa_m_accepted_dt",
+					"editor_id" : "poa_m_me_id",
 					"editor_last_name" : "poa_m_me_last_nm",
 					"editor_first_name" : "poa_m_me_first_nm",
 					"editor_middle_name" : "poa_m_me_middle_nm",
@@ -226,6 +227,10 @@ def get_doi(article_id):
 
 def get_accepted_date(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["accepted_date"])[0]
+	return attribute
+
+def get_me_id(article_id):
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_id"])[0]
 	return attribute
 
 def get_me_last_nm(article_id):

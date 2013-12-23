@@ -133,8 +133,8 @@ if __name__ == "__main__":
 		authors.append(author)
 
 	# create an article object
-	uri = doi2uri(doi)
-	article = eLifePOA(uri, title)
+	#uri = doi2uri(doi)
+	article = eLifePOA(doi, title)
 	article.abstract = abstract
 	article.manuscript = manuscript
 
