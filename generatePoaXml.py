@@ -150,7 +150,7 @@ class eLife2XML(object):
         #
         if poa_article.manuscript:
             self.elocation_id  = SubElement(self.article_meta, "elocation-id")
-            self.elocation_id.text = str(int(poa_article.manuscript))
+            self.elocation_id.text = "e" + str(int(poa_article.manuscript)).zfill(5)
         #
         if poa_article.dates:
             self.set_history(self.article_meta, poa_article)
@@ -347,11 +347,12 @@ class eLife2XML(object):
                 if affiliation.email:
                     self.email = SubElement(self.aff, "email")
                     self.email.text = affiliation.email
-                
-                if rid:
-                    self.xref = SubElement(self.aff, "xref")
-                    self.xref.set("ref-type", "fn")
-                    self.xref.set("rid", rid)
+
+                if contrib_type != "editor":
+                    if rid:
+                        self.xref = SubElement(self.aff, "xref")
+                        self.xref.set("ref-type", "fn")
+                        self.xref.set("rid", rid)
 
     def set_article_categories(self, parent, poa_article):
         # article-categories
