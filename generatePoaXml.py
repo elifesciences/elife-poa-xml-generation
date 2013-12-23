@@ -10,7 +10,7 @@ from git import *
 
 """
 create classes to represent affiliations, authors and papers.
-pass the compount object to a calss that writes the XML in the expected format. 
+pass the compount object to a class that writes the XML in the expected format.
 
 ## GOTCHAS/TODOs
 
@@ -38,7 +38,7 @@ class eLife2XML(object):
         # set the boiler plate values
         self.journal_id_types = ["nlm-ta", "hwp", "publisher-id"]
         self.contrib_types = ["author", "editor"]
-        self.date_types = ["accepted", "received"]
+        self.date_types = ["received", "accepted"]
         self.elife_journal_id = "eLife"
         self.elife_journal_title = "eLife"
         self.elife_epub_issn = "2050-084X"
@@ -121,14 +121,14 @@ class eLife2XML(object):
 
     def set_article_meta(self, parent, poa_article):
         self.article_meta = SubElement(parent, "article-meta")
-        
-        # article-id pub-id-type="publisher-id" | pub-id-type="manuscript"
+
+        # article-id pub-id-type="publisher-id"
         if poa_article.manuscript:
-            for pub_id_type in ["publisher-id", "manuscript"]:
-                self.article_id = SubElement(self.article_meta, "article-id") 
-                self.article_id.text = str(int(poa_article.manuscript)).zfill(5)
-                self.article_id.set("pub-id-type", pub_id_type) 
-        
+            pub_id_type = "publisher-id"
+            self.article_id = SubElement(self.article_meta, "article-id")
+            self.article_id.text = str(int(poa_article.manuscript)).zfill(5)
+            self.article_id.set("pub-id-type", pub_id_type)
+
         # article-id pub-id-type="doi"
         if poa_article.doi:
             pub_id_type = "doi"
@@ -150,7 +150,7 @@ class eLife2XML(object):
         #
         if poa_article.manuscript:
             self.elocation_id  = SubElement(self.article_meta, "elocation-id")
-            self.elocation_id.text = str(int(poa_article.manuscript))
+            self.elocation_id.text = "e" + str(int(poa_article.manuscript)).zfill(5)
         #
         if poa_article.dates:
             self.set_history(self.article_meta, poa_article)
@@ -179,7 +179,7 @@ class eLife2XML(object):
 
     def set_journal_meta(self, parent):
         """
-        take boiler plate values from the init of the calss 
+        take boiler plate values from the init of the class
         """
         self.journal_meta = SubElement(parent, "journal-meta")
 
@@ -264,8 +264,7 @@ class eLife2XML(object):
         # If contrib_type is None, all contributors will be added regardless of their type
         self.contrib_group = SubElement(parent, "contrib-group")
         if contrib_type == "editor":
-            parent.set("content-type", "section")
-            self.contrib_group.set("contrib-type", contrib_type)
+            self.contrib_group.set("contrib-type", "section")
 
         for contributor in poa_article.contributors:
             if contrib_type:
@@ -348,11 +347,12 @@ class eLife2XML(object):
                 if affiliation.email:
                     self.email = SubElement(self.aff, "email")
                     self.email.text = affiliation.email
-                
-                if rid:
-                    self.xref = SubElement(self.aff, "xref")
-                    self.xref.set("ref-type", "fn")
-                    self.xref.set("rid", rid)
+
+                if contrib_type != "editor":
+                    if rid:
+                        self.xref = SubElement(self.aff, "xref")
+                        self.xref.set("ref-type", "fn")
+                        self.xref.set("rid", rid)
 
     def set_article_categories(self, parent, poa_article):
         # article-categories
