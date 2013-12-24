@@ -264,7 +264,7 @@ class eLife2XML(object):
         # If contrib_type is None, all contributors will be added regardless of their type
         self.contrib_group = SubElement(parent, "contrib-group")
         if contrib_type == "editor":
-            self.contrib_group.set("contrib-type", "section")
+            self.contrib_group.set("content-type", "section")
 
         for contributor in poa_article.contributors:
             if contrib_type:
