@@ -304,6 +304,7 @@ class eLife2XML(object):
             # Contributor conflict xref tag logic
             if contributor.conflict:
                 rid = "conf" + str(self.conflict_count + 1)
+                self.conflict_count += 1
             elif poa_article.conflict_default:
                 rid = "conf1"
             else:
