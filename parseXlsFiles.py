@@ -1,6 +1,7 @@
 
 import xlrd
 from collections import defaultdict
+from generatePoaXml import *
 
 """
 Provide a thin wrapper around a set of functions
@@ -87,6 +88,15 @@ def memoize(f):
             ret = self[key] = self.f(*key)
             return ret
     return memodict(f)
+
+def entities(function):
+	"""
+	Convert entities to unicode as a decorator
+	"""
+	def wrapper(*args, **kwargs):
+		value = function(*args, **kwargs)
+		return entity_to_unicode(value)
+	return wrapper
 
 def get_xls_path(path_type):
 	"""
@@ -211,11 +221,13 @@ def get_license(article_id):
 
 # manuscript table
 
+@entities
 def get_title(article_id):
 	attributes = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["title"])
 	attribute = attributes[0]
 	return attribute
 
+@entities
 def get_abstract(article_id):
 	attributes = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["abstract"])
 	attribute = attributes[0]
@@ -233,26 +245,32 @@ def get_me_id(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_id"])[0]
 	return attribute
 
+@entities
 def get_me_last_nm(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_last_name"])[0]
 	return attribute
 
+@entities
 def get_me_first_nm(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_first_name"])[0]
 	return attribute
 
+@entities
 def get_me_middle_nm(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_middle_name"])[0]
 	return attribute
 
+@entities
 def get_me_institution(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_institution"])[0]
 	return attribute 
 
+@entities
 def get_me_department(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_department"])[0]
 	return attribute
 
+@entities
 def get_me_country(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_country"])[0]
 	return attribute
@@ -292,30 +310,37 @@ def get_author_dual_corresponding(article_id, author_id):
 	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["dual_corresponding"])
 	return attribute 
 
+@entities
 def get_author_last_name(article_id, author_id):
 	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_last_name"])
 	return attribute 
 
+@entities
 def get_author_first_name(article_id, author_id):
 	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_first_name"])
 	return attribute 
 
+@entities
 def get_author_middle_name(article_id, author_id):
 	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_middle_name"])
 	return attribute 
 
+@entities
 def get_author_institution(article_id, author_id):
 	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_institution"])
 	return attribute 
 
+@entities
 def get_author_department(article_id, author_id):
 	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_department"])
 	return attribute 
 
+@entities
 def get_author_city(article_id, author_id):
 	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_city"])
 	return attribute 
 
+@entities
 def get_author_country(article_id, author_id):
 	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_country"])
 	return attribute 
