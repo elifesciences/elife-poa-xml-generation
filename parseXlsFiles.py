@@ -2,6 +2,7 @@
 import xlrd
 from collections import defaultdict
 from generatePoaXml import *
+import settings as settings 
 
 """
 Provide a thin wrapper around a set of functions
@@ -35,10 +36,14 @@ TODO: parse out the ethics information
 
 """
 
-ROWS_WITH_COLNAMES = 3
-DATA_START_ROW = 4
-XLS_PATH = "/Users/ian/Dropbox/code/private-code/poa-xls-files/ejp_queries_v1.04/"
-## set location of xls files 
+# set location of XLS files
+XLS_PATH = settings.XLS_PATH
+
+# set numbers of rows and cols in xls files for getting col names and data
+ROWS_WITH_COLNAMES = settings.ROWS_WITH_COLNAMES
+DATA_START_ROW = settings.DATA_START_ROW
+
+# set a map for kind of information available in related xls files
 XLS_FILES = 	{"authors" : "poa_author_v1.04.xls",
 				 "license" : "poa_license_v1.04.xls",
 				 "manuscript" : "poa_manuscript_v1.04.xls",
