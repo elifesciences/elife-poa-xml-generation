@@ -86,7 +86,8 @@ def build_xml_for_article(article_id):
 
  
 		contrib_type = get_author_contrib_type(article_id, author_id)
-		if contrib_type == "Corresponding Author":
+		dual_corresponding = get_author_dual_corresponding(article_id, author_id)
+		if contrib_type == "Corresponding Author" or dual_corresponding == 1:
 			email = get_author_email(article_id, author_id)
 			affiliation.email = get_author_email(article_id, author_id)
 			author.corresp = True
