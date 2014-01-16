@@ -16,7 +16,7 @@ The goal is to have a functioning pipeline in place to delivery XML to HW before
 
 	$ pip install elementtree  
 	$ pip install xlrd
-	$ pip install http://svn.effbot.org/public/elementtree-1.3/  
+	$ pip install gitpython
 
 ## Project outline 
 
@@ -33,7 +33,6 @@ The goal is to have a functioning pipeline in place to delivery XML to HW before
 - `generatePoaXml.py` set of classes for modelling the output XML.  
 - `parseXlsFiles.py` reads data from provided XLS files, provides simple interface to the data.  
 
-
 Other files in the repo are represent incomplete or earlier work. 
 
 #### Settings
@@ -43,23 +42,33 @@ your own path structure. It will look for the following information:
 
 	- `XLS_PATH` the location of the xls files to be read in.  
 	- `TARGET_OUTPUT_DIR` a path to a directory for writing generated xml files.  
+	- `XLS_FILES` a dict giving a label to the files that will be processed in the XLS read pahse.
+	- `XLS_COLUMN_HEADINGS` a dict listing column heading names of interest in the XLS files that we will process.
 
+#### Obtaining XLS fils to process
+
+These files are generated out of the EJP system via a set of SQL queries. We do not store this data in this repository. Please contact @nathanlisgo to obtain a set for processing. We are currently procssing the following files. These files are versioned. The root of the filename gives an indication of what data we expect in these files. You should obtain the following files:
+
+	poa_author_ : information about eLife authors  
+	poa_license_ : licensing information for articles  
+	poa_manuscript_ : manuscript details, including abstract and reviewing editor information  
+	poa_received : recieved dates for manuscripts  
+	poa_subject_area_ : information on subject areas for the manuscripts  
+	organisms : information on organsisims that the manuscripts operate on  
+
+Each of these files needs to be placed into the directory located at `XLS_PATH` in settings.py. 
 
 #### Generating XML from and XLS file
 
 	$ python xml_generation.py
 
-
 #### Verifying XML file
 
 	$ xmllint --noout --loaddtd --valid sample-xml-generated-output/outputName.xml
 
-
 ## Project issues
 
 Live code issues are listed as issues in the [git repo for this project](https://github.com/elifesciences/elife-poa-xml-generation/issues).
-
-
 
 # Version history 
 
