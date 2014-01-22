@@ -7,6 +7,11 @@ This is a project to create XML files that conform to the output we expect for d
 
 The goal is to have a functioning pipeline in place to delivery XML to HW before the end of December 2013. 
 
+## Quickstart
+
+- set paths in settings.py
+- run `$ python xml_generation.py`
+
 ## Resources and project planning. 
 
 - [Overview of project resources](https://github.com/elifesciences/elifesciences-wiki/wiki/Elife-POA-XML-Project).
