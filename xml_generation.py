@@ -1,6 +1,7 @@
 from generatePoaXml import *
 from parseXlsFiles import * 
 import xlrd
+import settings as settings
 
 
 """
@@ -131,7 +132,7 @@ def write_xml(article_id, xml, dir = ''):
 if __name__ == "__main__":
 	# get a list of active article numbers 
 	article_ids = index_authors_on_article_id().keys()
-	TARGET_OUTPUT_DIR = "generated_xml_output/"
+	TARGET_OUTPUT_DIR = settings.TARGET_OUTPUT_DIR 
 
 	for article_id in article_ids:
 		# xml = build_xml_for_article(article_id)
