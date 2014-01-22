@@ -319,19 +319,19 @@ class eLife2XML(object):
                         self.department = SubElement(self.addline, "named-content")
                         self.department.set("content-type", "department")
                         self.department.text = affiliation.department
-                        self.addline.tail = ","
+                        self.addline.tail = ", "
 
                 if affiliation.institution:
                     self.institution = SubElement(self.aff, "institution")
                     self.institution.text = affiliation.institution
-                    self.institution.tail = ","
+                    self.institution.tail = ", "
 
                 if affiliation.city:
                     self.addline = SubElement(self.aff, "addr-line")
                     self.city = SubElement(self.addline, "named-content")
                     self.city.set("content-type", "city")
                     self.city.text = affiliation.city
-                    self.addline.tail = ","
+                    self.addline.tail = ", "
 
                 if affiliation.country:
                     self.country = SubElement(self.aff, "country")

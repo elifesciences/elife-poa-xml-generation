@@ -71,7 +71,12 @@ def build_xml_for_article(article_id):
 		author_type = "author"
 
 		first_name = get_author_first_name(article_id, author_id)      
-		last_name = get_author_last_name(article_id, author_id) 
+		last_name = get_author_last_name(article_id, author_id)
+		middle_name = get_author_middle_name(article_id, author_id)
+		initials = middle_name_initials(middle_name)
+		if initials:
+			# Middle initials
+			first_name += " " + initials
 		author = eLifePOSContributor(author_type, last_name, first_name)
 		affiliation = ContributorAffiliation()
 
@@ -82,7 +87,8 @@ def build_xml_for_article(article_id):
 
  
 		contrib_type = get_author_contrib_type(article_id, author_id)
-		if contrib_type == "Corresponding Author":
+		dual_corresponding = get_author_dual_corresponding(article_id, author_id)
+		if contrib_type == "Corresponding Author" or dual_corresponding == 1:
 			email = get_author_email(article_id, author_id)
 			affiliation.email = get_author_email(article_id, author_id)
 			author.corresp = True
@@ -98,8 +104,12 @@ def build_xml_for_article(article_id):
 	author_type = "editor"
 
 	first_name = get_me_first_nm(article_id)
-	last_name = get_me_last_nm(article_id)	
-
+	last_name = get_me_last_nm(article_id)
+	middle_name = get_me_middle_nm(article_id)
+	initials = middle_name_initials(middle_name)
+	if initials:
+		# Middle initials
+		first_name += " " + initials
 	editor = eLifePOSContributor(author_type, last_name, first_name)
 	editor.auth_id = `int(get_me_id(article_id))`
 	affiliation = ContributorAffiliation()

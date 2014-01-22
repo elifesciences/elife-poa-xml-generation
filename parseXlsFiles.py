@@ -3,6 +3,7 @@ import xlrd
 from collections import defaultdict
 from generatePoaXml import *
 import settings as settings 
+import re
 
 """
 Provide a thin wrapper around a set of functions
@@ -341,6 +342,22 @@ def check_fax_number(number):
 	else:
 		return True
 
+def middle_name_initials(middle_name):
+	"""
+	Given a middle name value parse it to middle initials
+	Example inputs:  S, S., Smith, Smith Doe, Smith-Doe, S-D, S D, SD, S.D., S. D.
+	Example outputs: S, S,  S,     SD,        S-D,       S-D, SD,  SD, SD,   SD
+	"""
+	initials = ""
+	# Keep only uppercase characters and hyphens
+	if middle_name:
+		char_list = re.findall("[A-Z]|\-", str(middle_name))
+		initials = "".join(char_list)
+	
+	if initials == "":
+		return None
+	return initials
+
 if __name__ == "__main__":
 
 	test_article_id = 1856.0
@@ -364,3 +381,4 @@ if __name__ == "__main__":
 		author_postion = get_author_position(test_article_id, author_id)
 		email = get_author_email(test_article_id, author_id)
 		print author_postion, email 
+	
