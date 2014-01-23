@@ -2,14 +2,14 @@
 # xls reading settings 
 ROWS_WITH_COLNAMES = 3
 DATA_START_ROW = 4
-XLS_PATH = "/Users/ian/Dropbox/code/private-code/poa-xls-files/ejp_queries_v1.04/" 
+XLS_PATH = "/Users/ian/Dropbox/code/private-code/poa-xls-files/ejp_queries_v1.06/" 
 
-XLS_FILES = 	{"authors" : "poa_author_v1.04.xls",
-				 "license" : "poa_license_v1.04.xls",
-				 "manuscript" : "poa_manuscript_v1.04.xls",
-				 "received" : "poa_received.04.xls",
-				 "subjects" : "poa_subject_area_v1.04.xls",
-				 "organisms": "poa_research_organism_v1.04.xls"}
+XLS_FILES = 	{"authors" : "poa_author_v1.06.xls",
+				 "license" : "poa_license_v1.06.xls",
+				 "manuscript" : "poa_manuscript_v1.06.xls",
+				 "received" : "poa_received_v1.06.xls",
+				 "subjects" : "poa_subject_area_v1.06.xls",
+				 "organisms": "poa_research_organism_v1.06.xls"}
 
 XLS_COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"subject_areas" : "poa_s_subjectarea",
@@ -18,6 +18,7 @@ XLS_COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"abstract" : "poa_m_abstract",
 					"doi" : "poa_m_doi",
 					"accepted_date" : "poa_m_accepted_dt",
+					"received_date" : "poa_r_receipt_dt2",
 					"editor_id" : "poa_m_me_id",
 					"editor_last_name" : "poa_m_me_last_nm",
 					"editor_first_name" : "poa_m_me_first_nm",

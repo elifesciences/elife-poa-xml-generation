@@ -212,6 +212,10 @@ def get_accepted_date(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["accepted_date"])[0]
 	return attribute
 
+def get_received_date(article_id):
+	attribute = get_article_attributes(article_id, "received", COLUMN_HEADINGS["received_date"])[0]
+	return attribute
+
 def get_me_id(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["editor_id"])[0]
 	return attribute
