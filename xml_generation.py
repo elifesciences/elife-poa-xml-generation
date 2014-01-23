@@ -53,8 +53,6 @@ def build_xml_for_article(article_id):
 	ethic = get_ethics(article_id)
 	if ethic:
 		ethics = parse_ethics(ethic)
-		if len(ethics) > 1:
-			print article_id
 		for e in ethics:
 			article.add_ethic(e)
 
