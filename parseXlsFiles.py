@@ -4,6 +4,7 @@ from collections import defaultdict
 from generatePoaXml import *
 import settings as settings 
 import re
+from xml.dom import minidom
 
 """
 Provide a thin wrapper around a set of functions
@@ -357,6 +358,42 @@ def middle_name_initials(middle_name):
 	if initials == "":
 		return None
 	return initials
+
+def parse_ethics(ethic):
+	"""
+	Given angle bracket escaped XML string, parse
+	animal and human ethic comments, and return
+	a list of strings if involved_comments tag
+	is found. Boiler plate prefix added too.
+	"""
+	
+	ethics = []
+	
+	# Decode escaped angle brackets
+	ethic_xml = decode_brackets(ethic)
+	
+	# Parse XML
+	encoding = 'utf-8'
+	reparsed = minidom.parseString(ethic_xml)
+	
+	# Extract comments
+	for ethic_type in 'animal_subjects','human_subjects':
+		ethic_node = reparsed.getElementsByTagName(ethic_type)[0]
+		for node in ethic_node.childNodes:
+			if node.nodeName == 'involved_comments':
+				text_node = node.childNodes[0]
+				ethic_text = text_node.nodeValue
+				
+				# Add boilerplate
+				if ethic_type == 'animal_subjects':
+					ethic_text = 'Animal experimentation: ' + ethic_text.strip()
+				elif ethic_type == 'human_subjects':
+					ethic_text = 'Human subjects: ' + ethic_text.strip()
+				
+				# Decode unicode characters
+				ethics.append(entity_to_unicode(ethic_text))
+
+	return ethics
 
 if __name__ == "__main__":
 
