@@ -7,6 +7,7 @@ from xml.dom import minidom
 import time
 import re
 from git import *
+import settings
 
 """
 create classes to represent affiliations, authors and papers.
@@ -618,6 +619,15 @@ def entity_to_unicode(s):
     using a regular expression replacement
     """
     s = re.sub(r"&#x(....);", repl, s)
+    return s
+
+def decode_brackets(s):
+    """
+    Decode angle bracket escape sequence
+    used to encode XML content
+    """
+    s = s.replace(settings.LESS_THAN_ESCAPE_SEQUENCE, '<')
+    s = s.replace(settings.GREATER_THAN_ESCAPE_SEQUENCE, '>')
     return s
 
 if __name__ == '__main__':

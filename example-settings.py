@@ -42,5 +42,8 @@ XLS_COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"organisms" : "poa_ro_researchorganism"
 				}
 
+LESS_THAN_ESCAPE_SEQUENCE = 'LTLT'
+GREATER_THAN_ESCAPE_SEQUENCE = 'GTGT'
+
 # xml writing settings 
 TARGET_OUTPUT_DIR = "generated_xml_output/"
