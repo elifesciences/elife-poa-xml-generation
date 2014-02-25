@@ -2,14 +2,18 @@
 # xls reading settings 
 ROWS_WITH_COLNAMES = 3
 DATA_START_ROW = 4
-XLS_PATH = "/Users/ian/Dropbox/code/private-code/poa-xls-files/ejp_queries_v1.06/" 
 
-XLS_FILES = 	{"authors" : "poa_author_v1.06.xls",
-				 "license" : "poa_license_v1.06.xls",
-				 "manuscript" : "poa_manuscript_v1.06.xls",
-				 "received" : "poa_received_v1.06.xls",
-				 "subjects" : "poa_subject_area_v1.06.xls",
-				 "organisms": "poa_research_organism_v1.06.xls"}
+XLS_PATH = "/Users/ian/Dropbox/code/private-code/poa-xls-files/csv-input-v1.06/" 
+
+
+        
+         
+XLS_FILES = 	{"authors" : "ejp_query_tool_query_id_177_POA_Author_2014_02_12_eLife.csv",
+				 "license" : "ejp_query_tool_query_id_178_POA_License_2014_02_12_eLife.csv",
+				 "manuscript" : "ejp_query_tool_query_id_176_POA_Manuscript_2014_02_12_eLife.csv",
+				 "received" : "ejp_query_tool_query_id_180_POA_Received_2014_02_12_eLife.csv",
+				 "subjects" : "ejp_query_tool_query_id_179_POA_Subject_Area_2014_02_12_eLife.csv",
+				 "organisms": "ejp_query_tool_query_id_182_POA_Research_Organism_2014_02_12_eLife.csv"}
 
 XLS_COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"subject_areas" : "poa_s_subjectarea",
@@ -18,7 +22,6 @@ XLS_COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"abstract" : "poa_m_abstract",
 					"doi" : "poa_m_doi",
 					"accepted_date" : "poa_m_accepted_dt",
-					"received_date" : "poa_r_receipt_dt2",
 					"editor_id" : "poa_m_me_id",
 					"editor_last_name" : "poa_m_me_last_nm",
 					"editor_first_name" : "poa_m_me_first_nm",
@@ -43,8 +46,11 @@ XLS_COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"organisms" : "poa_ro_researchorganism"
 				}
 
-LESS_THAN_ESCAPE_SEQUENCE = 'LTLT'
-GREATER_THAN_ESCAPE_SEQUENCE = 'GTGT'
-
 # xml writing settings 
 TARGET_OUTPUT_DIR = "generated_xml_output/"
+
+STAGING_TO_HW_DIR = "unpacked_renamed_ejp_files/"
+FTP_TO_HW_DIR = "ftp-to-hw"
+MADE_FTP_READY = "made_ftp_ready_on"
+EJP_INPUT_DIR = "sample-zip-from-ejp" 
+
