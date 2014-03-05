@@ -25,8 +25,8 @@ hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
 
-def instansiate_article(article_id):
-	logger.info("in instansiate_article for " + str(article_id))
+def instantiate_article(article_id):
+	logger.info("in instantiate_article for " + str(article_id))
 	try:
 		doi = get_doi(article_id)
 		title = get_title(article_id)
@@ -197,7 +197,7 @@ def write_xml(article_id, xml, dir = ''):
 
 def build_xml_for_article(article_id):
 	error_count = 0
-	article = instansiate_article(article_id)
+	article = instantiate_article(article_id)
 	if not set_abstract(article, article_id): error_count = error_count + 1
 	if not set_license(article, article_id): error_count = error_count + 1
 	if not set_dates(article, article_id): error_count = error_count + 1
