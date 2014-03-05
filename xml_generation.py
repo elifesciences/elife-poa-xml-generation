@@ -1,19 +1,20 @@
 from generatePoaXml import *
-from parseCSVFiles import * 
+from parseCSVFiles import *
 import xlrd
 import settings as settings
+import logging
 
 """
 read from an xls file
 output an xml file
 
 # Gotchas
-TODO: currnet XLS does not provide author contrib type TODO: query for author contrib type 
-TODO: we need a decision on what we do with middle names, for now we are ignoring them 
-TODO: print out authors in their contrib order 
+TODO: currnet XLS does not provide author contrib type TODO: query for author contrib type
+TODO: we need a decision on what we do with middle names, for now we are ignoring them
+TODO: print out authors in their contrib order
 TODO: add contrib-type
-TODO: add managing editor information 
-TODO: add subjects 
+TODO: add managing editor information
+TODO: add subjects
 
 """
 
@@ -65,12 +66,12 @@ def set_dates(article, article_id):
 		accepted = eLifeDate("accepted", t_accepted)
 		article.add_date(accepted)
 		# Use accepted date as the received date
-		
+
 		logger.info(str(accepted_date))
 		received_date =  accepted_date #get_received_date(article_id)
 		t_received = time.strptime(received_date.split()[0], "%Y-%m-%d")
 		received = eLifeDate("received", t_received)
-		article.add_date(received)		
+		article.add_date(received)
 
 		# set the license date to be the same as the accepted date
 		date_license = eLifeDate("license", t_accepted)
@@ -117,7 +118,7 @@ def set_organsims(article, article_id):
 		return False
 
 def set_author_info(article, article_id):
-	# author information 
+	# author information
 	logger.info("in set_author_info")
 	try:
 		author_ids = get_author_ids(article_id)
@@ -125,7 +126,7 @@ def set_author_info(article, article_id):
 
 			author_type = "author"
 
-			first_name = get_author_first_name(article_id, author_id)      
+			first_name = get_author_first_name(article_id, author_id)
 			last_name = get_author_last_name(article_id, author_id)
 			middle_name = get_author_middle_name(article_id, author_id)
 			initials = middle_name_initials(middle_name)
@@ -140,7 +141,6 @@ def set_author_info(article, article_id):
 			affiliation.city = get_author_city(article_id, author_id)
 			affiliation.country = get_author_country(article_id, author_id)
 
-	 
 			contrib_type = get_author_contrib_type(article_id, author_id)
 			dual_corresponding = get_author_dual_corresponding(article_id, author_id)
 			if contrib_type == "Corresponding Author" or dual_corresponding == 1:
@@ -197,21 +197,21 @@ def write_xml(article_id, xml, dir = ''):
 	f.close()
 
 def build_xml_for_article(article_id):
-	component_count = 0
+	error_count = 0
 	article = instansiate_article(article_id)
-	if set_abstract(article, article_id): component_count = component_count + 1 
-	if set_license(article, article_id): component_count = component_count + 1 
-	if set_dates(article, article_id): component_count = component_count + 1 
-	if set_ethics(article, article_id): component_count = component_count + 1 
-	if set_categories(article, article_id): component_count = component_count + 1 
-	if set_organsims(article, article_id): component_count = component_count + 1 
-	if set_author_info(article, article_id): component_count = component_count + 1 
-	if set_editor_info(article, article_id): component_count = component_count + 1 	
+	if set_abstract(article, article_id): error_count = error_count + 1
+	if set_license(article, article_id): error_count = error_count + 1
+	if set_dates(article, article_id): error_count = error_count + 1
+	if set_ethics(article, article_id): error_count = error_count + 1
+	if set_categories(article, article_id): error_count = error_count + 1
+	if set_organsims(article, article_id): error_count = error_count + 1
+	if set_author_info(article, article_id): error_count = error_count + 1
+	if set_editor_info(article, article_id): error_count = error_count + 1
 
 	# default conflict text
 	article.conflict_default = "The authors declare that no competing interests exist."
 
-	if component_count == 8:
+	if error_count == 0:
 		try:
 			article_xml = eLife2XML(article)
 			logger.info("generated xml for " + str(article_id))
@@ -223,11 +223,10 @@ def build_xml_for_article(article_id):
 		logger.warning("the following article did not have enough components and xml was not generated " + str(article_id))
 
 if __name__ == "__main__":
-	# get a list of active article numbers 
+	# get a list of active article numbers
 	article_ids = index_authors_on_article_id().keys()
-	TARGET_OUTPUT_DIR = settings.TARGET_OUTPUT_DIR 
+	TARGET_OUTPUT_DIR = settings.TARGET_OUTPUT_DIR
 
 	for article_id in article_ids:
 		print "working on ", article_id
 		xml = build_xml_for_article(article_id)
-
