@@ -29,7 +29,6 @@ def instansiate_article(article_id):
 	logger.info("in instansiate_article for " + str(article_id))
 	try:
 		doi = get_doi(article_id)
-		doi = doi + ".dummy"
 		title = get_title(article_id)
 		article = eLifePOA(doi, title)
 		return article
@@ -192,21 +191,23 @@ def set_editor_info(article, article_id):
 		return False
 
 def write_xml(article_id, xml, dir = ''):
-	f = open(dir + 'elife_poa_e' + str(int(article_id)).zfill(5) + '.dummy.xml', "wb")
+	f = open(dir + 'elife_poa_e' + str(int(article_id)).zfill(5) + '.xml', "wb")
 	f.write(xml.prettyXML())
 	f.close()
 
 def build_xml_for_article(article_id):
 	error_count = 0
 	article = instansiate_article(article_id)
-	if set_abstract(article, article_id): error_count = error_count + 1
-	if set_license(article, article_id): error_count = error_count + 1
-	if set_dates(article, article_id): error_count = error_count + 1
-	if set_ethics(article, article_id): error_count = error_count + 1
-	if set_categories(article, article_id): error_count = error_count + 1
-	if set_organsims(article, article_id): error_count = error_count + 1
-	if set_author_info(article, article_id): error_count = error_count + 1
-	if set_editor_info(article, article_id): error_count = error_count + 1
+	if not set_abstract(article, article_id): error_count = error_count + 1
+	if not set_license(article, article_id): error_count = error_count + 1
+	if not set_dates(article, article_id): error_count = error_count + 1
+	if not set_ethics(article, article_id): error_count = error_count + 1
+	if not set_categories(article, article_id): error_count = error_count + 1
+	if not set_organsims(article, article_id): error_count = error_count + 1
+	if not set_author_info(article, article_id): error_count = error_count + 1
+	if not set_editor_info(article, article_id): error_count = error_count + 1
+
+	print error_count
 
 	# default conflict text
 	article.conflict_default = "The authors declare that no competing interests exist."
@@ -217,10 +218,12 @@ def build_xml_for_article(article_id):
 			logger.info("generated xml for " + str(article_id))
 			write_xml(article_id, article_xml, dir = TARGET_OUTPUT_DIR)
 			logger.info("xml written for " + str(article_id))
+			print "written " + article_id
 		except:
 			logger.error("could not generate or write xml for " + str(article_id))
 	else:
 		logger.warning("the following article did not have enough components and xml was not generated " + str(article_id))
+		logger.warning("warning count was " + str(error_count))
 
 if __name__ == "__main__":
 	# get a list of active article numbers
@@ -230,3 +233,5 @@ if __name__ == "__main__":
 	for article_id in article_ids:
 		print "working on ", article_id
 		xml = build_xml_for_article(article_id)
+		logging.info("")
+		logging.error("")
