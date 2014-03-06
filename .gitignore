@@ -4,3 +4,4 @@ generated_xml_output/*
 *.log
 made_ftp_ready_on/20*
 ftp-to-hw/*.zip
+sample-zip-from-ejp/*.zip
