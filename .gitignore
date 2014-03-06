@@ -1,2 +1,4 @@
 .venv
+generated_xml_output/*
 *.pyc
+*.log
