@@ -5,3 +5,5 @@ generated_xml_output/*
 made_ftp_ready_on/20*
 ftp-to-hw/*.zip
 sample-zip-from-ejp/*.zip
+unpacked_renamed_ejp_files/*.pdf
+unpacked_renamed_ejp_files/*.xml
