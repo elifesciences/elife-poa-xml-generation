@@ -3,6 +3,29 @@ import settings as settings
 import glob
 import logging
 
+"""
+This script uses the fact that the cover pages of pdfs provided
+by EJP return no content when parsed by PyPDF2.
+
+When extracting these pages and exracting their content, we get a null
+value.
+
+This means that we hope that the first page that returns a non null value will be the
+first page of the author supplied manuscript.
+
+We open the EJP pdf, we iterate over the first half dozen or so pages,
+and we look for a match to "match_text" which is specified in a settings file.
+At the moment we are matching against a page number - `3`.
+
+About 7% of pdfs, in testing, could not be opened, or presented a problem, for this
+script. In places where that happens we should email production@elifesciences.org
+
+In addition, testing has shown that all cover pages, to date, have taken up no more
+than 3 PDF pages, so if we find ourselves decapitating more than 3 pages, there is
+probably a problem, and we should abort, and send an error message to production@elifesciecnes.org 
+
+"""
+
 logger = logging.getLogger("decapitator")
 hdlr = logging.FileHandler("decapitator.log")
 formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
@@ -106,7 +129,8 @@ def write_headless_pdf(headless_pdf, pdf_input_path, output_dir):
 	page_stream = file(ouput_path, "wb")
 	headless_pdf.write(page_stream)
 
-def decapitate_pdf(pdf_input_path, match_text, output_dir):
+def decapitate_pdf(pdf_input_path, output_dir):
+	match_text = get_match_text()
 	pdf_reader = setup_pdf_reader(pdf_input_path)
 	logger.info("setup pdf_reader")
 	start_page = get_article_first_page(pdf_reader, match_text)
@@ -131,7 +155,7 @@ if __name__ == "__main__":
 		logger.info("\n")
 		logger.info("about to work on " + str(pdf))
 		try:
-			decapitate_pdf(pdf, match_text, output_dir)
+			decapitate_pdf(pdf, output_dir)
 			logger.info("decapitated " + pdf)
 		except:
 			logger.error("could not decapitate " + pdf)
