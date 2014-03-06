@@ -7,3 +7,4 @@ ftp-to-hw/*.zip
 sample-zip-from-ejp/*.zip
 unpacked_renamed_ejp_files/*.pdf
 unpacked_renamed_ejp_files/*.xml
+settings.py
