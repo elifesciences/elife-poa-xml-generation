@@ -8,3 +8,5 @@ sample-zip-from-ejp/*.zip
 unpacked_renamed_ejp_files/*.pdf
 unpacked_renamed_ejp_files/*.xml
 settings.py
+sample_pdf_decapitation_output/*
+sample_pdf_from_ejp/*
