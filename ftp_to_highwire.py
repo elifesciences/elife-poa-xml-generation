@@ -13,6 +13,7 @@ Will deliver to the named HW ftp bucket.
 I noted that on one run with a large number of PDFs the upload speed
 was very slow, might need to be investigated
 
+# TODO - elife - imulvany - put in place a check to see that zip files contain all expected data
 # TODO - elife - imulvany - find out the final location for FTP delivery
 
 """
