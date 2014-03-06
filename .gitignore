@@ -3,4 +3,4 @@ generated_xml_output/*
 *.pyc
 *.log
 made_ftp_ready_on/20*
-ftp_to_hw/*.zip
+ftp-to-hw/*.zip
