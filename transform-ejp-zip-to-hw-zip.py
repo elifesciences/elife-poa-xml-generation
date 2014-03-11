@@ -270,21 +270,47 @@ def add_hw_manifest_to_new_zipfile(new_zipfile, hw_manifest):
 	f.close()
 	new_zipfile.write("temp_transfer", "manifest.xml")
 
+def get_doi_from_zipfile_name(current_zipfile):
+	"""
+	function is introduced to deal with lack of DOI
+	being provided by EJP. We infer the article number
+	from the name of the zip file, and we generate
+	a doi off of this.
+
+	Other code that takes the doi as an argument requires a full doi
+	even though that code just uses this to parse backwards to the
+	article number.
+
+	TODO - elife - ianm - refactor code to use only article number
+	"""
+	doi_base = "10.7554/eLife."
+	article_number = current_zipfile.split("_")[0]
+	doi = doi_base + article_number
+	return doi
+
+def extract_pdf_from_zipfile(current_zipfile):
+	pdf = "this is a pdf"
+	return pdf
+
+def process_zipfile(zipfile_name, output_dir):
+	current_zipfile = zipfile.ZipFile(zipfile_name, 'r')
+	doi = get_doi_from_zipfile(current_zipfile)
+	#doi = get_doi_from_zipfile_name(zipfile_name)
+	file_title_map = get_filename_new_title_map_from_zipfile(current_zipfile)
+	extracted_pdf = extract_pdf_from_zipfile(current_zipfile)
+	copy_pdf_to_hw_staging_dir(file_title_map, output_dir, doi, current_zipfile)
+	pdfless_file_title_map = remove_pdf_from_file_title_map(file_title_map)
+	new_zipfile = gen_new_zipfile(doi)
+	move_files_into_new_zipfile(current_zipfile, pdfless_file_title_map, new_zipfile, doi)
+	hw_manifest = generate_hw_manifest(new_zipfile, doi)
+	add_hw_manifest_to_new_zipfile(new_zipfile, hw_manifest)
+	move_new_zipfile(doi, hw_ftp_dir)
+
 if __name__ == "__main__":
 	input_dir = settings.EJP_INPUT_DIR
 	output_dir = settings.STAGING_TO_HW_DIR
 	files = glob.glob(input_dir + "/*.zip")
 	for input_zipfile in files:
-		print input_zipfile 
-		current_zipfile = zipfile.ZipFile(input_zipfile, 'r')
-		doi = get_doi_from_zipfile(current_zipfile)
-		file_title_map = get_filename_new_title_map_from_zipfile(current_zipfile)
-		copy_pdf_to_hw_staging_dir(file_title_map, output_dir, doi, current_zipfile)
-		file_title_map = remove_pdf_from_file_title_map(file_title_map)
-		print file_title_map
-		new_zipfile = gen_new_zipfile(doi)
-		print new_zipfile
-		move_files_into_new_zipfile(current_zipfile, file_title_map, new_zipfile, doi)
-		hw_manifest = generate_hw_manifest(new_zipfile, doi)
-		add_hw_manifest_to_new_zipfile(new_zipfile, hw_manifest)
-		move_new_zipfile(doi, hw_ftp_dir)
+		logger.info("\n\n")
+		logger.info("working on " + input_zipfile)
+		process_zipfile(input_zipfile, output_dir)
