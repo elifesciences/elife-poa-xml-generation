@@ -166,7 +166,7 @@ def gen_new_name_for_file(name, title, doi):
 	new_name_front = title.replace(" ", "_")
 	new_name_front = new_name_front.replace("-", "_")
 	new_name_front = new_name_front.replace("__", "_")
-	new_name_front = new_name_front.replace("__", "_")	
+	new_name_front = new_name_front.replace("__", "_")
 	if new_name_front == "Merged_PDF":  # we ignore the main file name and just use our base POA convention
 		new_name = "elife_poa_" + article_id + "." + file_ext
 	else:
