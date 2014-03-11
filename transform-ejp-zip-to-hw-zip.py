@@ -62,7 +62,7 @@ class manifestXML(object):
 		"""
 		set the root node
 		get the article type from the object passed in to the class
-		set default values for items that are boilder plate for this XML 
+		set default values for items that are boilder plate for this XML
 		"""
 
 		self.root = Element('datasupp')
