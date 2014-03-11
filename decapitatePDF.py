@@ -22,7 +22,7 @@ script. In places where that happens we should email production@elifesciences.or
 
 In addition, testing has shown that all cover pages, to date, have taken up no more
 than 3 PDF pages, so if we find ourselves decapitating more than 3 pages, there is
-probably a problem, and we should abort, and send an error message to production@elifesciecnes.org 
+probably a problem, and we should abort, and send an error message to production@elifesciecnes.org
 
 """
 
@@ -31,7 +31,7 @@ hdlr = logging.FileHandler("decapitator.log")
 formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
-logger.setLevel(logging.ERROR)
+logger.setLevel(logging.INFO)
 
 def initalise():
 	logger.info("\n\ninialising")
@@ -87,7 +87,9 @@ def get_all_pdfs(input_dir, file_system):
 		logger.error("no supported file system sypplied")
 
 def setup_pdf_reader(input_pdf_path):
+	print input_pdf_path
 	input_pdfreader = PdfFileReader(open(input_pdf_path, "rb"))
+	print input_pdfreader
 	return input_pdfreader
 
 def set_output_path(input_pdf_path, output_dir):
@@ -129,16 +131,57 @@ def write_headless_pdf(headless_pdf, pdf_input_path, output_dir):
 	page_stream = file(ouput_path, "wb")
 	headless_pdf.write(page_stream)
 
-def decapitate_pdf(pdf_input_path, output_dir):
+def get_start_page(pdf_input_path):
 	match_text = get_match_text()
 	pdf_reader = setup_pdf_reader(pdf_input_path)
 	logger.info("setup pdf_reader")
 	start_page = get_article_first_page(pdf_reader, match_text)
+	return start_page
+
+def decapitate_pdf(pdf_input_path, output_dir):
+	pdf_reader = setup_pdf_reader(pdf_input_path)
+	start_page = get_start_page(pdf_input_path)
 	logger.info("retreived start page")
 	headless_pdf = generate_headless_pdf(pdf_reader, start_page)
 	logger.info("generated headless pdf " + str(headless_pdf))
 	write_headless_pdf(headless_pdf, pdf_input_path, output_dir)
 	logger.info("wrote headless pdf")
+
+def is_first_page_in_range(pdf_input_path):
+	first_page = get_start_page(pdf_input_path)
+	try:
+		first_page = get_start_page(pdf_input_path)
+	except:
+		logger.error("could not scan " + pdf_input_path)
+		return False
+
+	if first_page < 4:
+		return True
+	else:
+		logger.error("first page is out of bounds")
+		return False
+
+def decapitate_pdf_with_error_check(pdf_input_path, output_dir):
+	"""
+	This function takes an input and output path, and
+	attempts to write a decapitated pdf file to the output path.
+	If the funciton is a success it returns True, otherwise it returns False.
+
+	In addition it checks that the first page of the author PDF falls within the first four
+	pages of the total input pdf.
+
+	"""
+	logger.info(pdf_input_path)
+	logger.info(output_dir)
+	if is_first_page_in_range(pdf_input_path):
+		try:
+			decapitate_pdf(pdf_input_path, output_dir)
+			return True
+		except:
+			logger.error("could not decapitate pdf")
+			return False
+	else:
+		return False
 
 if __name__ == "__main__":
 	"""
@@ -150,12 +193,16 @@ if __name__ == "__main__":
 	logger.info("file system is " + file_system)
 	logger.info("output dir is " + output_dir)
 	match_text = get_match_text()
-	pdfs = get_all_pdfs(input_dir, file_system)
-	for pdf in pdfs:
-		logger.info("\n")
-		logger.info("about to work on " + str(pdf))
-		try:
-			decapitate_pdf(pdf, output_dir)
-			logger.info("decapitated " + pdf)
-		except:
-			logger.error("could not decapitate " + pdf)
+	pdf = "./decap_elife_poa_e00032.pdf"
+	output_dir = "./staging_decapitate_pdf_dir/"
+	decapitate_pdf_with_error_check(pdf, output_dir)
+
+# pdfs = get_all_pdfs(input_dir, file_system)
+	# for pdf in pdfs:
+	# 	logger.info("\n")
+	# 	logger.info("about to work on " + str(pdf))
+	# 	try:
+	# 		decapitate_pdf(pdf, output_dir)
+	# 		logger.info("decapitated " + pdf)
+	# 	except:
+	# 		logger.error("could not decapitate " + pdf)
