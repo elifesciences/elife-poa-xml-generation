@@ -185,37 +185,35 @@ def get_doi_from_zipfile(ejp_input_zipfile):
 def get_filename_new_title_map_from_zipfile(ejp_input_zipfile):
 	workflow_logger.info("unpacking and renaming" + str(ejp_input_zipfile))
 	file_title_map = {}
-	print ejp_input_zipfile.namelist()
 	manifest = ejp_input_zipfile.read("manifest.xml")
 	tree = ET.fromstring(manifest)
 	for child in tree:
 		if child.tag == "file":
 			for file in child:
-				if file.tag == "filename": filename = file.text 
-				if file.tag == "title": title =  file.text 
+				if file.tag == "filename": filename = file.text
+				if file.tag == "title": title =  file.text
 			file_title_map[filename] = title
-	return file_title_map 
+	return file_title_map
 
-def unpack_and_rename_files_from_zip(ejp_input_zipfile):
-	print ejp_input_zipfile
-	if doi: 
-		zf = zipfile.ZipFile(ejp_input_zipfile, 'r')
-		logger.info("doi obtained for " + str(ejp_input_zipfile))
-		for name in file_title_map.keys():
-			title = file_title_map[name]
-			new_name = gen_new_name_for_file(name, title, doi)
-			file = zf.read(name)
-			out_handler = open(output_dir + "/" + new_name, "w")
-			out_handler.write(file)
-			out_handler.close()
-			print new_name
-	else:
-		logger.warning("unable to find a doi for " + str(ejp_input_zipfile))
-
+# def unpack_and_rename_files_from_zip(ejp_input_zipfile):
+# 	print ejp_input_zipfile
+# 	if doi:
+# 		zf = zipfile.ZipFile(ejp_input_zipfile, 'r')
+# 		logger.info("doi obtained for " + str(ejp_input_zipfile))
+# 		for name in file_title_map.keys():
+# 			title = file_title_map[name]
+# 			new_name = gen_new_name_for_file(name, title, doi)
+# 			file = zf.read(name)
+# 			out_handler = open(output_dir + "/" + new_name, "w")
+# 			out_handler.write(file)
+# 			out_handler.close()
+# 			print new_name
+# 	else:
+# 		logger.warning("unable to find a doi for " + str(ejp_input_zipfile))
 
 def get_new_zipfile_name(doi):
 	article_id = article_id_from_doi(doi)
-	new_zipfile_name = "elife_poa_" + article_id + "_ds.zip" 	
+	new_zipfile_name = "elife_poa_" + article_id + "_ds.zip"
 	return new_zipfile_name
 
 def gen_new_zipfile(doi):
