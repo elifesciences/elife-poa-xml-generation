@@ -174,7 +174,7 @@ def gen_new_name_for_file(name, title, doi):
 	return new_name
 
 def get_doi_from_zipfile(ejp_input_zipfile):
-	print ejp_input_zipfile.namelist() 
+	#print ejp_input_zipfile.namelist()
 	manifest = ejp_input_zipfile.read("manifest.xml")
 	tree = ET.fromstring(manifest)
 	for child in tree:
