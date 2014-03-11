@@ -3,7 +3,7 @@ quickly zip some archives
 """
 
 import os
-import zipfile 
+import zipfile
 import glob
 
 def zip_matching_files(pdf_file_articles_numbers, xml_file_articles_numbers, zf):
@@ -26,19 +26,15 @@ def zip_directory(dir, zipname):
 		zf.write(filename, arcname)
 
 dir_root = "/Users/ian/Dropbox/code/public-code/forks/elife-poa-xml-generation-body/sample-zip-from-ejp/"
-directories =  ["1135_0_supp_mat_highwire_zip_00003",
-				"1135_0_supp_mat_highwire_zip_00005",
-				"1135_0_supp_mat_highwire_zip_00007",
-				"1135_0_supp_mat_highwire_zip_00012",
-				"1135_0_supp_mat_highwire_zip_00013",
-				"1135_0_supp_mat_highwire_zip_00031",
-				"1135_0_supp_mat_highwire_zip_00036",
-				"1135_0_supp_mat_highwire_zip_00047"]
+
+directories =  ["3067_1_supp_mat_highwire_zip_45156_n22sp5",
+			    "3271_1_supp_mat_highwire_zip_45160_n22sgj",
+				"3512_1_supp_mat_highwire_zip_45163_n22swd"]
 
 for directory in directories:
 	zip_target = dir_root + directory
 	zip_name = directory + ".zip"
 	zf = zipfile.ZipFile(zip_name, "w")
 	files = glob.glob(zip_target + "/*")
-	print zip_target, files 
+	print zip_target, files
 	zip_directory(zip_target, zf)
