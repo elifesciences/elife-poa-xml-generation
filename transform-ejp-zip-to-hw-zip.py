@@ -135,24 +135,24 @@ class ElifeDocumentType(minidom.DocumentType):
 
 def get_last_commit_to_master():
     """
-    returns the last commit on the master branch. It would be more ideal to get the commit 
+    returns the last commit on the master branch. It would be more ideal to get the commit
     from the branch we are currently on, but as this is a check mostly to help
-    with production issues, returning the commit from master will be sufficient. 
+    with production issues, returning the commit from master will be sufficient.
     """
     repo = Repo(".")
-    last_commit = repo.commits()[0] 
-    return str(last_commit) 
-    # commit =  repo.heads[0].commit 
-    # return str(commit) 
+    last_commit = repo.commits()[0]
+    return str(last_commit)
+    # commit =  repo.heads[0].commit
+    # return str(commit)
 
 def article_id_from_doi(doi):
 	article_id = doi.split("/")[1]
 	article_id = article_id.replace(".","")
-	article_id = article_id.replace("eLife","e")	
+	article_id = article_id.replace("eLife","e")
 	return article_id
 
 def get_datestamp():
-	a = arrow.utcnow() 
+	a = arrow.utcnow()
 	date_stamp = str(a.datetime.year) + str(a.datetime.month).zfill(2) + str(a.datetime.day).zfill(2)
 	return date_stamp
 
