@@ -14,25 +14,26 @@ import time
 import re
 from git import *
 import settings
-import shutil 
+import shutil
+from decapitatePDF import decapitate_pdf_with_error_check
 
 """
-open the zip file from EJP, 
+open the zip file from EJP,
 
 get the manifext.xml file
 
-move the pdf to the hw staging dir 
+move the pdf to the hw staging dir
 
 rename and move supp files to a new zipfile called
-	elife_poa_e000213_supporting_files.zip 
+	elife_poa_e000213_supporting_files.zip
 
-find the pdf file and move this to the hw ftp staging directory 
+find the pdf file and move this to the hw ftp staging directory
 
-generate a new manifest and instert into the new zip file 
+generate a new manifest and instert into the new zip file
 
-move the new zip file to the HW staging site 
+move the new zip file to the HW staging site
 
-move the old ejp zip file to the processed files directory 
+move the old ejp zip file to the processed files directory
 """
 
 # local logger
@@ -40,15 +41,15 @@ logger = logging.getLogger('transformEjpToHWZip')
 hdlr = logging.FileHandler('transformEjpToHWZip.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
-logger.addHandler(hdlr) 
+logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
 
-# global logger 
+# global logger
 workflow_logger = logging.getLogger('ejp_to_hw_workflow')
 hdlr = logging.FileHandler('ejp_to_hw_workflow.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
-workflow_logger.addHandler(hdlr) 
+workflow_logger.addHandler(hdlr)
 workflow_logger.setLevel(logging.INFO)
 
 input_dir = settings.EJP_INPUT_DIR
