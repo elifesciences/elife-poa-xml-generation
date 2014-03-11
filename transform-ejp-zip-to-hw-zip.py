@@ -232,17 +232,56 @@ def move_files_into_new_zipfile(current_zipfile, file_title_map, new_zipfile, do
 		f.close()
 		new_zipfile.write("temp_transfer", new_name)
 
+def alert_production(alert_message):
+	""
+	test_message = "holy shit batman, something's gone wrong"
+
 def copy_pdf_to_hw_staging_dir(file_title_map, output_dir, doi, current_zipfile):
+	"""
+	we will attempt to generate a headless pdf and move this pdf
+	to the ftp staging site.
+
+	if this headless creation fails, we will raise an error to
+	production@elifesciecnes.org, and try to copy the original pdf
+	file to ftp staging
+
+	the function that we call to decapitate the pdf is contained in decapitatePDF.py.
+	It manages some error handline, and tries to determine witheher the pdf
+	cover content has been celanly removed.
+
+	TODO: - elife - ianm - tidy up paths to temporary pdf decpitation paths
+	"""
+
+
 	for name in file_title_map.keys():
+		# we extract the pdf from the zipfile
 		title = file_title_map[name]
-		print title 
+
 		if title == "Merged PDF":
-			print title 
+			print title
 			new_name = gen_new_name_for_file(name, title, doi)
 			file = current_zipfile.read(name)
-			out_handler = open(output_dir + "/" + new_name, "w")
-			out_handler.write(file)
-			out_handler.close()
+			print new_name
+			decap_name = "decap_" + new_name
+			# we save the pdf to a local file
+			temp_file = open(decap_name, "w")
+			temp_file.write(file)
+			temp_file.close()
+
+	if decapitate_pdf_with_error_check(decap_name, "./staging_decapitate_pdf_dir/"):
+		# pass the local file path, and teh path to a temp dir, to the decapiation script
+		move_file = open("./staging_decapitate_pdf_dir/" + decap_name, "r").read()
+		out_handler = open(output_dir + "/" + new_name, "w")
+		out_handler.write(move_file)
+		out_handler.close()
+		print "decapitaiton worked"
+	else:
+		# if the decapitation script has failed, we move the original pdf file
+		move_file = file
+		alert_message = "could not decapitate " + new_name
+		logger.error(alert_message)
+		alert_production(alert_message)
+
 
 def remove_pdf_from_file_title_map(file_title_map):
 	new_map = {}
