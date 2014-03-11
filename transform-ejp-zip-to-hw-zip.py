@@ -1,10 +1,9 @@
 import zipfile
 import glob
 from elementtree import ElementTree as ET
-import logging 
-import settings as settings 
-import arrow 
-
+import logging
+import settings as settings
+import arrow
 import xml
 from xml.dom.minidom import Document
 from collections import namedtuple
