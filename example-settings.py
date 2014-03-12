@@ -54,6 +54,8 @@ FTP_TO_HW_DIR = "ftp-to-hw"
 MADE_FTP_READY = "made_ftp_ready_on"
 EJP_INPUT_DIR = "sample-zip-from-ejp"
 
+MATCH_TEXT = `3`
+
 FTP_URI = ""
 FTP_USERNAME = ""
 FTP_PASSWORD = ""
