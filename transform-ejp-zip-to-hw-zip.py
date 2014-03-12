@@ -264,7 +264,7 @@ def copy_pdf_to_hw_staging_dir(file_title_map, output_dir, doi, current_zipfile)
 			print new_name
 			decap_name = "decap_" + new_name
 			# we save the pdf to a local file
-			temp_file = open(decap_name, "w")
+			temp_file = open(decap_name, "wb")
 			temp_file.write(file)
 			temp_file.close()
 
@@ -342,6 +342,8 @@ def process_zipfile(zipfile_name, output_dir):
 	move_files_into_new_zipfile(current_zipfile, pdfless_file_title_map, new_zipfile, doi)
 	hw_manifest = generate_hw_manifest(new_zipfile, doi)
 	add_hw_manifest_to_new_zipfile(new_zipfile, hw_manifest)
+	# Close zip file before moving
+	new_zipfile.close()
 	move_new_zipfile(doi, hw_ftp_dir)
 
 if __name__ == "__main__":
