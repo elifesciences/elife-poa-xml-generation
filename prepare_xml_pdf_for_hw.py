@@ -70,10 +70,10 @@ def zip_matching_files(pdf_file_articles_numbers, xml_file_articles_numbers, zf)
 	for file in pdf_file_articles_numbers:
 		if file in xml_file_articles_numbers:
 			absname = file + ".pdf"
-			arcname = absname.split("/")[1]
+			arcname = absname.split(os.sep)[1]
 			zf.write(absname, arcname)
 			absname = file + ".xml"
-			arcname = absname.split("/")[1]
+			arcname = absname.split(os.sep)[1]
 			zf.write(absname, arcname)
 
 def move_zipfile_to_hw_staging(xml_pdf_zip, ftp_to_hw):
@@ -83,10 +83,10 @@ def move_processed_files(pdf_file_articles_numbers, xml_file_articles_numbers, s
 	for file in pdf_file_articles_numbers:
 		if file in xml_file_articles_numbers:
 			absname = file + ".pdf"
-			arcname = absname.split("/")[1]
+			arcname = absname.split(os.sep)[1]
 			shutil.move(sourcedir + "/" + arcname, made_ftp_ready + "/" + arcname)
 			absname = file + ".xml"
-			arcname = absname.split("/")[1]
+			arcname = absname.split(os.sep)[1]
 			shutil.move(sourcedir + "/" + arcname, made_ftp_ready + "/" + arcname)
 
 def set_datestamp():
@@ -124,6 +124,8 @@ def prepare_pdf_xml_for_ftp():
 
 	check_matching_files_exist(pdf_file_articles_numbers, xml_file_articles_numbers)
 	zip_matching_files(pdf_file_articles_numbers, xml_file_articles_numbers, zf)
+	# Close zip file before moving
+	zf.close()
 	move_zipfile_to_hw_staging(xml_pdf_zip, ftp_to_hw)
 	move_processed_files(pdf_file_articles_numbers, xml_file_articles_numbers, sourcedir, made_ftp_ready_dir)
 

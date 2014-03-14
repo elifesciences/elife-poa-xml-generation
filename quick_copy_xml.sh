@@ -6,4 +6,6 @@ cp ./generated_xml_output/elife_poa_e00013.xml ./unpacked_renamed_ejp_files/
 cp ./generated_xml_output/elife_poa_e00031.xml ./unpacked_renamed_ejp_files/
 cp ./generated_xml_output/elife_poa_e00036.xml ./unpacked_renamed_ejp_files/
 cp ./generated_xml_output/elife_poa_e00047.xml ./unpacked_renamed_ejp_files/
-
+cp ./generated_xml_output/elife_poa_e02025.xml ./unpacked_renamed_ejp_files/
+cp ./generated_xml_output/elife_poa_e02370.xml ./unpacked_renamed_ejp_files/
+cp ./generated_xml_output/elife_poa_e02042.xml ./unpacked_renamed_ejp_files/
