@@ -53,6 +53,7 @@ STAGING_TO_HW_DIR = "unpacked_renamed_ejp_files/"
 FTP_TO_HW_DIR = "ftp-to-hw"
 MADE_FTP_READY = "made_ftp_ready_on"
 EJP_INPUT_DIR = "sample-zip-from-ejp"
+STAGING_DECAPITATE_PDF_DIR = "staging_decapitate_pdf_dir"
 
 MATCH_TEXT = `3`
 

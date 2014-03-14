@@ -268,10 +268,10 @@ def copy_pdf_to_hw_staging_dir(file_title_map, output_dir, doi, current_zipfile)
 			temp_file.write(file)
 			temp_file.close()
 
-	if decapitate_pdf_with_error_check(decap_name, "./staging_decapitate_pdf_dir/"):
+	if decapitate_pdf_with_error_check(decap_name, "./" + settings.STAGING_DECAPITATE_PDF_DIR + "/"):
 		# pass the local file path, and teh path to a temp dir, to the decapiation script
-		move_file = open("./staging_decapitate_pdf_dir/" + decap_name, "r").read()
-		out_handler = open(output_dir + "/" + new_name, "w")
+		move_file = open("./" + settings.STAGING_DECAPITATE_PDF_DIR + "/" + decap_name, "rb").read()
+		out_handler = open(output_dir + "/" + new_name, "wb")
 		out_handler.write(move_file)
 		out_handler.close()
 		print "decapitaiton worked"
@@ -335,7 +335,7 @@ def process_zipfile(zipfile_name, output_dir):
 	doi = get_doi_from_zipfile(current_zipfile)
 	#doi = get_doi_from_zipfile_name(zipfile_name)
 	file_title_map = get_filename_new_title_map_from_zipfile(current_zipfile)
-	extracted_pdf = extract_pdf_from_zipfile(current_zipfile)
+	#extracted_pdf = extract_pdf_from_zipfile(current_zipfile)
 	copy_pdf_to_hw_staging_dir(file_title_map, output_dir, doi, current_zipfile)
 	pdfless_file_title_map = remove_pdf_from_file_title_map(file_title_map)
 	new_zipfile = gen_new_zipfile(doi)
