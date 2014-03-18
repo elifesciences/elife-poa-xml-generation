@@ -179,7 +179,12 @@ def get_doi_from_zipfile(ejp_input_zipfile):
 	tree = ET.fromstring(manifest)
 	for child in tree:
 		if child.tag == "resource":
-			doi = child.text
+			if child.attrib["type"] == "doi":
+				doi = child.text
+			elif child.attrib["type"] == "resourceid":
+				doi_base = "10.7554/eLife."
+				article_number = child.text.split("-")[-1]
+				doi = doi_base + article_number
 	return doi
 
 def get_filename_new_title_map_from_zipfile(ejp_input_zipfile):
