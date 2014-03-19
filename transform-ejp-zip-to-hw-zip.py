@@ -140,7 +140,12 @@ def get_last_commit_to_master():
     with production issues, returning the commit from master will be sufficient.
     """
     repo = Repo(".")
-    last_commit = repo.commits()[0]
+    last_commit = None
+    try:
+        last_commit = repo.commits()[0] 
+    except AttributeError:
+        # Optimised for version 0.3.2.RC1
+        last_commit = repo.head.commit
     return str(last_commit)
     # commit =  repo.heads[0].commit
     # return str(commit)
