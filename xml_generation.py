@@ -25,6 +25,9 @@ hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
 
+# set output directory
+TARGET_OUTPUT_DIR = settings.TARGET_OUTPUT_DIR
+
 def instantiate_article(article_id):
 	logger.info("in instantiate_article for " + str(article_id))
 	try:
