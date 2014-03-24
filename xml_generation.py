@@ -200,6 +200,10 @@ def write_xml(article_id, xml, dir = ''):
 
 def build_xml_for_article(article_id):
 	error_count = 0
+	
+	# Only happy with string article_id - cast it now to be safe!
+	article_id = str(article_id)
+	
 	article = instantiate_article(article_id)
 	if not set_abstract(article, article_id): error_count = error_count + 1
 	if not set_license(article, article_id): error_count = error_count + 1
