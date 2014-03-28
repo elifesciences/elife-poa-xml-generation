@@ -3,6 +3,7 @@ from parseCSVFiles import *
 import xlrd
 import settings as settings
 import logging
+import os
 
 """
 read from an xls file
@@ -194,7 +195,7 @@ def set_editor_info(article, article_id):
 		return False
 
 def write_xml(article_id, xml, dir = ''):
-	f = open(dir + 'elife_poa_e' + str(int(article_id)).zfill(5) + '.xml', "wb")
+	f = open(dir + os.sep + 'elife_poa_e' + str(int(article_id)).zfill(5) + '.xml', "wb")
 	f.write(xml.prettyXML())
 	f.close()
 
