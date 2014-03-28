@@ -49,7 +49,7 @@ XLS_COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 # xml writing settings
 TARGET_OUTPUT_DIR = "generated_xml_output"
 
-STAGING_TO_HW_DIR = "unpacked_renamed_ejp_files/"
+STAGING_TO_HW_DIR = "unpacked_renamed_ejp_files"
 FTP_TO_HW_DIR = "ftp-to-hw"
 MADE_FTP_READY = "made_ftp_ready_on"
 EJP_INPUT_DIR = "sample-zip-from-ejp"
