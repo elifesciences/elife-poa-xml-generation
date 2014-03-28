@@ -93,8 +93,8 @@ class eLife2XML(object):
             fn = SubElement(self.competing_interest, "fn")
             fn.set("fn-type", "conflict")
             fn.set("id", id)
-            p = SubElement(fn, "p")
-            p.text = poa_article.conflict_default
+            pconf1 = SubElement(fn, "p")
+            pconf1.text = poa_article.conflict_default
             conflict_count = conflict_count + 1
         for contributor in poa_article.contributors:
             if contributor.conflict:
@@ -107,6 +107,9 @@ class eLife2XML(object):
                 p.text = p.text + contributor.conflict
                 # increment
                 conflict_count = conflict_count + 1
+        if conflict_count > 1:
+            # Change the default conflict text
+            pconf1.text = "The other authors declare that no competing interests exist."
 
     def set_fn_group_ethics_information(self, parent, poa_article):
         self.competing_interest = SubElement(parent, "fn-group")
