@@ -86,16 +86,12 @@ class eLife2XML(object):
         title = SubElement(self.competing_interest, "title")
         title.text = "Competing interest"
         
-        conflict_count = 0
+        # Check if we are supplied a conflict default statement and set count accordingly
         if poa_article.conflict_default:
-            # default for contributors with no conflicts
-            id = "conf1"
-            fn = SubElement(self.competing_interest, "fn")
-            fn.set("fn-type", "conflict")
-            fn.set("id", id)
-            pconf1 = SubElement(fn, "p")
-            pconf1.text = poa_article.conflict_default
-            conflict_count = conflict_count + 1
+            conflict_count = 1
+        else:
+            conflict_count = 0
+            
         for contributor in poa_article.contributors:
             if contributor.conflict:
                 id = "conf" + str(conflict_count + 1)
@@ -104,12 +100,23 @@ class eLife2XML(object):
                 fn.set("id", id)
                 p = SubElement(fn, "p")
                 p.text = contributor.given_name + " " + contributor.surname + ", "
-                p.text = p.text + contributor.conflict
+                p.text = p.text + contributor.conflict + "."
                 # increment
                 conflict_count = conflict_count + 1
-        if conflict_count > 1:
-            # Change the default conflict text
-            pconf1.text = "The other authors declare that no competing interests exist."
+        if poa_article.conflict_default:
+            # default for contributors with no conflicts
+            if conflict_count > 1:
+                # Change the default conflict text
+                conflict_text = "The other authors declare that no competing interests exist."
+            else:
+                conflict_text = poa_article.conflict_default
+            id = "conf1"
+            fn = SubElement(self.competing_interest, "fn")
+            fn.set("fn-type", "conflict")
+            fn.set("id", id)
+            p = SubElement(fn, "p")
+            p.text = conflict_text
+            conflict_count = conflict_count + 1
 
     def set_fn_group_ethics_information(self, parent, poa_article):
         self.competing_interest = SubElement(parent, "fn-group")
