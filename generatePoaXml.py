@@ -360,11 +360,12 @@ class eLife2XML(object):
                     self.email = SubElement(self.aff, "email")
                     self.email.text = affiliation.email
 
-                if contrib_type != "editor":
-                    if rid:
-                        self.xref = SubElement(self.aff, "xref")
-                        self.xref.set("ref-type", "fn")
-                        self.xref.set("rid", rid)
+            # Contrib conflict xref
+            if contrib_type != "editor":
+                if rid:
+                    self.xref = SubElement(self.contrib, "xref")
+                    self.xref.set("ref-type", "fn")
+                    self.xref.set("rid", rid)
 
     def set_article_categories(self, parent, poa_article):
         # article-categories
