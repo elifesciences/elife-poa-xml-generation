@@ -66,15 +66,15 @@ def check_matching_files_exist(pdf_file_articles_numbers, xml_file_articles_numb
 	for file in xml_file_articles_numbers:
 		if file not in pdf_file_articles_numbers: logger.warning(str(file) + " has no pdf match")
 
-def zip_matching_files(pdf_file_articles_numbers, xml_file_articles_numbers, zf):
+def zip_matching_files(pdf_file_articles_numbers, xml_file_articles_numbers, zf, sourcedir):
 	for file in pdf_file_articles_numbers:
 		if file in xml_file_articles_numbers:
 			absname = file + ".pdf"
 			arcname = absname.split(os.sep)[-1]
-			zf.write(absname, arcname)
+			zf.write(sourcedir + "/" + absname, arcname)
 			absname = file + ".xml"
 			arcname = absname.split(os.sep)[-1]
-			zf.write(absname, arcname)
+			zf.write(sourcedir + "/" + absname, arcname)
 
 def move_zipfile_to_hw_staging(xml_pdf_zip, ftp_to_hw):
 	shutil.move(xml_pdf_zip, ftp_to_hw + "/" + xml_pdf_zip)
@@ -137,7 +137,7 @@ def prepare_pdf_xml_for_ftp():
 	zf = zipfile.ZipFile(xml_pdf_zip, "w")
 
 	check_matching_files_exist(pdf_file_articles_numbers, xml_file_articles_numbers)
-	zip_matching_files(pdf_file_articles_numbers, xml_file_articles_numbers, zf)
+	zip_matching_files(pdf_file_articles_numbers, xml_file_articles_numbers, zf, sourcedir)
 	# Close zip file before moving
 	zf.close()
 	move_zipfile_to_hw_staging(xml_pdf_zip, ftp_to_hw)
