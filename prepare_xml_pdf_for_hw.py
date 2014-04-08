@@ -107,6 +107,20 @@ def set_made_ftp_ready_dir():
 		os.makedirs(made_ftp_ready_dir)
 	return made_ftp_ready_dir
 
+def get_filename_from_path(f, extension):
+	"""
+	Get a filename minus the supplied file extension
+	and without any folder or path
+	"""
+	filename = f.split(extension)[0]
+	# Remove path if present
+	try:
+		filename = filename.split(os.sep)[-1]
+	except:
+		pass
+	
+	return filename
+
 def prepare_pdf_xml_for_ftp():
 	sourcedir = settings.STAGING_TO_HW_DIR
 	ftp_to_hw = settings.FTP_TO_HW_DIR
@@ -115,8 +129,8 @@ def prepare_pdf_xml_for_ftp():
 
 	pdf_file_articles_numbers = []
 	xml_file_articles_numbers = []
-	for f in pdf_files: pdf_file_articles_numbers.append(f.split(".pdf")[0])
-	for f in xml_files: xml_file_articles_numbers.append(f.split(".xml")[0])
+	for f in pdf_files: pdf_file_articles_numbers.append(get_filename_from_path(f, ".pdf"))
+	for f in xml_files: xml_file_articles_numbers.append(get_filename_from_path(f, ".xml"))
 
 	made_ftp_ready_dir = set_made_ftp_ready_dir()
 	xml_pdf_zip = set_xml_pdf_zip_name()
