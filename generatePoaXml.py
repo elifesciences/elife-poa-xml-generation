@@ -86,16 +86,12 @@ class eLife2XML(object):
         title = SubElement(self.competing_interest, "title")
         title.text = "Competing interest"
         
-        conflict_count = 0
+        # Check if we are supplied a conflict default statement and set count accordingly
         if poa_article.conflict_default:
-            # default for contributors with no conflicts
-            id = "conf1"
-            fn = SubElement(self.competing_interest, "fn")
-            fn.set("fn-type", "conflict")
-            fn.set("id", id)
-            p = SubElement(fn, "p")
-            p.text = poa_article.conflict_default
-            conflict_count = conflict_count + 1
+            conflict_count = 1
+        else:
+            conflict_count = 0
+            
         for contributor in poa_article.contributors:
             if contributor.conflict:
                 id = "conf" + str(conflict_count + 1)
@@ -104,9 +100,23 @@ class eLife2XML(object):
                 fn.set("id", id)
                 p = SubElement(fn, "p")
                 p.text = contributor.given_name + " " + contributor.surname + ", "
-                p.text = p.text + contributor.conflict
+                p.text = p.text + contributor.conflict + "."
                 # increment
                 conflict_count = conflict_count + 1
+        if poa_article.conflict_default:
+            # default for contributors with no conflicts
+            if conflict_count > 1:
+                # Change the default conflict text
+                conflict_text = "The other authors declare that no competing interests exist."
+            else:
+                conflict_text = poa_article.conflict_default
+            id = "conf1"
+            fn = SubElement(self.competing_interest, "fn")
+            fn.set("fn-type", "conflict")
+            fn.set("id", id)
+            p = SubElement(fn, "p")
+            p.text = conflict_text
+            conflict_count = conflict_count + 1
 
     def set_fn_group_ethics_information(self, parent, poa_article):
         self.competing_interest = SubElement(parent, "fn-group")
@@ -350,11 +360,12 @@ class eLife2XML(object):
                     self.email = SubElement(self.aff, "email")
                     self.email.text = affiliation.email
 
-                if contrib_type != "editor":
-                    if rid:
-                        self.xref = SubElement(self.aff, "xref")
-                        self.xref.set("ref-type", "fn")
-                        self.xref.set("rid", rid)
+            # Contrib conflict xref
+            if contrib_type != "editor":
+                if rid:
+                    self.xref = SubElement(self.contrib, "xref")
+                    self.xref.set("ref-type", "fn")
+                    self.xref.set("rid", rid)
 
     def set_article_categories(self, parent, poa_article):
         # article-categories
