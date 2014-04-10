@@ -100,20 +100,20 @@ class manifestXML(object):
 		"""
 		#filename_text = "placeholder"
 		filename_text = new_zipfile.filename
-		title_text = "Download .zip"
-		linktext_text = "Any figures and tables for this article are included in the PDF."
-		linktext_text += " The .zip folder contains additional supplemental files."
+		description_text = "Supplemental files description"
+		title_text = "Any figures and tables for this article are included in the PDF."
+		title_text += " The .zip folder contains additional supplemental files."
 		
 		# Add XML
 		self.file = SubElement(self.root, "file")
 		self.filename = SubElement(self.file, "filename")
 		self.filename.text = filename_text
 
-		self.description = SubElement(self.file, "linktext")
-		self.description.text = linktext_text
-
 		self.title = SubElement(self.file, "title")
 		self.title.text = title_text
+		
+		self.description = SubElement(self.file, "description")
+		self.description.text = description_text
 
 
 # self.department = SubElement(self.addline, "named-content")
