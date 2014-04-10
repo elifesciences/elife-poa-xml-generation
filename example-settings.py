@@ -60,3 +60,4 @@ MATCH_TEXT = `3`
 FTP_URI = ""
 FTP_USERNAME = ""
 FTP_PASSWORD = ""
+FTP_CWD = ""

@@ -23,7 +23,7 @@ source_dir = settings.FTP_TO_HW_DIR
 ftpuri = settings.FTP_URI
 ftpusername = settings.FTP_USERNAME
 ftppassword = settings.FTP_PASSWORD
-
+ftpcwd = settings.FTP_CWD
 
 
 def upload(ftp, file):
@@ -40,6 +40,8 @@ def upload(ftp, file):
 def ftp_to_endpoint(zipfiles):
 	for zipfile in zipfiles:
 		ftp = FTP(ftpuri, ftpusername, ftppassword)
+		if ftpcwd != "":
+			ftp.cwd(ftpcwd)
 		upload(ftp, zipfile)
 		ftp.quit()
 	
