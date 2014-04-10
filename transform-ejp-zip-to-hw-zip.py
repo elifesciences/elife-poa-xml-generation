@@ -72,7 +72,7 @@ class manifestXML(object):
 		self.resource.text = str(doi)
 
 		self.linktext = SubElement(self.root, "linktext")
-		self.linktext.text = "this is the awesome linktext"
+		self.linktext.text = "Supplementary data"
 		
 		# Add file elements to the manifest
 		self.extended_manifest(new_zipfile)
