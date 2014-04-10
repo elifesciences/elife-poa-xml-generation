@@ -73,7 +73,15 @@ class manifestXML(object):
 
 		self.linktext = SubElement(self.root, "linktext")
 		self.linktext.text = "this is the awesome linktext"
+		
+		# Add file elements to the manifest
+		self.extended_manifest(new_zipfile)
 
+	def extended_manifest(self, new_zipfile):
+		"""
+		Old procedure to build a manifest XML based on the filenames
+		found in the zip file
+		"""
 		filelist = new_zipfile.namelist()
 		for filename in filelist:
 			self.file = SubElement(self.root, "file")
