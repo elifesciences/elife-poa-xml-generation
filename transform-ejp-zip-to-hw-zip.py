@@ -75,7 +75,7 @@ class manifestXML(object):
 		self.linktext.text = "Supplementary data"
 		
 		# Add file elements to the manifest
-		self.extended_manifest(new_zipfile)
+		self.simple_manifest(new_zipfile)
 
 	def extended_manifest(self, new_zipfile):
 		"""
@@ -93,6 +93,27 @@ class manifestXML(object):
 
 			self.description = SubElement(self.file, "description")
 			self.description.text = filename
+			
+	def simple_manifest(self, new_zipfile):
+		"""
+		Add a simple XML file element to the manifest
+		"""
+		#filename_text = "placeholder"
+		filename_text = new_zipfile.filename
+		title_text = "Download .zip"
+		linktext_text = "Any figures and tables for this article are included in the PDF."
+		linktext_text += " The .zip folder contains additional supplemental files."
+		
+		# Add XML
+		self.file = SubElement(self.root, "file")
+		self.filename = SubElement(self.file, "filename")
+		self.filename.text = filename_text
+
+		self.description = SubElement(self.file, "linktext")
+		self.description.text = linktext_text
+
+		self.title = SubElement(self.file, "title")
+		self.title.text = title_text
 
 
 # self.department = SubElement(self.addline, "named-content")
