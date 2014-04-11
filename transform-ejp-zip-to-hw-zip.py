@@ -75,7 +75,7 @@ class manifestXML(object):
 		self.linktext.text = "Supplementary data"
 		
 		# Add file elements to the manifest
-		self.simple_manifest(new_zipfile)
+		self.simple_manifest(new_zipfile, doi)
 
 	def extended_manifest(self, new_zipfile):
 		"""
@@ -94,13 +94,13 @@ class manifestXML(object):
 			self.description = SubElement(self.file, "description")
 			self.description.text = filename
 			
-	def simple_manifest(self, new_zipfile):
+	def simple_manifest(self, new_zipfile, doi):
 		"""
 		Add a simple XML file element to the manifest
 		Note: linktext element must come before title (order matters)
 		"""
-		#filename_text = "placeholder"
-		filename_text = new_zipfile.filename
+		# Filename is the folder inside the zip file
+		filename_text = get_new_zipfile_folder_name(doi)
 		linktext_text = "Download zip folder"
 		title_text = "Any figures and tables for this article are included in the PDF."
 		title_text += self.get_file_contents_description(new_zipfile)
@@ -291,6 +291,13 @@ def get_new_zipfile_name(doi):
 	new_zipfile_name = "elife_poa_" + article_id + "_ds.zip"
 	return new_zipfile_name
 
+def get_new_zipfile_folder_name(doi):
+	article_id = article_id_from_doi(doi)
+	# Remove the leading 'e' from article_id
+	doi_id = article_id[1:]
+	new_zipfile_folder_name = "elife" + doi_id + "_Supplemental_files"
+	return new_zipfile_folder_name
+
 def gen_new_zipfile(doi):
 	new_zipfile_name = get_new_zipfile_name(doi)
 	new_zipfile = zipfile.ZipFile(new_zipfile_name, 'w')
@@ -299,7 +306,7 @@ def gen_new_zipfile(doi):
 def move_files_into_new_zipfile(current_zipfile, file_title_map, new_zipfile, doi):
 	for name in file_title_map.keys():
 		title = file_title_map[name]
-		new_name = gen_new_name_for_file(name, title, doi)
+		new_name = get_new_zipfile_folder_name(doi) + "/" + gen_new_name_for_file(name, title, doi)
 
 		file = current_zipfile.read(name)
 		f = open("temp_transfer", "w")
