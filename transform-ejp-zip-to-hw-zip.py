@@ -97,10 +97,11 @@ class manifestXML(object):
 	def simple_manifest(self, new_zipfile):
 		"""
 		Add a simple XML file element to the manifest
+		Note: linktext element must come before title (order matters)
 		"""
 		#filename_text = "placeholder"
 		filename_text = new_zipfile.filename
-		description_text = "Supplemental files description"
+		linktext_text = "Download zip folder"
 		title_text = "Any figures and tables for this article are included in the PDF."
 		title_text += " The .zip folder contains additional supplemental files."
 		
@@ -109,11 +110,12 @@ class manifestXML(object):
 		self.filename = SubElement(self.file, "filename")
 		self.filename.text = filename_text
 
+		self.description = SubElement(self.file, "linktext")
+		self.description.text = linktext_text
+
 		self.title = SubElement(self.file, "title")
 		self.title.text = title_text
 		
-		self.description = SubElement(self.file, "description")
-		self.description.text = description_text
 
 
 # self.department = SubElement(self.addline, "named-content")
