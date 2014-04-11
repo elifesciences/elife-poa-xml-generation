@@ -103,7 +103,8 @@ class manifestXML(object):
 		filename_text = get_new_zipfile_folder_name(doi)
 		linktext_text = "Download zip folder"
 		title_text = "Any figures and tables for this article are included in the PDF."
-		title_text += self.get_file_contents_description(new_zipfile)
+		title_text += " The zipped file contains additional supplemental files."
+		#title_text += self.get_file_contents_description(new_zipfile)
 		
 		# Add XML
 		self.file = SubElement(self.root, "file")
