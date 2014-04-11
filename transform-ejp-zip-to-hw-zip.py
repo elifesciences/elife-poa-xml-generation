@@ -103,7 +103,7 @@ class manifestXML(object):
 		filename_text = new_zipfile.filename
 		linktext_text = "Download zip folder"
 		title_text = "Any figures and tables for this article are included in the PDF."
-		title_text += " The .zip folder contains additional supplemental files."
+		title_text += self.get_file_contents_description(new_zipfile)
 		
 		# Add XML
 		self.file = SubElement(self.root, "file")
@@ -115,6 +115,40 @@ class manifestXML(object):
 
 		self.title = SubElement(self.file, "title")
 		self.title.text = title_text
+		
+	def get_file_contents_description(self, new_zipfile):
+		"""
+		Given a zipfile, concatenate a description of the
+		types of files inside
+		"""
+		file_count = 0
+		extension_counts = {}
+		description = ""
+		filelist = new_zipfile.namelist()
+		for filename in filelist:
+			file_count = file_count + 1
+			# Get the file extension
+			try:
+				extension = filename.split(".")[-1]
+			except:
+				extension = None
+			# Increment count of the extension type
+			try:
+				extension_counts[extension] += 1
+			except:
+				# Create the extension if it does not exist yet in the counter
+				extension_counts[extension] = 1
+			
+		description = description + " The zipped file contains " + str(file_count) + " files"
+		if len(extension_counts) > 0:
+			description = description + " including: "
+			delim = ""
+			for k,v in extension_counts.items():
+				description = description + delim + "%s %s" % (v, k)
+				delim = ", "
+		description = description + "."
+		
+		return description
 		
 
 
