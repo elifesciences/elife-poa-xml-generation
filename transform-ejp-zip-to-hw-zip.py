@@ -315,7 +315,7 @@ def move_files_into_new_zipfile(current_zipfile, file_title_map, new_zipfile, do
 		new_name = gen_new_name_for_file(name, title, doi)
 
 		file = current_zipfile.read(name)
-		f = open("temp_transfer", "w")
+		f = open("temp_transfer", "wb")
 		f.write(file)
 		f.close()
 		new_zipfile.write("temp_transfer", new_name)
