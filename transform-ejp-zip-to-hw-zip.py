@@ -100,7 +100,7 @@ class manifestXML(object):
 		Note: linktext element must come before title (order matters)
 		"""
 		# Filename is the folder inside the zip file
-		filename_text = get_new_zipfile_folder_name(doi)
+		filename_text = get_new_internal_zipfile_name(doi)
 		linktext_text = "Download zip folder"
 		title_text = "Any figures and tables for this article are included in the PDF."
 		title_text += " The zipped file contains additional supplemental files."
@@ -292,12 +292,17 @@ def get_new_zipfile_name(doi):
 	new_zipfile_name = "elife_poa_" + article_id + "_ds.zip"
 	return new_zipfile_name
 
-def get_new_zipfile_folder_name(doi):
+def get_new_internal_zipfile_name(doi):
 	article_id = article_id_from_doi(doi)
 	# Remove the leading 'e' from article_id
 	doi_id = article_id[1:]
-	new_zipfile_folder_name = "elife" + doi_id + "_Supplemental_files"
+	new_zipfile_folder_name = "elife" + doi_id + "_Supplemental_files.zip"
 	return new_zipfile_folder_name
+
+def gen_new_internal_zipfile(doi):
+	new_zipfile_name = get_new_internal_zipfile_name(doi)
+	new_zipfile = zipfile.ZipFile(new_zipfile_name, 'w')
+	return new_zipfile
 
 def gen_new_zipfile(doi):
 	new_zipfile_name = get_new_zipfile_name(doi)
@@ -307,13 +312,22 @@ def gen_new_zipfile(doi):
 def move_files_into_new_zipfile(current_zipfile, file_title_map, new_zipfile, doi):
 	for name in file_title_map.keys():
 		title = file_title_map[name]
-		new_name = get_new_zipfile_folder_name(doi) + "/" + gen_new_name_for_file(name, title, doi)
+		new_name = gen_new_name_for_file(name, title, doi)
 
 		file = current_zipfile.read(name)
 		f = open("temp_transfer", "w")
 		f.write(file)
 		f.close()
 		new_zipfile.write("temp_transfer", new_name)
+
+def add_file_to_zipfile(new_zipfile, name, new_name = None):
+	"""
+	Simple add a file to a zip file
+	"""
+	if not new_name:
+		new_name = name
+		
+	new_zipfile.write(name, new_name)
 
 def alert_production(alert_message):
 	""
@@ -421,8 +435,16 @@ def process_zipfile(zipfile_name, output_dir):
 	#extracted_pdf = extract_pdf_from_zipfile(current_zipfile)
 	copy_pdf_to_hw_staging_dir(file_title_map, output_dir, doi, current_zipfile)
 	pdfless_file_title_map = remove_pdf_from_file_title_map(file_title_map)
+	
+	# Internal zip file
+	internal_zipfile = gen_new_internal_zipfile(doi)
+	move_files_into_new_zipfile(current_zipfile, pdfless_file_title_map, internal_zipfile, doi)
+	internal_zipfile.close()
+	
+	# Outside wrapping zip file
 	new_zipfile = gen_new_zipfile(doi)
-	move_files_into_new_zipfile(current_zipfile, pdfless_file_title_map, new_zipfile, doi)
+	add_file_to_zipfile(new_zipfile, name = internal_zipfile.filename)
+	
 	hw_manifest = generate_hw_manifest(new_zipfile, doi)
 	add_hw_manifest_to_new_zipfile(new_zipfile, hw_manifest)
 	# Close zip file before moving
