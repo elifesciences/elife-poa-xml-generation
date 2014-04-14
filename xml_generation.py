@@ -64,10 +64,9 @@ def set_dates(article, article_id):
 		t_accepted = time.strptime(accepted_date.split()[0], "%Y-%m-%d")
 		accepted = eLifeDate("accepted", t_accepted)
 		article.add_date(accepted)
-		# Use accepted date as the received date
-
 		logger.info(str(accepted_date))
-		received_date =  accepted_date #get_received_date(article_id)
+		
+		received_date = get_received_date(article_id)
 		t_received = time.strptime(received_date.split()[0], "%Y-%m-%d")
 		received = eLifeDate("received", t_received)
 		article.add_date(received)
