@@ -148,7 +148,10 @@ def decapitate_pdf(pdf_input_path, output_dir):
 	logger.info("wrote headless pdf")
 
 def is_first_page_in_range(pdf_input_path):
-	first_page = get_start_page(pdf_input_path)
+	try:
+		first_page = get_start_page(pdf_input_path)
+	except IndexError:
+		first_page = None
 	try:
 		first_page = get_start_page(pdf_input_path)
 	except:
