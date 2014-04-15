@@ -1,4 +1,5 @@
 from ftplib import FTP
+import ftplib
 import settings as settings
 import glob
 import os
@@ -37,11 +38,34 @@ def upload(ftp, file):
 		ftp.storbinary("STOR " + uploadname, open(file, "rb"), 1024)
 		print "uploaded " + uploadname
 
-def ftp_to_endpoint(zipfiles):
+def ftp_cwd_mkd(ftp, sub_dir):
+	"""
+	Given an FTP connection and a sub_dir name
+	try to cwd to the directory. If the directory
+	does not exist, create it, then cwd again
+	"""
+	cwd_success = None
+	try:
+		ftp.cwd(sub_dir)
+		cwd_success = True
+	except ftplib.error_perm:
+		# Directory probably does not exist, create it
+		ftp.mkd(sub_dir)
+		cwd_success = False
+	if cwd_success is not True:
+		ftp.cwd(sub_dir)
+		
+	return cwd_success
+
+def ftp_to_endpoint(zipfiles, sub_dir = None):
 	for zipfile in zipfiles:
 		ftp = FTP(ftpuri, ftpusername, ftppassword)
+		ftp_cwd_mkd(ftp, "/")
 		if ftpcwd != "":
-			ftp.cwd(ftpcwd)
+			ftp_cwd_mkd(ftp, ftpcwd)
+		if sub_dir is not None:
+			ftp_cwd_mkd(ftp, sub_dir)
+		
 		upload(ftp, zipfile)
 		ftp.quit()
 	
