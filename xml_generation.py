@@ -33,6 +33,9 @@ def instantiate_article(article_id):
 	logger.info("in instantiate_article for " + str(article_id))
 	try:
 		doi = get_doi(article_id)
+		# Fallback if doi string is blank, default to eLife concatenated
+		if doi.strip() == "":
+			doi = get_elife_doi(article_id)
 		title = get_title(article_id)
 		article = eLifePOA(doi, title)
 		return article

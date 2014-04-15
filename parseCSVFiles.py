@@ -361,6 +361,13 @@ def get_author_conflict(article_id, author_id):
 	return attribute 
 
 ## conversion functions
+def get_elife_doi(article_id):
+	"""
+	Given an article_id, return a DOI for the eLife journal
+	"""
+	doi = "10.7554/eLife." + str(int(article_id)).zfill(5)
+	return doi
+
 def doi2uri(doi):
 	uri = "http://dx.doi.org/" + doi
 	return uri 
