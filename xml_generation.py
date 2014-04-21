@@ -229,11 +229,14 @@ def build_xml_for_article(article_id):
 			write_xml(article_id, article_xml, dir = TARGET_OUTPUT_DIR)
 			logger.info("xml written for " + str(article_id))
 			print "written " + article_id
+			return True
 		except:
 			logger.error("could not generate or write xml for " + str(article_id))
+			return False
 	else:
 		logger.warning("the following article did not have enough components and xml was not generated " + str(article_id))
 		logger.warning("warning count was " + str(error_count))
+		return False
 
 if __name__ == "__main__":
 	# get a list of active article numbers
