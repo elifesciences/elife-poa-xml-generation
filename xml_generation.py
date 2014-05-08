@@ -141,7 +141,9 @@ def set_author_info(article, article_id):
 			if department.strip() != "":
 				affiliation.department = department
 			affiliation.institution = get_author_institution(article_id, author_id)
-			affiliation.city = get_author_city(article_id, author_id)
+			city = get_author_city(article_id, author_id)
+			if city.strip() != "":
+				affiliation.city = city
 			affiliation.country = get_author_country(article_id, author_id)
 
 			contrib_type = get_author_contrib_type(article_id, author_id)
