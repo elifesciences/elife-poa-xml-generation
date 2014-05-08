@@ -141,9 +141,13 @@ def set_author_info(article, article_id):
 			author = eLifePOSContributor(author_type, last_name, first_name)
 			affiliation = ContributorAffiliation()
 
-			affiliation.department = get_author_department(article_id, author_id)
+			department = get_author_department(article_id, author_id)
+			if department.strip() != "":
+				affiliation.department = department
 			affiliation.institution = get_author_institution(article_id, author_id)
-			affiliation.city = get_author_city(article_id, author_id)
+			city = get_author_city(article_id, author_id)
+			if city.strip() != "":
+				affiliation.city = city
 			affiliation.country = get_author_country(article_id, author_id)
 
 			contrib_type = get_author_contrib_type(article_id, author_id)
@@ -184,7 +188,9 @@ def set_editor_info(article, article_id):
 		logger.info(str(type(get_me_id(article_id))))
 		editor.auth_id = `int(get_me_id(article_id))`
 		affiliation = ContributorAffiliation()
-		affiliation.department = get_me_department(article_id)
+		department =  get_me_department(article_id)
+		if department.strip() != "":
+			affiliation.department = department
 		affiliation.institution = get_me_institution(article_id)
 		affiliation.country = get_me_country(article_id)
 
