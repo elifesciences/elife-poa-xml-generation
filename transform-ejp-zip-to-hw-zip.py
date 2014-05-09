@@ -103,9 +103,7 @@ class manifestXML(object):
 		filename_text = get_new_internal_zipfile_name(doi)
 		linktext_text = "Download zip folder"
 		title_text = "Any figures and tables for this article are included in the PDF."
-		title_text += (" The zipped file contains any figure supplements, "
-					   "source data, videos, source code or supplementary files "
-					   "associated with this article.")
+		title_text += " The zip folder contains additional supplemental files."
 		#title_text += self.get_file_contents_description(new_zipfile)
 		
 		# Add XML
@@ -142,7 +140,7 @@ class manifestXML(object):
 				# Create the extension if it does not exist yet in the counter
 				extension_counts[extension] = 1
 			
-		description = description + " The zipped file contains " + str(file_count) + " files"
+		description = description + " The zip folder contains " + str(file_count) + " files"
 		if len(extension_counts) > 0:
 			description = description + " including: "
 			delim = ""
