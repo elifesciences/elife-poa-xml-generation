@@ -394,7 +394,13 @@ def middle_name_initials(middle_name):
 	initials = ""
 	# Keep only uppercase characters and hyphens
 	if middle_name:
-		char_list = re.findall("[A-Z]|\-", str(middle_name))
+		try:
+			char_list = re.findall("[A-Z]|\-", str(middle_name))
+		except UnicodeEncodeError:
+			# Regular expression failed on unicode characters,
+			# failover by using the first character
+			char_list = []
+			char_list.append(middle_name[0])
 		initials = "".join(char_list)
 	
 	if initials == "":
