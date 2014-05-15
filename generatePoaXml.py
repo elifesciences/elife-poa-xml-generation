@@ -231,15 +231,21 @@ class eLife2XML(object):
         ext_link.tail = poa_article.license.p2
 
     def set_copyright(self, parent, poa_article):
-        if len(poa_article.contributors) > 2:
-            contributor = poa_article.contributors[0]
+        # Count authors (non-editors)
+        non_editor = []
+        for c in poa_article.contributors:
+            if c.contrib_type != "editor":
+                non_editor.append(c)
+        
+        if len(non_editor) > 2:
+            contributor = non_editor[0]
             copyright_holder = contributor.surname + " et al"
-        elif len(poa_article.contributors) == 2:
-            contributor1 = poa_article.contributors[0]
-            contributor2 = poa_article.contributors[1]
+        elif len(non_editor) == 2:
+            contributor1 = non_editor[0]
+            contributor2 = non_editor[1]
             copyright_holder = contributor1.surname + " & " + contributor2.surname
-        elif len(poa_article.contributors) == 1:
-            contributor = poa_article.contributors[0]
+        elif len(non_editor) == 1:
+            contributor = non_editor[0]
             copyright_holder = contributor.surname
         else:
             copyright_holder = ""
