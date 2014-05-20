@@ -14,6 +14,7 @@ import time
 import re
 from git import *
 import settings
+import os
 import shutil
 from decapitatePDF import decapitate_pdf_with_error_check
 
@@ -55,6 +56,7 @@ workflow_logger.setLevel(logging.INFO)
 input_dir = settings.EJP_INPUT_DIR
 output_dir = settings.STAGING_TO_HW_DIR
 hw_ftp_dir = settings.FTP_TO_HW_DIR
+tmp_dir = settings.TMP_DIR
 
 class manifestXML(object):
 
@@ -301,12 +303,14 @@ def get_new_internal_zipfile_name(doi):
 
 def gen_new_internal_zipfile(doi):
 	new_zipfile_name = get_new_internal_zipfile_name(doi)
-	new_zipfile = zipfile.ZipFile(new_zipfile_name, 'w')
+	new_zipfile_name_plus_path = tmp_dir + "/" + new_zipfile_name
+	new_zipfile = zipfile.ZipFile(new_zipfile_name_plus_path, 'w')
 	return new_zipfile
 
 def gen_new_zipfile(doi):
 	new_zipfile_name = get_new_zipfile_name(doi)
-	new_zipfile = zipfile.ZipFile(new_zipfile_name, 'w')
+	new_zipfile_name_plus_path = tmp_dir + "/" + new_zipfile_name
+	new_zipfile = zipfile.ZipFile(new_zipfile_name_plus_path, 'w')
 	return new_zipfile
 
 def move_files_into_new_zipfile(current_zipfile, file_title_map, new_zipfile, doi):
@@ -315,10 +319,11 @@ def move_files_into_new_zipfile(current_zipfile, file_title_map, new_zipfile, do
 		new_name = gen_new_name_for_file(name, title, doi)
 
 		file = current_zipfile.read(name)
-		f = open("temp_transfer", "wb")
+		temp_file_name = tmp_dir + "/" + "temp_transfer"
+		f = open(temp_file_name, "wb")
 		f.write(file)
 		f.close()
-		new_zipfile.write("temp_transfer", new_name)
+		new_zipfile.write(temp_file_name, new_name)
 
 def add_file_to_zipfile(new_zipfile, name, new_name = None):
 	"""
@@ -360,12 +365,13 @@ def copy_pdf_to_hw_staging_dir(file_title_map, output_dir, doi, current_zipfile)
 			file = current_zipfile.read(name)
 			print new_name
 			decap_name = "decap_" + new_name
+			decap_name_plus_path = tmp_dir + "/" + decap_name
 			# we save the pdf to a local file
-			temp_file = open(decap_name, "wb")
+			temp_file = open(decap_name_plus_path, "wb")
 			temp_file.write(file)
 			temp_file.close()
 
-	if decapitate_pdf_with_error_check(decap_name, "./" + settings.STAGING_DECAPITATE_PDF_DIR + "/"):
+	if decapitate_pdf_with_error_check(decap_name_plus_path, "./" + settings.STAGING_DECAPITATE_PDF_DIR + "/"):
 		# pass the local file path, and teh path to a temp dir, to the decapiation script
 		move_file = open("./" + settings.STAGING_DECAPITATE_PDF_DIR + "/" + decap_name, "rb").read()
 		out_handler = open(output_dir + "/" + new_name, "wb")
@@ -397,13 +403,15 @@ def generate_hw_manifest(new_zipfile, doi):
 
 def move_new_zipfile(doi, hw_ftp_dir):
 	new_zipfile_name = get_new_zipfile_name(doi)
-	shutil.move(new_zipfile_name, hw_ftp_dir + "/" + new_zipfile_name)
+	new_zipfile_name_plus_path = tmp_dir + "/" + new_zipfile_name
+	shutil.move(new_zipfile_name_plus_path, hw_ftp_dir + "/" + new_zipfile_name)
 
 def add_hw_manifest_to_new_zipfile(new_zipfile, hw_manifest):
-	f = open("temp_transfer", "w")
+	temp_file_name = tmp_dir + "/" + "temp_transfer"
+	f = open(temp_file_name, "w")
 	f.write(hw_manifest)
 	f.close()
-	new_zipfile.write("temp_transfer", "manifest.xml")
+	new_zipfile.write(temp_file_name, "manifest.xml")
 
 def get_doi_from_zipfile_name(current_zipfile):
 	"""
