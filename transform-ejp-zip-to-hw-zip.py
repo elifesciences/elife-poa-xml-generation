@@ -451,7 +451,8 @@ def process_zipfile(zipfile_name, output_dir):
 	
 	# Outside wrapping zip file
 	new_zipfile = gen_new_zipfile(doi)
-	add_file_to_zipfile(new_zipfile, name = internal_zipfile.filename)
+	new_name = internal_zipfile.filename.split("/")[-1]
+	add_file_to_zipfile(new_zipfile, internal_zipfile.filename, new_name)
 	
 	hw_manifest = generate_hw_manifest(new_zipfile, doi)
 	add_hw_manifest_to_new_zipfile(new_zipfile, hw_manifest)
