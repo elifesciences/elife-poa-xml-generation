@@ -23,6 +23,12 @@ The goal is to have a functioning pipeline in place to delivery XML to HW before
 	$ pip install xlrd
 	$ pip install gitpython
 
+[Lettuce][let] for testing.
+	
+	$ pip install lettuce
+	
+[let]: http://packages.python.org/lettuce/
+
 ## Project outline 
 
 #### Data directories
