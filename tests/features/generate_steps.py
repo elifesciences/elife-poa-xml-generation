@@ -28,3 +28,40 @@ def i_decode_the_string_with_decode_brackets(step):
 def i_have_the_decoded_string_decoded_string(step, decoded_string):
     assert world.decoded_string == decoded_string, \
         "Got decoded_string %s" % world.decoded_string
+
+@step(u'I have settings')
+def i_have_settings(step):
+    world.settings = settings
+    assert world.settings is not None, \
+        "Got settings %s" % world.settings
+
+@step(u'I read settings (\S+)')
+def i_read_settings_property(step, property):
+    world.value = getattr(world.settings, property)
+    assert world.value is not None, \
+        "Got value %s" % world.value
+
+@step(u'I have the value (.*)')
+def i_have_the_value(step, value):
+    # Type convert the value as required
+    if type(world.value) == str:
+        value = str(value)
+    elif type(world.value) == int:
+        value = int(value)
+    # Compare value
+    assert world.value == value, \
+        "Got value %s" % world.value
+    
+@step(u'I set settings (\S+) to (.*)')
+def i_set_settings_property_to_value(step, property, value):
+    attr = None
+    setattr(world.settings, property, value)
+    attr = getattr(world.settings, property)
+    assert attr is not None, \
+        "Got attr %s" % str(attr)
+    
+@step(u'I reload settings')
+def i_reload_settings(step):
+    reload(world.settings)
+    assert world.settings is not None, \
+        "Got settings %s" % world.settings
