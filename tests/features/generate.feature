@@ -58,6 +58,8 @@ Feature: Generate POA XML
     | GTGT                                        | >
     | LTLTGTGT                                    | <>
     | LTLTiGTGTeyeLTLT/iGTGT                      | <i>eye</i>
+    | LTLTiGTGTNicotiana attenuataLTLT/iGTGT      | <i>Nicotiana attenuata</i>
+    | YLTLTsupGTGT1LTLT/supGTGTSLTLTsupGTGT2LTLT/supGTGTPLTLTsupGTGT3LTLT/supGTGTTLTLTsupGTGT4LTLT/supGTGTSLTLTsupGTGT5LTLT/supGTGTPLTLTsupGTGT6LTLT/supGTGTSLTLTsupGTGT7LTLT/supGTGT repeats                         | Y<sup>1</sup>S<sup>2</sup>P<sup>3</sup>T<sup>4</sup>S<sup>5</sup>P<sup>6</sup>S<sup>7</sup> repeats
     
   Scenario: Parse CSV files
     Given I have settings
