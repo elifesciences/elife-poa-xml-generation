@@ -65,7 +65,7 @@ Feature: Generate POA XML
     Given I have settings
     And I reload settings
     And I set settings XLS_PATH to test_data/
-    And I set json settings XLS_FILES to {"authors" : "poa_author.csv", "license" : "poa_license.csv", "manuscript" : "poa_manuscript.csv", "received" : "poa_received.csv", "subjects" : "poa_subject_area.csv", "organisms": "poa_research_organism.csv"}
+    And I set json settings XLS_FILES to {"authors" : "poa_author.csv", "license" : "poa_license.csv", "manuscript" : "poa_manuscript.csv", "received" : "poa_received.csv", "subjects" : "poa_subject_area.csv", "organisms": "poa_research_organism.csv", "abstract": "poa_abstract.csv", "title": "poa_title.csv"}
     And I reload XML generation libraries
     And I have article_id <article_id>
     And I have author_id <author_id>
@@ -74,9 +74,12 @@ Feature: Generate POA XML
     
   Examples:
     | article_id    | author_id  | method_name             | attribute
-    | 00003         |            | get_title               | A novel role for lipid droplets in the organismal antibacterial response
+    | 00003         |            | get_title               | This, 'title, includes "quotation", marks
+    | 00007         |            | get_title               | Herbivory-induced "volatiles" function as defenses increasing fitness of the native plant LTLTiGTGTNicotiana attenuataLTLT/iGTGT in nature
     | 00003         | 1258       | get_author_first_name   | Preetha
     | 00012         |            | get_license             | 1
     | 00007         |            | get_organisms           | Other
     | 00003         |            | get_organisms           | B. subtilis,D. melanogaster,E. coli,Mouse
     | 00007         |            | get_subjects            | Genomics and evolutionary biology,Plant biology
+    | 00007         |            | get_abstract            | An abstract with some "quotation" marks
+    | 00012         |            | get_abstract            | In this abstract are consensus YLTLTsupGTGT1LTLT/supGTGTSLTLTsupGTGT2LTLT/supGTGTPLTLTsupGTGT3LTLT/supGTGTTLTLTsupGTGT4LTLT/supGTGTSLTLTsupGTGT5LTLT/supGTGTPLTLTsupGTGT6LTLT/supGTGTSLTLTsupGTGT7LTLT/supGTGT repeats, LTLTiGTGTDrosophilaLTLT/iGTGT and "quotations".

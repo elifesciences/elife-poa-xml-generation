@@ -13,7 +13,13 @@ XLS_FILES = 	{"authors" : "ejp_query_tool_query_id_177_POA_Author_2014_02_12_eLi
 				 "manuscript" : "ejp_query_tool_query_id_176_POA_Manuscript_2014_02_12_eLife.csv",
 				 "received" : "ejp_query_tool_query_id_180_POA_Received_2014_02_12_eLife.csv",
 				 "subjects" : "ejp_query_tool_query_id_179_POA_Subject_Area_2014_02_12_eLife.csv",
-				 "organisms": "ejp_query_tool_query_id_182_POA_Research_Organism_2014_02_12_eLife.csv"}
+				 "organisms": "ejp_query_tool_query_id_182_POA_Research_Organism_2014_02_12_eLife.csv",
+				 "abstract": "ejp_query_tool_query_id_196_POA_Abstract_2014_05_30_eLife.csv",
+				 "title": "ejp_query_tool_query_id_191_POA_Title_2014_05_30_eLife.csv"
+                 }
+
+# Special files that allow quotation marks in their final column: column 3
+OVERFLOW_XLS_FILES = ["abstract", "title"]
 
 XLS_COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"subject_areas" : "poa_s_subjectarea",
