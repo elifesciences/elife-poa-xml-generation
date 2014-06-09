@@ -36,7 +36,7 @@ Feature: Generate POA XML
     | XLS_FILES                                   | {"authors" : "poa_author.csv", "license" : "poa_license.csv", "manuscript" : "poa_manuscript.csv", "received" : "poa_received.csv", "subjects" : "poa_subject_area.csv", "organisms": "poa_research_organism.csv"}
 
   Scenario: Test entity to unicode conversion
-    Given I have the string <string>
+    Given I have the raw string <string>
     When I convert the string with entities to unicode
     Then I have the unicode <unicode>
 
@@ -47,7 +47,7 @@ Feature: Generate POA XML
     | Edit&#x00F3;rial&#x00F3; Department&#x00F3; | Editórialó Departmentó
     
   Scenario: Angle bracket escape sequence conversion
-    Given I have the string <string>
+    Given I have the raw string <string>
     And I reload settings
     When I decode the string with decode brackets
     Then I have the decoded string <decoded_string>
@@ -83,3 +83,25 @@ Feature: Generate POA XML
     | 00007         |            | get_subjects            | Genomics and evolutionary biology,Plant biology
     | 00007         |            | get_abstract            | An abstract with some "quotation" marks
     | 00012         |            | get_abstract            | In this abstract are consensus YLTLTsupGTGT1LTLT/supGTGTSLTLTsupGTGT2LTLT/supGTGTPLTLTsupGTGT3LTLT/supGTGTTLTLTsupGTGT4LTLT/supGTGTSLTLTsupGTGT5LTLT/supGTGTPLTLTsupGTGT6LTLT/supGTGTSLTLTsupGTGT7LTLT/supGTGT repeats, LTLTiGTGTDrosophilaLTLT/iGTGT and "quotations".
+    
+  Scenario: Test entity to unicode conversion, angle bracket replacements and XML tree building
+    Given I have the raw string <string>
+    And I convert the string with entities to unicode
+    And I decode the string with decode brackets
+    And I tag replace the decoded string
+    And I surround the decoded string with tag_name <tag_name>
+    And I have the root xml element
+    When I convert the decoded string to an xml element
+    Then I have xml element string <xml_elem_string>
+    And I append the xml element to the root xml element
+    #And I do some stuff
+    And I convert the root xml element to string
+    Then I have the xml string <xml_string>
+
+  Examples:
+    | string                                           | tag_name  | xml_elem_string                                            | xml_string
+    | muffins                                          | p         | <?xml version="1.0" ?><p>muffins</p>                       | <?xml version="1.0" ?><root><p>muffins</p></root>
+    | Coffe LTLTiGTGTHo&#x00FC;seLTLT/iGTGT&#x03B1;    | p         | <?xml version="1.0" ?><p>Coffe <italic>Hoüse</italic>α</p>  | <?xml version="1.0" ?><root><p>Coffe <italic>Hoüse</italic>α</p></root>
+    | C&#x00FC; LTLTiGTGTH&#x00FC;sLTLT/iGTGT&#x03B1; LTLTsupGTGTH&#x00FC;LTLT/supGTGTa    | p         | <?xml version="1.0" ?><p>Cü <italic>Hüs</italic>α <sup>Hü</sup>a</p>  | <?xml version="1.0" ?><root><p>Cü <italic>Hüs</italic>α <sup>Hü</sup>a</p></root>
+    | I LTLTiGTGTLTLTsupGTGTmLTLT/supGTGTLTLT/iGTGT        | p         | <?xml version="1.0" ?><p>I <italic><sup>m</sup></italic></p>  | <?xml version="1.0" ?><root><p>I <italic><italic>m</italic></italic></p></root>
+    | 2&#x00FC; LTLTiGTGTisLTLT/iGTGT LTLT 3LTLTsupGTGT&#x03B1;LTLT/supGTGT GTGT 4    | p         | <?xml version="1.0" ?><p>2ü <italic>is</italic> &lt; 3<sup>α</sup> &gt; 4</p>  | <?xml version="1.0" ?><root><p>2ü <italic>is</italic> &lt; 3<sup>α</sup> &gt; 4</p></root>

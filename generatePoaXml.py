@@ -647,6 +647,16 @@ def decode_brackets(s):
     s = s.replace(settings.GREATER_THAN_ESCAPE_SEQUENCE, '>')
     return s
 
+def replace_tags(s):
+    """
+    Replace tags such as <i> to <italic>
+    <sup> and <sub> are allowed and do not need to be replaced
+    This does not validate markup
+    """
+    s = s.replace('<i>', '<italic>')
+    s = s.replace('</i>', '</italic>')
+    return s
+
 if __name__ == '__main__':
 
     # test affiliations 
