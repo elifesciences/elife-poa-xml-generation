@@ -94,7 +94,6 @@ Feature: Generate POA XML
     When I convert the decoded string to an xml element
     Then I have xml element string <xml_elem_string>
     And I append the xml element to the root xml element
-    #And I do some stuff
     And I convert the root xml element to string
     Then I have the xml string <xml_string>
 
