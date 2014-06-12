@@ -657,6 +657,46 @@ def replace_tags(s):
     s = s.replace('</i>', '</italic>')
     return s
 
+def append_minidom_xml_to_elementtree_xml(parent, xml, recursive = False):
+    """
+    Recursively,
+    Given an ElementTree.Element as parent, and a minidom instance as xml,
+    append the tags and content from xml to parent
+    Used primarily for adding a snippet of XML with <italic> tags
+    """
+
+    # Get the root tag name
+    if recursive is False:
+        tag_name = xml.documentElement.tagName
+        node = xml.getElementsByTagName(tag_name)[0]
+        new_elem = SubElement(parent, tag_name)
+    else:
+        node = xml
+        tag_name = node.tagName
+        new_elem = parent
+
+    for child_node in node.childNodes:
+
+        if child_node.nodeName == '#text':
+
+            if not new_elem.text:
+                new_elem.text = child_node.nodeValue
+            else:
+                new_elem_sub.tail = child_node.nodeValue
+                
+        elif child_node.childNodes is not None:
+            # Call recursively to add nested tags
+            new_elem_sub = SubElement(new_elem, child_node.tagName)
+            new_elem_sub = append_minidom_xml_to_elementtree_xml(new_elem_sub, child_node, True)
+
+    # Debug
+    #encoding = 'utf-8'
+    #rough_string = ElementTree.tostring(parent, encoding)
+    #print rough_string
+    
+    return parent
+    
+
 if __name__ == '__main__':
 
     # test affiliations 

@@ -103,5 +103,5 @@ Feature: Generate POA XML
     | muffins                                          | p         | <?xml version="1.0" ?><p>muffins</p>                       | <?xml version="1.0" ?><root><p>muffins</p></root>
     | Coffe LTLTiGTGTHo&#x00FC;seLTLT/iGTGT&#x03B1;    | p         | <?xml version="1.0" ?><p>Coffe <italic>Hoüse</italic>α</p>  | <?xml version="1.0" ?><root><p>Coffe <italic>Hoüse</italic>α</p></root>
     | C&#x00FC; LTLTiGTGTH&#x00FC;sLTLT/iGTGT&#x03B1; LTLTsupGTGTH&#x00FC;LTLT/supGTGTa    | p         | <?xml version="1.0" ?><p>Cü <italic>Hüs</italic>α <sup>Hü</sup>a</p>  | <?xml version="1.0" ?><root><p>Cü <italic>Hüs</italic>α <sup>Hü</sup>a</p></root>
-    | I LTLTiGTGTLTLTsupGTGTmLTLT/supGTGTLTLT/iGTGT        | p         | <?xml version="1.0" ?><p>I <italic><sup>m</sup></italic></p>  | <?xml version="1.0" ?><root><p>I <italic><italic>m</italic></italic></p></root>
+    | I LTLTiGTGTLTLTsupGTGTmLTLT/supGTGTLTLT/iGTGT        | p         | <?xml version="1.0" ?><p>I <italic><sup>m</sup></italic></p>  | <?xml version="1.0" ?><root><p>I <italic><sup>m</sup></italic></p></root>
     | 2&#x00FC; LTLTiGTGTisLTLT/iGTGT LTLT 3LTLTsupGTGT&#x03B1;LTLT/supGTGT GTGT 4    | p         | <?xml version="1.0" ?><p>2ü <italic>is</italic> &lt; 3<sup>α</sup> &gt; 4</p>  | <?xml version="1.0" ?><root><p>2ü <italic>is</italic> &lt; 3<sup>α</sup> &gt; 4</p></root>
