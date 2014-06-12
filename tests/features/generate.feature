@@ -84,11 +84,31 @@ Feature: Generate POA XML
     | 00007         |            | get_abstract            | An abstract with some "quotation" marks
     | 00012         |            | get_abstract            | In this abstract are consensus YLTLTsupGTGT1LTLT/supGTGTSLTLTsupGTGT2LTLT/supGTGTPLTLTsupGTGT3LTLT/supGTGTTLTLTsupGTGT4LTLT/supGTGTSLTLTsupGTGT5LTLT/supGTGTPLTLTsupGTGT6LTLT/supGTGTSLTLTsupGTGT7LTLT/supGTGT repeats, LTLTiGTGTDrosophilaLTLT/iGTGT and "quotations".
     
+  Scenario: Escape unmatched angle brackets
+    Given I have the raw string <string>
+    And I copy string to world decoded string
+    When I escape unmatched angle brackets
+    I have the decoded string <decoded_string>
+    
+  Examples:
+    | string                                           | decoded_string
+    | cookies                                          | cookies
+    | α beta                                           | α beta
+    | <i> α < ü > i</i>                                | <i> α &lt; ü &gt; i</i>
+    | <i> <<</i>                                       | <i> &lt;&lt;</i>
+    | < <i></i>                                        | &lt; <i></i> 
+    | <i><</i>                                         | <i>&lt;</i>
+    | no < tag                                         | no &lt; tag  
+    | <i>a</i> <                                       | <i>a</i> &lt;
+    | <i><sup><</sup>></i>                             | <i><sup>&lt;</sup>&gt;</i>
+  
+    
   Scenario: Test entity to unicode conversion, angle bracket replacements and XML tree building
     Given I have the raw string <string>
     And I convert the string with entities to unicode
     And I decode the string with decode brackets
     And I tag replace the decoded string
+    And I escape unmatched angle brackets
     And I surround the decoded string with tag_name <tag_name>
     And I have the root xml element
     When I convert the decoded string to an xml element

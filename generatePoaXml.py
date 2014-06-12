@@ -657,6 +657,43 @@ def replace_tags(s):
     s = s.replace('</i>', '</italic>')
     return s
 
+def escape_unmatched_angle_brackets(s):
+    """
+    In order to make an XML string less malformed, escape
+    unmatched less than tags that are not part of an allowed tag
+    Note: Very, very basic, and do not try regex \1 style replacements
+      on unicode ever again! Instead this uses string replace
+    """
+    allowed_tags = ['<i>','</i>',
+                    '<italic>','</italic>',
+                    '<sup>','</sup>',
+                    '<sub>','</sub>']
+    
+    # Split string on tags
+    tags = re.split('(<.*?>)', s)
+    #print tags
+
+    for i in range(len(tags)):
+        val = tags[i]
+        
+        # Use angle bracket character counts to find unmatched tags
+        #  as well as our allowed_tags list to ignore good tags
+        
+        if val.count('<') == val.count('>') and val not in allowed_tags:
+            val = val.replace('<', '&lt;')
+            val = val.replace('>', '&gt;')
+        else:
+            # Count how many unmatched tags we have
+            while val.count('<') != val.count('>'):
+                if val.count('<') != val.count('>') and val.count('<') > 0:
+                    val = val.replace('<', '&lt;', 1)
+                elif val.count('<') != val.count('>') and val.count('>') > 0:
+                    val = val.replace('>', '&gt;', 1)
+        tags[i] = val
+
+    return ''.join(tags)
+    
+
 def append_minidom_xml_to_elementtree_xml(parent, xml, recursive = False):
     """
     Recursively,

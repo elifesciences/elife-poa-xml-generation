@@ -178,6 +178,18 @@ def i_append_the_xml_element_to_the_root_xml_element(step):
     assert world.root_xml_element is not None, \
         "Got root_xml_element %s" % world.root_xml_element
    
+@step(u'I copy string to world decoded string')
+def i_copy_string_to_world_decoded_string(step):
+    world.decoded_string = world.string
+    assert world.decoded_string is not None, \
+        "Got decoded_string %s" % world.decoded_string
+    
+@step(u'I escape unmatched angle brackets')
+def i_escape_unmatched_angle_brackets(step):
+    world.decoded_string = escape_unmatched_angle_brackets(world.decoded_string)
+    assert world.decoded_string is not None, \
+        "Got decoded_string %s" % world.decoded_string
+
 @step(u'I convert the root xml element to string')
 def i_convert_the_root_xml_element_to_string(step):
     encoding = 'utf-8'
