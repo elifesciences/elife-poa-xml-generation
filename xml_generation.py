@@ -233,9 +233,14 @@ def build_xml_for_article(article_id):
 		logger.warning("the following article did not have enough components and xml was not generated " + str(article_id))
 		logger.warning("warning count was " + str(error_count))
 
+@memoize
+def index_manuscripts_on_article_id():
+	return index_table_on_article_id("manuscript")
+
 if __name__ == "__main__":
 	# get a list of active article numbers
-	article_ids = index_authors_on_article_id().keys()
+	#article_ids = index_authors_on_article_id().keys()
+	article_ids = index_manuscripts_on_article_id().keys()
 	TARGET_OUTPUT_DIR = settings.TARGET_OUTPUT_DIR
 
 	for article_id in article_ids:
