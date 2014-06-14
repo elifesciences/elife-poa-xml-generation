@@ -150,9 +150,8 @@ class eLife2XML(object):
         # article-categories
         self.set_article_categories(self.article_meta, poa_article)
         #
-        self.title_group = SubElement(self.article_meta, "title-group")
-        self.title = SubElement(self.title_group, "article-title")
-        self.title.text = poa_article.title 
+        self.set_title_group(self.article_meta, poa_article)
+        
         #
         for contrib_type in self.contrib_types:
             self.set_contrib_group(self.article_meta, poa_article, contrib_type)
@@ -169,12 +168,27 @@ class eLife2XML(object):
         if poa_article.license:
             self.set_permissions(self.article_meta, poa_article)
         #
-        self.set_abstract = SubElement(self.article_meta, "abstract")
+        self.set_abstract(self.article_meta, poa_article)
         #
         if len(poa_article.research_organisms) > 0:
             self.set_kwd_group_research_organism(self.article_meta, poa_article)
-        self.set_para = SubElement(self.set_abstract, "p")
-        self.set_para.text = poa_article.abstract
+
+    def set_title_group(self, parent, poa_article):
+        """
+        Allows the addition of XML tags
+        """
+        root_tag_name = 'title-group'
+        tag_name = 'article-title'
+        root_xml_element = Element(root_tag_name)
+        # XML
+        tagged_string = '<' + tag_name + '>' + poa_article.title + '</' + tag_name + '>'
+        reparsed = minidom.parseString(tagged_string)
+
+        root_xml_element = append_minidom_xml_to_elementtree_xml(
+            root_xml_element, reparsed
+            )
+
+        parent.append(root_xml_element)
 
     def set_journal_title_group(self, parent):
         """
@@ -276,6 +290,23 @@ class eLife2XML(object):
         if poa_article.license.copyright is True:
             self.set_copyright(self.permissions, poa_article)
         self.set_license(self.permissions, poa_article)
+
+    def set_abstract(self, parent, poa_article):
+        """
+        Allows the addition of XML tags
+        """
+        root_tag_name = 'abstract'
+        tag_name = 'p'
+        root_xml_element = Element(root_tag_name)
+        # XML
+        tagged_string = '<' + tag_name + '>' + poa_article.abstract + '</' + tag_name + '>'
+        reparsed = minidom.parseString(tagged_string)
+
+        root_xml_element = append_minidom_xml_to_elementtree_xml(
+            root_xml_element, reparsed
+            )
+
+        parent.append(root_xml_element)
 
     def set_contrib_group(self, parent, poa_article, contrib_type = None):
         # If contrib_type is None, all contributors will be added regardless of their type
@@ -693,6 +724,17 @@ def escape_unmatched_angle_brackets(s):
 
     return ''.join(tags)
     
+def convert_to_xml_string(s):
+    """
+    For input strings with escaped tags and special characters
+    issue a set of conversion functions to prepare it prior
+    to adding it to an article object
+    """
+    s = entity_to_unicode(s).encode('utf-8')
+    s = decode_brackets(s)
+    s = replace_tags(s)
+    s = escape_unmatched_angle_brackets(s)
+    return s
 
 def append_minidom_xml_to_elementtree_xml(parent, xml, recursive = False):
     """
@@ -712,19 +754,21 @@ def append_minidom_xml_to_elementtree_xml(parent, xml, recursive = False):
         tag_name = node.tagName
         new_elem = parent
 
+    i = 0
     for child_node in node.childNodes:
-
         if child_node.nodeName == '#text':
-
-            if not new_elem.text:
+            if not new_elem.text and i <= 0:
                 new_elem.text = child_node.nodeValue
+            elif not new_elem.text and i > 0:
+                new_elem_sub.tail = child_node.nodeValue
             else:
                 new_elem_sub.tail = child_node.nodeValue
                 
         elif child_node.childNodes is not None:
-            # Call recursively to add nested tags
             new_elem_sub = SubElement(new_elem, child_node.tagName)
             new_elem_sub = append_minidom_xml_to_elementtree_xml(new_elem_sub, child_node, True)
+
+        i = i + 1
 
     # Debug
     #encoding = 'utf-8'

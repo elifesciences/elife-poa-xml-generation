@@ -32,17 +32,27 @@ def instantiate_article(article_id):
 		# Fallback if doi string is blank, default to eLife concatenated
 		if doi.strip() == "":
 			doi = get_elife_doi(article_id)
-		title = get_title(article_id)
-		article = eLifePOA(doi, title)
+		#title = get_title(article_id)
+		article = eLifePOA(doi, title=None)
 		return article
 	except:
 		logger.error("could not create article class")
+
+def set_title(article, article_id):
+	logger.info("in set_title")
+	#try:
+	title = get_title(article_id)
+	article.title = convert_to_xml_string(title)
+	return True
+	#except:
+	#	logger.error("could not set title ")
+	#	return False
 
 def set_abstract(article, article_id):
 	logger.info("in set_abstract")
 	try:
 		abstract = get_abstract(article_id)
-		article.abstract = abstract
+		article.abstract = convert_to_xml_string(abstract)
 		article.manuscript = article_id
 		return True
 	except:
@@ -206,6 +216,7 @@ def write_xml(article_id, xml, dir = ''):
 def build_xml_for_article(article_id):
 	error_count = 0
 	article = instantiate_article(article_id)
+	if not set_title(article, article_id): error_count = error_count + 1
 	if not set_abstract(article, article_id): error_count = error_count + 1
 	if not set_license(article, article_id): error_count = error_count + 1
 	if not set_dates(article, article_id): error_count = error_count + 1
