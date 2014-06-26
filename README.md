@@ -22,6 +22,8 @@ The goal is to have a functioning pipeline in place to delivery XML to HW before
 	$ pip install elementtree  
 	$ pip install xlrd
 	$ pip install gitpython
+	$ pip install requests
+	$ pip install lxml
 
 [Lettuce][let] for testing.
 	
@@ -62,10 +64,12 @@ These files are generated out of the EJP system via a set of SQL queries. We do 
 
 	poa_author_ : information about eLife authors  
 	poa_license_ : licensing information for articles  
-	poa_manuscript_ : manuscript details, including abstract and reviewing editor information  
-	poa_received : recieved dates for manuscripts  
+	poa_manuscript_ : manuscript details, including reviewing editor information  
+	poa_received_ : recieved dates for manuscripts  
 	poa_subject_area_ : information on subject areas for the manuscripts  
-	organisms : information on organsisims that the manuscripts operate on  
+	poa_research_organism_ : information on organsisims that the manuscripts operate on
+	poa_title_ : manuscript titles
+	poa_abstract_ : manuscript abstracts
 
 Each of these files needs to be placed into the directory located at `XLS_PATH` in settings.py. 
 
