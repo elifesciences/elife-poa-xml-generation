@@ -103,12 +103,9 @@ class crossrefXML(object):
             self.set_journal_article(self.journal, poa_article)
 
     def set_journal_metadata(self, parent):
-        # First journal_metadata
+        # journal_metadata
         journal_metadata = SubElement(parent, 'journal_metadata')
         journal_metadata.set("language", "en")
-
-        # Second journal_metadata
-        journal_metadata = SubElement(parent, 'journal_metadata')
         self.full_title = SubElement(journal_metadata, 'full_title')
         self.full_title.text = self.elife_journal_title
         self.issn = SubElement(journal_metadata, 'issn')
@@ -134,8 +131,6 @@ class crossrefXML(object):
         self.identifier.set("id_type", "doi")
         self.identifier.text = poa_article.doi
         
-        self.set_crossmark(self.journal_article, poa_article)
-
         self.archive_locations = SubElement(self.journal_article, 'archive_locations')
         self.archive = SubElement(self.archive_locations, 'archive')
         self.archive.set("name", "CLOCKSS")
@@ -153,23 +148,6 @@ class crossrefXML(object):
         resource = 'http://elifesciences.org/lookup/doi/' + poa_article.doi
         self.resource.text = resource
 
-    def set_crossmark(self, parent, poa_article):
-        self.crossmark = SubElement(parent, 'crossmark')
-        
-        self.crossmark_version = SubElement(self.crossmark , 'crossmark_version')
-        self.crossmark_version.text = "1"
-        
-        self.crossmark_policy = SubElement(self.crossmark , 'crossmark_policy')
-        self.crossmark_policy.text = self.elife_crossmark_policy
-        
-        self.crossmark_domains = SubElement(self.crossmark , 'crossmark_domains')
-        self.crossmark_domain = SubElement(self.crossmark_domains , 'crossmark_domain')
-        self.crossmark_domain.text = self.elife_crossmark_domain
-        
-        self.crossmark_domain_exclusive = SubElement(self.crossmark , 'crossmark_domain_exclusive')
-        self.crossmark_domain_exclusive.text = "false"
-
-     
     def set_contributors(self, parent, poa_article, contrib_type = None):
         # If contrib_type is None, all contributors will be added regardless of their type
         self.contributors = SubElement(parent, "contributors")
