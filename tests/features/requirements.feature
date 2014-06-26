@@ -16,3 +16,5 @@ Feature: Use python imports and requirements
     | xml_generation
     | parseCSVFiles
     | settings
+    | lxml
+    | requests
