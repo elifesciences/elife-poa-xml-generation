@@ -8,18 +8,24 @@ XLS_PATH = "/Users/ian/Dropbox/code/private-code/poa-xls-files/csv-input-v1.06/"
 
         
          
-XLS_FILES = 	{"authors" : "ejp_query_tool_query_id_177_POA_Author_2014_02_12_eLife.csv",
-				 "license" : "ejp_query_tool_query_id_178_POA_License_2014_02_12_eLife.csv",
-				 "manuscript" : "ejp_query_tool_query_id_176_POA_Manuscript_2014_02_12_eLife.csv",
-				 "received" : "ejp_query_tool_query_id_180_POA_Received_2014_02_12_eLife.csv",
-				 "subjects" : "ejp_query_tool_query_id_179_POA_Subject_Area_2014_02_12_eLife.csv",
-				 "organisms": "ejp_query_tool_query_id_182_POA_Research_Organism_2014_02_12_eLife.csv"}
+XLS_FILES = 	{"authors" : "poa_author.csv",
+				 "license" : "poa_license.csv",
+				 "manuscript" : "poa_manuscript.csv",
+				 "received" : "poa_received.csv",
+				 "subjects" : "poa_subject_area.csv",
+				 "organisms": "poa_research_organism.csv",
+				 "abstract": "poa_abstract.csv",
+				 "title": "poa_title.csv"
+                 }
+
+# Special files that allow quotation marks in their final column: column 3
+OVERFLOW_XLS_FILES = ["abstract", "title"]
 
 XLS_COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"subject_areas" : "poa_s_subjectarea",
 					"license_id" : "poa_l_license_id",
-					"title" : "poa_m_title",
-					"abstract" : "poa_m_abstract",
+					"title" : "poa_m_title_tag",
+					"abstract" : "poa_m_abstract_tag",
 					"doi" : "poa_m_doi",
 					"accepted_date" : "poa_m_accepted_dt",
 					"received_date" : "poa_r_received_dt",
@@ -55,3 +61,5 @@ FTP_TO_HW_DIR = "ftp-to-hw"
 MADE_FTP_READY = "made_ftp_ready_on"
 EJP_INPUT_DIR = "sample-zip-from-ejp" 
 
+LESS_THAN_ESCAPE_SEQUENCE = 'LTLT'
+GREATER_THAN_ESCAPE_SEQUENCE = 'GTGT'
