@@ -36,17 +36,27 @@ def instantiate_article(article_id):
 		# Fallback if doi string is blank, default to eLife concatenated
 		if doi.strip() == "":
 			doi = get_elife_doi(article_id)
-		title = get_title(article_id)
-		article = eLifePOA(doi, title)
+		#title = get_title(article_id)
+		article = eLifePOA(doi, title=None)
 		return article
 	except:
 		logger.error("could not create article class")
+
+def set_title(article, article_id):
+	logger.info("in set_title")
+	#try:
+	title = get_title(article_id)
+	article.title = convert_to_xml_string(title)
+	return True
+	#except:
+	#	logger.error("could not set title ")
+	#	return False
 
 def set_abstract(article, article_id):
 	logger.info("in set_abstract")
 	try:
 		abstract = get_abstract(article_id)
-		article.abstract = abstract
+		article.abstract = convert_to_xml_string(abstract)
 		article.manuscript = article_id
 		return True
 	except:
@@ -214,6 +224,7 @@ def build_xml_for_article(article_id):
 	article_id = str(article_id)
 	
 	article = instantiate_article(article_id)
+	if not set_title(article, article_id): error_count = error_count + 1
 	if not set_abstract(article, article_id): error_count = error_count + 1
 	if not set_license(article, article_id): error_count = error_count + 1
 	if not set_dates(article, article_id): error_count = error_count + 1
@@ -244,9 +255,14 @@ def build_xml_for_article(article_id):
 		logger.warning("warning count was " + str(error_count))
 		return False
 
+@memoize
+def index_manuscripts_on_article_id():
+	return index_table_on_article_id("manuscript")
+
 if __name__ == "__main__":
 	# get a list of active article numbers
-	article_ids = index_authors_on_article_id().keys()
+	#article_ids = index_authors_on_article_id().keys()
+	article_ids = index_manuscripts_on_article_id().keys()
 	TARGET_OUTPUT_DIR = settings.TARGET_OUTPUT_DIR
 
 	for article_id in article_ids:
