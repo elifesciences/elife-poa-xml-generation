@@ -556,7 +556,7 @@ class eLifeLicense():
             self.license_id = license_id
             self.license_type = "open-access"
             self.copyright = True
-            self.href = "http://creativecommons.org/licenses/by/3.0/"
+            self.href = "http://creativecommons.org/licenses/by/4.0/"
             self.name = "Creative Commons Attribution License"
             self.p1 = "This article is distributed under the terms of the "
             self.p2 = " permitting unrestricted use and redistribution provided that the original author and source are credited."
