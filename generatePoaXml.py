@@ -577,6 +577,7 @@ class eLifePOA():
 
     def __init__(self, doi, title):
         self.articleType = "research-article"
+        self.display_channel = None
         self.doi = doi 
         self.contributors = [] 
         self.title = title 
@@ -607,10 +608,8 @@ class eLifePOA():
             return None
         
     def get_display_channel(self):
-        # display-channel string relates to the articleType
-        if self.articleType == "research-article":
-            return "Research article"
-        return None
+        # display-channel string partly relates to the articleType
+        return self.display_channel
     
     def add_article_category(self, article_category):
         self.article_categories.append(article_category)
