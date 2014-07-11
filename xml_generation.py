@@ -71,7 +71,7 @@ def set_articleType(article, article_id):
 			'article_type':    'research-article',
 			'display_channel': 'Research article'}
 		article_type_index['10'] = {
-			'article_type':    'discussion',
+			'article_type':    'research-article',
 			'display_channel': 'Feature article'}
 		article_type_index['14'] = {
 			'article_type':    'research-article',
