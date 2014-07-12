@@ -257,6 +257,10 @@ def get_doi(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["doi"])[0]
 	return attribute 
 
+def get_articleType(article_id):
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["articleType"])[0]
+	return attribute 
+
 def get_accepted_date(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["accepted_date"])[0]
 	return attribute

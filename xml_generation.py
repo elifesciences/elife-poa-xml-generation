@@ -63,6 +63,32 @@ def set_abstract(article, article_id):
 		logger.error("could not set abstract ")
 		return False
 
+def set_articleType(article, article_id):
+	logger.info("in set_articleType")
+	try:
+		articleType_id = get_articleType(article_id)
+		
+		# Boilerplate article-type values based on id in CSV file
+		article_type_index = {}
+		
+		article_type_index['1']  = {
+			'article_type':    'research-article',
+			'display_channel': 'Research article'}
+		article_type_index['10'] = {
+			'article_type':    'research-article',
+			'display_channel': 'Feature article'}
+		article_type_index['14'] = {
+			'article_type':    'research-article',
+			'display_channel': 'Short report'}
+		
+		article_type = article_type_index[str(articleType_id)]
+		article.articleType = article_type['article_type']
+		article.display_channel = article_type['display_channel']
+		return True
+	except:
+		logger.error("could not set articleType")
+		return False
+
 def set_license(article, article_id):
 	logger.info("in set_license")
 	try:
@@ -226,6 +252,7 @@ def build_xml_for_article(article_id):
 	article = instantiate_article(article_id)
 	if not set_title(article, article_id): error_count = error_count + 1
 	if not set_abstract(article, article_id): error_count = error_count + 1
+	if not set_articleType(article, article_id): error_count = error_count + 1
 	if not set_license(article, article_id): error_count = error_count + 1
 	if not set_dates(article, article_id): error_count = error_count + 1
 	if not set_ethics(article, article_id): error_count = error_count + 1
