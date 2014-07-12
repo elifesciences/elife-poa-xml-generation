@@ -840,8 +840,10 @@ if __name__ == '__main__':
     manuscript = 929
     title = "The Test Title"
     abstract = "Test abstract"
+    display_channel = "Research article"
     newArticle = eLifePOA(doi, title)
     newArticle.abstract = abstract
+    newArticle.display_channel = display_channel
     newArticle.conflict_default = "The authors declare that no competing interests exist."
     
     newArticle.add_ethic("Human subjects: The eLife IRB approved our study")
