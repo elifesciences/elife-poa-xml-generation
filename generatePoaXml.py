@@ -577,6 +577,7 @@ class eLifePOA():
 
     def __init__(self, doi, title):
         self.articleType = "research-article"
+        self.display_channel = None
         self.doi = doi 
         self.contributors = [] 
         self.title = title 
@@ -607,10 +608,8 @@ class eLifePOA():
             return None
         
     def get_display_channel(self):
-        # display-channel string relates to the articleType
-        if self.articleType == "research-article":
-            return "Research article"
-        return None
+        # display-channel string partly relates to the articleType
+        return self.display_channel
     
     def add_article_category(self, article_category):
         self.article_categories.append(article_category)
@@ -841,8 +840,10 @@ if __name__ == '__main__':
     manuscript = 929
     title = "The Test Title"
     abstract = "Test abstract"
+    display_channel = "Research article"
     newArticle = eLifePOA(doi, title)
     newArticle.abstract = abstract
+    newArticle.display_channel = display_channel
     newArticle.conflict_default = "The authors declare that no competing interests exist."
     
     newArticle.add_ethic("Human subjects: The eLife IRB approved our study")

@@ -83,6 +83,9 @@ Feature: Generate POA XML
     | 00007         |            | get_subjects            | Genomics and evolutionary biology,Plant biology
     | 00007         |            | get_abstract            | An abstract with some "quotation" marks
     | 00012         |            | get_abstract            | In this abstract are consensus YLTLTsupGTGT1LTLT/supGTGTSLTLTsupGTGT2LTLT/supGTGTPLTLTsupGTGT3LTLT/supGTGTTLTLTsupGTGT4LTLT/supGTGTSLTLTsupGTGT5LTLT/supGTGTPLTLTsupGTGT6LTLT/supGTGTSLTLTsupGTGT7LTLT/supGTGT repeats, LTLTiGTGTDrosophilaLTLT/iGTGT and "quotations".
+    | 00003         |            | get_articleType         | 10
+    | 00007         |            | get_articleType         | 1
+    | 00012         |            | get_articleType         | 14
     
   Scenario: Escape unmatched angle brackets
     Given I have the raw string <string>
