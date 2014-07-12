@@ -32,21 +32,57 @@ def instantiate_article(article_id):
 		# Fallback if doi string is blank, default to eLife concatenated
 		if doi.strip() == "":
 			doi = get_elife_doi(article_id)
-		title = get_title(article_id)
-		article = eLifePOA(doi, title)
+		#title = get_title(article_id)
+		article = eLifePOA(doi, title=None)
 		return article
 	except:
 		logger.error("could not create article class")
+
+def set_title(article, article_id):
+	logger.info("in set_title")
+	#try:
+	title = get_title(article_id)
+	article.title = convert_to_xml_string(title)
+	return True
+	#except:
+	#	logger.error("could not set title ")
+	#	return False
 
 def set_abstract(article, article_id):
 	logger.info("in set_abstract")
 	try:
 		abstract = get_abstract(article_id)
-		article.abstract = abstract
+		article.abstract = convert_to_xml_string(abstract)
 		article.manuscript = article_id
 		return True
 	except:
 		logger.error("could not set abstract ")
+		return False
+
+def set_articleType(article, article_id):
+	logger.info("in set_articleType")
+	try:
+		articleType_id = get_articleType(article_id)
+		
+		# Boilerplate article-type values based on id in CSV file
+		article_type_index = {}
+		
+		article_type_index['1']  = {
+			'article_type':    'research-article',
+			'display_channel': 'Research article'}
+		article_type_index['10'] = {
+			'article_type':    'research-article',
+			'display_channel': 'Feature article'}
+		article_type_index['14'] = {
+			'article_type':    'research-article',
+			'display_channel': 'Short report'}
+		
+		article_type = article_type_index[str(articleType_id)]
+		article.articleType = article_type['article_type']
+		article.display_channel = article_type['display_channel']
+		return True
+	except:
+		logger.error("could not set articleType")
 		return False
 
 def set_license(article, article_id):
@@ -206,7 +242,9 @@ def write_xml(article_id, xml, dir = ''):
 def build_xml_for_article(article_id):
 	error_count = 0
 	article = instantiate_article(article_id)
+	if not set_title(article, article_id): error_count = error_count + 1
 	if not set_abstract(article, article_id): error_count = error_count + 1
+	if not set_articleType(article, article_id): error_count = error_count + 1
 	if not set_license(article, article_id): error_count = error_count + 1
 	if not set_dates(article, article_id): error_count = error_count + 1
 	if not set_ethics(article, article_id): error_count = error_count + 1
@@ -233,9 +271,14 @@ def build_xml_for_article(article_id):
 		logger.warning("the following article did not have enough components and xml was not generated " + str(article_id))
 		logger.warning("warning count was " + str(error_count))
 
+@memoize
+def index_manuscripts_on_article_id():
+	return index_table_on_article_id("manuscript")
+
 if __name__ == "__main__":
 	# get a list of active article numbers
-	article_ids = index_authors_on_article_id().keys()
+	#article_ids = index_authors_on_article_id().keys()
+	article_ids = index_manuscripts_on_article_id().keys()
 	TARGET_OUTPUT_DIR = settings.TARGET_OUTPUT_DIR
 
 	for article_id in article_ids:

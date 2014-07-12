@@ -150,9 +150,8 @@ class eLife2XML(object):
         # article-categories
         self.set_article_categories(self.article_meta, poa_article)
         #
-        self.title_group = SubElement(self.article_meta, "title-group")
-        self.title = SubElement(self.title_group, "article-title")
-        self.title.text = poa_article.title 
+        self.set_title_group(self.article_meta, poa_article)
+        
         #
         for contrib_type in self.contrib_types:
             self.set_contrib_group(self.article_meta, poa_article, contrib_type)
@@ -169,12 +168,27 @@ class eLife2XML(object):
         if poa_article.license:
             self.set_permissions(self.article_meta, poa_article)
         #
-        self.set_abstract = SubElement(self.article_meta, "abstract")
+        self.set_abstract(self.article_meta, poa_article)
         #
         if len(poa_article.research_organisms) > 0:
             self.set_kwd_group_research_organism(self.article_meta, poa_article)
-        self.set_para = SubElement(self.set_abstract, "p")
-        self.set_para.text = poa_article.abstract
+
+    def set_title_group(self, parent, poa_article):
+        """
+        Allows the addition of XML tags
+        """
+        root_tag_name = 'title-group'
+        tag_name = 'article-title'
+        root_xml_element = Element(root_tag_name)
+        # XML
+        tagged_string = '<' + tag_name + '>' + poa_article.title + '</' + tag_name + '>'
+        reparsed = minidom.parseString(tagged_string)
+
+        root_xml_element = append_minidom_xml_to_elementtree_xml(
+            root_xml_element, reparsed
+            )
+
+        parent.append(root_xml_element)
 
     def set_journal_title_group(self, parent):
         """
@@ -276,6 +290,23 @@ class eLife2XML(object):
         if poa_article.license.copyright is True:
             self.set_copyright(self.permissions, poa_article)
         self.set_license(self.permissions, poa_article)
+
+    def set_abstract(self, parent, poa_article):
+        """
+        Allows the addition of XML tags
+        """
+        root_tag_name = 'abstract'
+        tag_name = 'p'
+        root_xml_element = Element(root_tag_name)
+        # XML
+        tagged_string = '<' + tag_name + '>' + poa_article.abstract + '</' + tag_name + '>'
+        reparsed = minidom.parseString(tagged_string)
+
+        root_xml_element = append_minidom_xml_to_elementtree_xml(
+            root_xml_element, reparsed
+            )
+
+        parent.append(root_xml_element)
 
     def set_contrib_group(self, parent, poa_article, contrib_type = None):
         # If contrib_type is None, all contributors will be added regardless of their type
@@ -449,7 +480,9 @@ class eLife2XML(object):
         reparsed = minidom.parseString(rough_string)
         if doctype:
             reparsed.insertBefore(doctype, reparsed.documentElement)
-        return reparsed.toprettyxml(indent="\t", encoding = encoding)
+        #return reparsed.toprettyxml(indent="\t", encoding = encoding)
+        # Switch to toxml() instead of toprettyxml() to solve extra whitespace issues
+        return reparsed.toxml(encoding = encoding)
 
 class ContributorAffiliation():
     phone = None
@@ -525,7 +558,7 @@ class eLifeLicense():
             self.license_id = license_id
             self.license_type = "open-access"
             self.copyright = True
-            self.href = "http://creativecommons.org/licenses/by/3.0/"
+            self.href = "http://creativecommons.org/licenses/by/4.0/"
             self.name = "Creative Commons Attribution License"
             self.p1 = "This article is distributed under the terms of the "
             self.p2 = " permitting unrestricted use and redistribution provided that the original author and source are credited."
@@ -546,6 +579,7 @@ class eLifePOA():
 
     def __init__(self, doi, title):
         self.articleType = "research-article"
+        self.display_channel = None
         self.doi = doi 
         self.contributors = [] 
         self.title = title 
@@ -576,10 +610,8 @@ class eLifePOA():
             return None
         
     def get_display_channel(self):
-        # display-channel string relates to the articleType
-        if self.articleType == "research-article":
-            return "Research article"
-        return None
+        # display-channel string partly relates to the articleType
+        return self.display_channel
     
     def add_article_category(self, article_category):
         self.article_categories.append(article_category)
@@ -647,6 +679,106 @@ def decode_brackets(s):
     s = s.replace(settings.GREATER_THAN_ESCAPE_SEQUENCE, '>')
     return s
 
+def replace_tags(s):
+    """
+    Replace tags such as <i> to <italic>
+    <sup> and <sub> are allowed and do not need to be replaced
+    This does not validate markup
+    """
+    s = s.replace('<i>', '<italic>')
+    s = s.replace('</i>', '</italic>')
+    return s
+
+def escape_unmatched_angle_brackets(s):
+    """
+    In order to make an XML string less malformed, escape
+    unmatched less than tags that are not part of an allowed tag
+    Note: Very, very basic, and do not try regex \1 style replacements
+      on unicode ever again! Instead this uses string replace
+    """
+    allowed_tags = ['<i>','</i>',
+                    '<italic>','</italic>',
+                    '<sup>','</sup>',
+                    '<sub>','</sub>']
+    
+    # Split string on tags
+    tags = re.split('(<.*?>)', s)
+    #print tags
+
+    for i in range(len(tags)):
+        val = tags[i]
+        
+        # Use angle bracket character counts to find unmatched tags
+        #  as well as our allowed_tags list to ignore good tags
+        
+        if val.count('<') == val.count('>') and val not in allowed_tags:
+            val = val.replace('<', '&lt;')
+            val = val.replace('>', '&gt;')
+        else:
+            # Count how many unmatched tags we have
+            while val.count('<') != val.count('>'):
+                if val.count('<') != val.count('>') and val.count('<') > 0:
+                    val = val.replace('<', '&lt;', 1)
+                elif val.count('<') != val.count('>') and val.count('>') > 0:
+                    val = val.replace('>', '&gt;', 1)
+        tags[i] = val
+
+    return ''.join(tags)
+    
+def convert_to_xml_string(s):
+    """
+    For input strings with escaped tags and special characters
+    issue a set of conversion functions to prepare it prior
+    to adding it to an article object
+    """
+    s = entity_to_unicode(s).encode('utf-8')
+    s = decode_brackets(s)
+    s = replace_tags(s)
+    s = escape_unmatched_angle_brackets(s)
+    return s
+
+def append_minidom_xml_to_elementtree_xml(parent, xml, recursive = False):
+    """
+    Recursively,
+    Given an ElementTree.Element as parent, and a minidom instance as xml,
+    append the tags and content from xml to parent
+    Used primarily for adding a snippet of XML with <italic> tags
+    """
+
+    # Get the root tag name
+    if recursive is False:
+        tag_name = xml.documentElement.tagName
+        node = xml.getElementsByTagName(tag_name)[0]
+        new_elem = SubElement(parent, tag_name)
+    else:
+        node = xml
+        tag_name = node.tagName
+        new_elem = parent
+
+    i = 0
+    for child_node in node.childNodes:
+        if child_node.nodeName == '#text':
+            if not new_elem.text and i <= 0:
+                new_elem.text = child_node.nodeValue
+            elif not new_elem.text and i > 0:
+                new_elem_sub.tail = child_node.nodeValue
+            else:
+                new_elem_sub.tail = child_node.nodeValue
+                
+        elif child_node.childNodes is not None:
+            new_elem_sub = SubElement(new_elem, child_node.tagName)
+            new_elem_sub = append_minidom_xml_to_elementtree_xml(new_elem_sub, child_node, True)
+
+        i = i + 1
+
+    # Debug
+    #encoding = 'utf-8'
+    #rough_string = ElementTree.tostring(parent, encoding)
+    #print rough_string
+    
+    return parent
+    
+
 if __name__ == '__main__':
 
     # test affiliations 
@@ -710,8 +842,10 @@ if __name__ == '__main__':
     manuscript = 929
     title = "The Test Title"
     abstract = "Test abstract"
+    display_channel = "Research article"
     newArticle = eLifePOA(doi, title)
     newArticle.abstract = abstract
+    newArticle.display_channel = display_channel
     newArticle.conflict_default = "The authors declare that no competing interests exist."
     
     newArticle.add_ethic("Human subjects: The eLife IRB approved our study")

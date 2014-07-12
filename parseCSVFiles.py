@@ -57,6 +57,8 @@ DATA_START_ROW = settings.DATA_START_ROW
 XLS_FILES = settings.XLS_FILES
 COLUMN_HEADINGS = settings.XLS_COLUMN_HEADINGS
 
+OVERFLOW_XLS_FILES = settings.OVERFLOW_XLS_FILES
+
 def memoize(f):
     """ Memoization decorator for functions taking one or more arguments. """
     class memodict(dict):
@@ -98,6 +100,22 @@ def get_xls_sheet(table_type):
 	csvreader = csv.reader(open(path, 'rb'), delimiter=',', quotechar='"')
 	sheet = []
 	for row in csvreader: sheet.append(row)
+	# For overflow file types, parse again with no quotechar
+	if table_type in OVERFLOW_XLS_FILES:
+		csvreader = csv.reader(open(path, 'rb'), delimiter=',', quotechar=None)
+		for row in csvreader:
+			if csvreader.line_num <= DATA_START_ROW:
+				continue
+			# Merge cells 3 to the end because any commas will cause extra columns
+			row[2] = ','.join(row[2:])
+			for index, cell in enumerate(row):
+				# Strip leading quotation marks
+				row[index] = cell.lstrip('"').rstrip('"')
+			try:
+				sheet[csvreader.line_num-1] = row
+			except IndexError:
+				# Last line may not exist so handle the error
+				pass
 	return sheet 
 
 @memoize
@@ -225,18 +243,22 @@ def get_license(article_id):
 
 @entities
 def get_title(article_id):
-	attributes = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["title"])
+	attributes = get_article_attributes(article_id, "title", COLUMN_HEADINGS["title"])
 	attribute = attributes[0]
 	return attribute
 
 @entities
 def get_abstract(article_id):
-	attributes = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["abstract"])
+	attributes = get_article_attributes(article_id, "abstract", COLUMN_HEADINGS["abstract"])
 	attribute = attributes[0]
 	return attribute
 
 def get_doi(article_id):
 	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["doi"])[0]
+	return attribute 
+
+def get_articleType(article_id):
+	attribute = get_article_attributes(article_id, "manuscript", COLUMN_HEADINGS["articleType"])[0]
 	return attribute 
 
 def get_accepted_date(article_id):
