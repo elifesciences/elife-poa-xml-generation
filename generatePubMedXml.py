@@ -149,18 +149,16 @@ class pubMedPoaXML(object):
             day = SubElement(self.publication_date, "Day")
             day.text = str(self.pub_date.tm_mday).zfill(2)
 
-    def set_date(self, parent, poa_article, date_type):
-        # date date-type = date_type
-        date = poa_article.get_date(date_type)
-        if date:
-           self.date = SubElement(parent, "date")
-           self.date.set("date-type", date_type)
+    def set_date(self, parent, a_date, date_type):
+        if a_date:
+           self.date = SubElement(parent, "PubDate")
+           self.date.set("PubStatus", date_type)
            year = SubElement(self.date, "Year")
-           year.text = str(date.date.tm_year)
+           year.text = str(a_date.tm_year)
            month = SubElement(self.date, "Month")
-           month.text = str(date.date.tm_mon).zfill(2)
+           month.text = str(a_date.tm_mon).zfill(2)
            day = SubElement(self.date, "Day")
-           day.text = str(date.date.tm_mday).zfill(2)
+           day.text = str(a_date.tm_mday).zfill(2)
 
     def set_history(self, parent, poa_article):
         self.history = SubElement(parent, "History")
@@ -168,7 +166,12 @@ class pubMedPoaXML(object):
         for date_type in self.date_types:
             date = poa_article.get_date(date_type)
             if date:
-                self.set_date(self.history, poa_article, date_type)
+                self.set_date(self.history, date.date, date_type)
+                
+        # Set aheadofprint date
+        a_date = self.pub_date
+        if a_date:
+            self.set_date(self.history, a_date, "aheadofprint")
 
     def set_abstract(self, parent, poa_article):
 

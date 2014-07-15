@@ -129,6 +129,13 @@ def build_article_from_xml(article_xml_filename):
     contributors = get_contributors_from_xml(root, contrib_type = "author")
     article.contributors = contributors
     
+    # Boilerplate dates - TODO!!!
+    t_accepted = time.strptime('2014-07-14', "%Y-%m-%d")
+    accepted = eLifeDate("accepted", t_accepted)
+    article.add_date(accepted)
+    received = eLifeDate("received", t_accepted)
+    article.add_date(received)
+    
     return article,error_count
 
 if __name__ == '__main__':
@@ -144,6 +151,7 @@ if __name__ == '__main__':
     for article_xml in article_xlms:
         print "working on ", article_xml
         article,error_count = build_article_from_xml("generated_xml_output" + os.sep + article_xml)
+        
         if error_count == 0:
             poa_articles.append(article)
         print article.doi
