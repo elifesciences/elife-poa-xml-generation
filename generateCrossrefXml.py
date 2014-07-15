@@ -36,8 +36,6 @@ class crossrefXML(object):
         self.elife_email_address = 'production@elifesciences.org'
         self.elife_epub_issn = "2050-084X"
         self.elife_publisher_name = "eLife Sciences Publications, Ltd"
-        self.elife_crossmark_policy = "10.7554/eLife/crossmark_policy"
-        self.elife_crossmark_domain = "elifesciences.org"
 
         self.root.set('version', "4.3.2")
         self.root.set('xmlns', 'http://www.crossref.org/schema/4.3.2')
@@ -215,6 +213,7 @@ class crossrefXML(object):
         reparsed = minidom.parseString(rough_string)
 
         return reparsed.toprettyxml(indent="\t", encoding = encoding)
+        #return reparsed.toxml(encoding = encoding)
 
 if __name__ == '__main__':
     
