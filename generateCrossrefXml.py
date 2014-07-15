@@ -7,9 +7,11 @@ from xml.dom import minidom
 import time
 import calendar
 import re
+import os
 from git import *
 from generatePoaXml import *
 from xml_generation import *
+from parsePoaXml import *
 import settings
 
 """
@@ -116,10 +118,9 @@ class crossrefXML(object):
         self.journal_article = SubElement(parent, 'journal_article')
         self.journal_article.set("publication_type", "full_text")
         
-        self.titles = SubElement(self.journal_article, 'titles')
-        self.title = SubElement(self.titles, 'title')
-        self.title.text = poa_article.title 
-        
+        # Set the title with italic tag support
+        self.set_titles(self.journal_article, poa_article)
+
         for contrib_type in self.contrib_types:
             self.set_contributors(self.journal_article, poa_article, contrib_type)
         
@@ -136,6 +137,22 @@ class crossrefXML(object):
         self.archive.set("name", "CLOCKSS")
         
         self.set_doi_data(self.journal_article, poa_article)
+        
+    def set_titles(self, parent, poa_article):
+        """
+        Set the titles and title tags allowing sub tags within title
+        """
+        root_tag_name = 'titles'
+        tag_name = 'title'
+        root_xml_element = Element(root_tag_name)
+        tagged_string = '<' + tag_name + '>' + poa_article.title + '</' + tag_name + '>'
+        reparsed = minidom.parseString(tagged_string)
+
+        root_xml_element = append_minidom_xml_to_elementtree_xml(
+            root_xml_element, reparsed
+            )
+
+        parent.append(root_xml_element)
         
     def set_doi_data(self, parent, poa_article):
         self.doi_data = SubElement(parent, 'doi_data')
@@ -199,43 +216,27 @@ class crossrefXML(object):
 
         return reparsed.toprettyxml(indent="\t", encoding = encoding)
 
-def build_article(article_id):
-    """
-    Temporary duplication of instantiating an article object
-    until refactoring is done
-    """
-    error_count = 0
-    article = instantiate_article(article_id)
-    if not set_abstract(article, article_id): error_count = error_count + 1
-    if not set_license(article, article_id): error_count = error_count + 1
-    if not set_dates(article, article_id): error_count = error_count + 1
-    if not set_ethics(article, article_id): error_count = error_count + 1
-    if not set_categories(article, article_id): error_count = error_count + 1
-    if not set_organsims(article, article_id): error_count = error_count + 1
-    if not set_author_info(article, article_id): error_count = error_count + 1
-    if not set_editor_info(article, article_id): error_count = error_count + 1
-    print error_count
-    
-    # default conflict text
-    article.conflict_default = "The authors declare that no competing interests exist."
-    
-    return article, error_count
-
 if __name__ == '__main__':
     
-    article_ids = ["3080","3005","3100","3110"]
+    article_xlms = ["elife_poa_e03011.xml"
+                    ,"elife_poa_e03198.xml"
+                    ,"elife_poa_e03191.xml"
+                    ,"elife_poa_e03300.xml"
+                    ,"elife_poa_e02676.xml"
+                    ]
     poa_articles = []
     
-    for article_id in article_ids:
-        print "working on ", article_id
-        article,error_count = build_article(article_id)
+    for article_xml in article_xlms:
+        print "working on ", article_xml
+        article,error_count = build_article_from_xml("generated_xml_output" + os.sep + article_xml)
         if error_count == 0:
             poa_articles.append(article)
-    
+
     # test the XML generator 
     eXML = crossrefXML(poa_articles)
     prettyXML = eXML.prettyXML()
     print prettyXML
+
 
 
 
