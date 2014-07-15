@@ -51,6 +51,7 @@ def get_abstract_from_xml(root):
         # TODO!!!! resolve nested tag issues
         #print tag
         abstract = tag.text
+        abstract = "Stub - <italic>todo!!!</italic>"
 
         #print abstract
 
