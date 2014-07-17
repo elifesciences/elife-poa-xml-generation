@@ -3,6 +3,7 @@ from parseCSVFiles import *
 import xlrd
 import settings as settings
 import logging
+import os
 
 """
 read from an xls file
@@ -24,6 +25,9 @@ formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
+
+# set output directory
+TARGET_OUTPUT_DIR = settings.TARGET_OUTPUT_DIR
 
 def instantiate_article(article_id):
 	logger.info("in instantiate_article for " + str(article_id))
@@ -235,12 +239,16 @@ def set_editor_info(article, article_id):
 		return False
 
 def write_xml(article_id, xml, dir = ''):
-	f = open(dir + 'elife_poa_e' + str(int(article_id)).zfill(5) + '.xml', "wb")
+	f = open(dir + os.sep + 'elife_poa_e' + str(int(article_id)).zfill(5) + '.xml', "wb")
 	f.write(xml.prettyXML())
 	f.close()
 
 def build_xml_for_article(article_id):
 	error_count = 0
+	
+	# Only happy with string article_id - cast it now to be safe!
+	article_id = str(article_id)
+	
 	article = instantiate_article(article_id)
 	if not set_title(article, article_id): error_count = error_count + 1
 	if not set_abstract(article, article_id): error_count = error_count + 1
@@ -265,11 +273,14 @@ def build_xml_for_article(article_id):
 			write_xml(article_id, article_xml, dir = TARGET_OUTPUT_DIR)
 			logger.info("xml written for " + str(article_id))
 			print "written " + article_id
+			return True
 		except:
 			logger.error("could not generate or write xml for " + str(article_id))
+			return False
 	else:
 		logger.warning("the following article did not have enough components and xml was not generated " + str(article_id))
 		logger.warning("warning count was " + str(error_count))
+		return False
 
 @memoize
 def index_manuscripts_on_article_id():

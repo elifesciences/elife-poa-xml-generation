@@ -2,3 +2,13 @@
 generated_xml_output/*
 *.pyc
 *.log
+made_ftp_ready_on/20*
+ftp-to-hw/*.zip
+sample-zip-from-ejp/*.zip
+unpacked_renamed_ejp_files/*.pdf
+unpacked_renamed_ejp_files/*.xml
+settings.py
+sample_pdf_decapitation_output/*
+sample_pdf_from_ejp/*
+staging_decapitate_pdf_dir/*
+tmp/*
