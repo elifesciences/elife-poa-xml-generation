@@ -75,8 +75,7 @@ class pubMedPoaXML(object):
         self.journal_title = SubElement(self.journal, 'JournalTitle')
         self.journal_title.text = self.elife_journal_title
         
-        self.issn = SubElement(self.journal, 'issn')
-        self.issn.set("media_type", "electronic")
+        self.issn = SubElement(self.journal, 'Issn')
         self.issn.text = self.elife_epub_issn
         
         self.volume = SubElement(self.journal, "Volume")
@@ -85,8 +84,8 @@ class pubMedPoaXML(object):
         self.issue = SubElement(self.journal, "Issue")
         self.issue.text = self.elife_journal_issue
         
-        self.journal_pubdate = SubElement(self.journal, "PubDate")
-        self.set_pub_date(self.journal_pubdate, self.pub_date, "aheadofprint")
+        #self.journal_pubdate = SubElement(self.journal, "PubDate")
+        self.set_pub_date(self.journal, self.pub_date, "aheadofprint")
 
 
     def set_article_title(self, parent, poa_article):
