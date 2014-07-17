@@ -1,0 +1,50 @@
+"""
+
+open 1153_1_supp_mat_highwire_zip_3396_mzgbl4.zip 
+
+unzip 1135_0_supp_mat_highwire_zip_3418_mzrbyr
+
+open 
+
+and then .... 
+
+	extract the files
+	read the manifest file to see what's in there
+
+	for each <filename> rename that fila as article_id_title, where title is derived from the manifest xml 
+
+	take the pdf identified by title "Merged PDF" and the main POA xml
+		rename the pdf as according to instructions from Tina
+
+		we will use elife_poa_e000213.pdf as the name of the PDF
+		the parent xml file will be elife_poa_e000213.xml (which I can make)
+
+		take the xml and the PDF, put them into a zip file
+			elife_poa_YYYYMMDD.zip 
+
+		You can put as many pdf & xml coples into that file for delivery on that date as we wish. 
+
+		deliver that with a go.xml file. 
+
+		send the elife_poa_YYYYMMDD.zip 
+
+		send the data supplements
+
+		the data supplements
+			we have to send these per article
+			filename is elife_poa_e000_ds.zip 
+				this contains the files and a manifest.xml file 
+				the manifest file contains a pointer to the zip file with all of the supp files
+				the manifest file points to the suppfile zip file and the title 
+				in the manifext file containst the names of the files in the zip file 
+
+				the zip file can be called anything we like, but we should call it something sensible 
+
+		and finally send the go.xml file 
+			the go.xml file has no internal data, it's just it's presesne tells HW to process the contents of the
+			ftp directory 
+
+- unpack files from EJP and rename them.
+
+
+"""

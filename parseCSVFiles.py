@@ -216,7 +216,7 @@ def get_article_attributes(article_id, attribute_type, attribute_label):
 	# logger.info(str(attribute_index))
 	logger.info("about to get col_names for colname " + str(attribute_type))
 	col_names = get_xls_col_names(attribute_type)
-	attribute_rows = attribute_index[article_id]
+	attribute_rows = attribute_index[str(article_id)]
 	for attribute_row in attribute_rows:
 		attributes.append(get_cell_value(attribute_label ,col_names, attribute_row))
 	return attributes
