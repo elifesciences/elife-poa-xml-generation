@@ -13,6 +13,48 @@ import settings
 Parse PoA XML file and can instantiate a eLifePOA object from the data
 """
 
+def convert_element_to_string(parent, xml_string, recursive = False):
+    """
+    Recursively,
+    Given an ElementTree.Element as parent,
+    append the tags and content from xml to the string
+    Used primarily for parsing XML with <italic> tags
+    Does not include tag attributes
+    """
+
+    tag_count = 0
+    sub_xml_string = ''
+    
+    # Iterate over child tags, if present, and call recursively
+    for child in parent:
+        sub_xml_string += convert_element_to_string(child, xml_string, True)
+        tag_count = tag_count + 1
+    
+    # Add the recursive xml to the main xml_string
+    xml_string += sub_xml_string
+
+    if tag_count > 0:
+        # Add text to start of the string and tail to the end
+        if parent.text:
+            xml_string = parent.text + xml_string
+
+        if parent.tail:
+            xml_string = xml_string + parent.tail 
+
+    elif tag_count == 0:
+        # No nested tags, add the tag to the string
+        xml_string += '<' + parent.tag + '>'
+
+        if parent.text:
+            xml_string += parent.text
+        
+        xml_string += '</' + parent.tag + '>'
+     
+        if parent.tail:
+            xml_string += parent.tail
+            
+    return xml_string
+
 def get_article_id_from_xml(root, pub_id_type = "publisher-id"):
     """
     Given an xml.etree.ElementTree.Element, get the
@@ -36,9 +78,8 @@ def get_title_from_xml(root):
     """
     title = None
     for tag in root.findall('./front/article-meta/title-group/article-title'):
-        # TODO!!!! resolve nested tag issues
-        #title = tag.text
-        title = "A <italic>little</italic> test"
+        # Recursively flatten child elements into a string
+        title = convert_element_to_string(tag, '').encode('utf-8')
         
     return title
     
@@ -49,12 +90,8 @@ def get_abstract_from_xml(root):
     """
     abstract = None
     for tag in root.findall('./front/article-meta/abstract'):
-        # TODO!!!! resolve nested tag issues
-        #print tag
-        abstract = tag.text
-        abstract = "Stub - <italic>todo!!!</italic>"
-
-        #print abstract
+        # Recursively flatten child elements into a string
+        abstract = convert_element_to_string(tag, u'').encode('utf-8')
 
     return abstract
 
