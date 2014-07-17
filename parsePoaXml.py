@@ -2,6 +2,7 @@ import xml
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from xml.etree import ElementTree
 import time
+import datetime
 import calendar
 import re
 import os
@@ -99,6 +100,34 @@ def get_contributors_from_xml(root, contrib_type = None):
 
     return contributors
 
+def get_history_from_xml(root, contrib_type = None):
+    """
+    Given an xml.etree.ElementTree.Element, get the
+    history
+    and return types of dates and their time.struct_time representation
+    """
+    history = {}
+    for tag in root.findall('./front/article-meta/history/date'):
+        date_type = tag.get("date-type")
+        for child in tag:
+            if child.tag == 'day':
+                day = child.text
+            elif child.tag == 'month':
+                month = child.text
+            elif child.tag == 'year':   
+                year = child.text
+
+        # Create the time object
+        try:
+            date = datetime.datetime(int(year), int(month), int(day))
+        except:
+            date = None
+            
+        if date:
+            history[date_type] = date.timetuple()
+
+    return history
+
 def build_article_from_xml(article_xml_filename):
     """
     Parse NLM XML with ElementTree, and populate an
@@ -129,13 +158,18 @@ def build_article_from_xml(article_xml_filename):
     contributors = get_contributors_from_xml(root, contrib_type = "author")
     article.contributors = contributors
     
-    # Boilerplate dates - TODO!!!
-    t_accepted = time.strptime('2014-07-14', "%Y-%m-%d")
-    accepted = eLifeDate("accepted", t_accepted)
-    article.add_date(accepted)
-    received = eLifeDate("received", t_accepted)
-    article.add_date(received)
+    history_dates = get_history_from_xml(root)
     
+    date_types = ["received", "accepted"]
+    for date_type in date_types:
+        try:
+            if history_dates[date_type]:
+                date_instance = eLifeDate(date_type, history_dates[date_type])
+                article.add_date(date_instance)
+        except KeyError:
+            # date did not exist
+            error_count = error_count + 1
+
     return article,error_count
 
 if __name__ == '__main__':
