@@ -43,12 +43,15 @@ def convert_element_to_string(parent, xml_string, recursive = False):
 
     elif tag_count == 0:
         # No nested tags, add the tag to the string
-        xml_string += '<' + parent.tag + '>'
+        if recursive is True:
+            # Only add nested tags, not the parent tag
+            xml_string += '<' + parent.tag + '>'
 
         if parent.text:
             xml_string += parent.text
         
-        xml_string += '</' + parent.tag + '>'
+        if recursive is True:
+            xml_string += '</' + parent.tag + '>'
      
         if parent.tail:
             xml_string += parent.tail
