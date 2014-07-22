@@ -8,6 +8,7 @@ import time
 import calendar
 import re
 import os
+import operator
 from git import *
 from generatePoaXml import *
 from xml_generation import *
@@ -169,7 +170,19 @@ class crossrefXML(object):
         # If contrib_type is None, all contributors will be added regardless of their type
         self.contributors = SubElement(parent, "contributors")
 
-        for contributor in poa_article.contributors:
+        # Set the sort order of each based on corresp or equal_contrib so we can sort later
+        sorted_contributors = poa_article.contributors
+        for contributor in sorted_contributors:
+            if contributor.corresp == True or contributor.equal_contrib == True:
+                contributor.sort_order = 1
+            else:
+                contributor.sort_order = 2
+            
+        # Now we can sort by sort order
+        sorted_contributors = sorted(poa_article.contributors, key=operator.attrgetter("sort_order"))
+        
+        # Ready to add to XML
+        for contributor in sorted_contributors:
             if contrib_type:
                 # Filter by contrib_type if supplied
                 if contributor.contrib_type != contrib_type:
