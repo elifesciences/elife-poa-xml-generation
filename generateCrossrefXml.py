@@ -170,19 +170,10 @@ class crossrefXML(object):
         # If contrib_type is None, all contributors will be added regardless of their type
         self.contributors = SubElement(parent, "contributors")
 
-        # Set the sort order of each based on corresp or equal_contrib so we can sort later
-        sorted_contributors = poa_article.contributors
-        for contributor in sorted_contributors:
-            if contributor.corresp == True or contributor.equal_contrib == True:
-                contributor.sort_order = 1
-            else:
-                contributor.sort_order = 2
-            
-        # Now we can sort by sort order
-        sorted_contributors = sorted(poa_article.contributors, key=operator.attrgetter("sort_order"))
-        
         # Ready to add to XML
-        for contributor in sorted_contributors:
+        # Use the natural list order of contributors when setting the first author
+        sequence = "first"
+        for contributor in poa_article.contributors:
             if contrib_type:
                 # Filter by contrib_type if supplied
                 if contributor.contrib_type != contrib_type:
@@ -196,15 +187,18 @@ class crossrefXML(object):
             self.person_name.set("contributor_role", contributor.contrib_type)
             
             if contributor.corresp == True or contributor.equal_contrib == True:
-                self.person_name.set("sequence", "first")
+                self.person_name.set("sequence", sequence)
             else:
-                self.person_name.set("sequence", "additional")
+                self.person_name.set("sequence", sequence)
                 
             self.given_name = SubElement(self.person_name, "given_name")
             self.given_name.text = contributor.given_name
             
             self.surname = SubElement(self.person_name, "surname")
             self.surname.text = contributor.surname
+            
+            # Reset sequence value after the first sucessful loop
+            sequence = "additional"
 
     def set_publication_date(self, parent, pub_date):
         # pub_date is a python time object
