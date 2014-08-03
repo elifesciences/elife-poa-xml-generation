@@ -168,6 +168,21 @@ def get_history_from_xml(root, contrib_type = None):
 
     return history
 
+def get_license_from_xml(root, contrib_type = None):
+    """
+    Given an xml.etree.ElementTree.Element, get the
+    license
+    and return the license details
+    """
+    license = {}
+    license['href'] = None
+    
+    # Get the license href
+    for tag in root.findall('./front/article-meta/permissions/license'):
+        license['href'] = tag.get("{http://www.w3.org/1999/xlink}href")
+            
+    return license
+
 def build_article_from_xml(article_xml_filename):
     """
     Parse NLM XML with ElementTree, and populate an
@@ -197,6 +212,12 @@ def build_article_from_xml(article_xml_filename):
     # contributors
     contributors = get_contributors_from_xml(root, contrib_type = "author")
     article.contributors = contributors
+    
+    # license href
+    license_data = get_license_from_xml(root)
+    license = eLifeLicense()
+    license.href = license_data['href']
+    article.license = license
     
     history_dates = get_history_from_xml(root)
     

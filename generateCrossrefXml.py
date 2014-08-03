@@ -37,11 +37,14 @@ class crossrefXML(object):
         self.elife_email_address = 'production@elifesciences.org'
         self.elife_epub_issn = "2050-084X"
         self.elife_publisher_name = "eLife Sciences Publications, Ltd"
+        self.elife_crossmark_policy = "10.7554/eLife/crossmark_policy"
+        self.elife_crossmark_domain = "www.elifesciences.org"
 
         self.root.set('version', "4.3.2")
         self.root.set('xmlns', 'http://www.crossref.org/schema/4.3.2')
         self.root.set('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
         self.root.set('xmlns:fr', 'http://www.crossref.org/fundref.xsd')
+        self.root.set('xmlns:ai', 'http://www.crossref.org/AccessIndicators.xsd')
         self.root.set('xmlns:schemaLocation', 'http://www.crossref.org/schema/4.3.2 http://www.crossref.org/schemas/crossref4.3.2.xsd')
         self.root.set('xmlns:mml', 'http://www.w3.org/1998/Math/MathML')
 
@@ -131,6 +134,8 @@ class crossrefXML(object):
         self.identifier.set("id_type", "doi")
         self.identifier.text = poa_article.doi
         
+        self.set_crossmark(self.journal_article, poa_article)
+        
         #self.archive_locations = SubElement(self.journal_article, 'archive_locations')
         #self.archive = SubElement(self.archive_locations, 'archive')
         #self.archive.set("name", "CLOCKSS")
@@ -165,6 +170,41 @@ class crossrefXML(object):
         
         resource = 'http://elifesciences.org/lookup/doi/' + poa_article.doi
         self.resource.text = resource
+
+    def set_crossmark(self, parent, poa_article):
+        self.crossmark = SubElement(parent, 'crossmark')
+        
+        self.crossmark_version = SubElement(self.crossmark , 'crossmark_version')
+        self.crossmark_version.text = "1"
+        
+        self.crossmark_policy = SubElement(self.crossmark , 'crossmark_policy')
+        self.crossmark_policy.text = self.elife_crossmark_policy
+        
+        self.crossmark_domains = SubElement(self.crossmark , 'crossmark_domains')
+        self.crossmark_domain = SubElement(self.crossmark_domains , 'crossmark_domain')
+        self.crossmark_domain_domain = SubElement(self.crossmark_domain , 'domain')
+        self.crossmark_domain_domain.text = self.elife_crossmark_domain
+        
+        self.crossmark_domain_exclusive = SubElement(self.crossmark , 'crossmark_domain_exclusive')
+        self.crossmark_domain_exclusive.text = "false"
+        
+        self.set_custom_metadata(self.crossmark, poa_article)
+        
+    def set_custom_metadata(self, parent, poa_article):
+        self.custom_metadata = SubElement(parent, 'custom_metadata')
+        
+        self.ai_program = SubElement(self.custom_metadata, 'ai:program')
+        self.ai_program.set('name', 'AccessIndicators')
+        
+        license_href = poa_article.license.href
+       
+        license_ref_applies_to = ['am']
+        
+        if license_href:
+            for applies_to in license_ref_applies_to:
+                self.ai_program_ref = SubElement(self.ai_program, 'ai:license_ref')
+                self.ai_program_ref.set('applies_to', applies_to)
+                self.ai_program_ref.text = license_href
 
     def set_contributors(self, parent, poa_article, contrib_type = None):
         # If contrib_type is None, all contributors will be added regardless of their type
@@ -231,6 +271,7 @@ if __name__ == '__main__':
                     ,"elife_poa_e03191.xml"
                     ,"elife_poa_e03300.xml"
                     ,"elife_poa_e02676.xml"
+                    ,"elife_poa_e02839.xml"
                     ]
     poa_articles = []
     
