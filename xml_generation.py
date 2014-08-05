@@ -170,10 +170,10 @@ def set_author_info(article, article_id):
 			first_name = get_author_first_name(article_id, author_id)
 			last_name = get_author_last_name(article_id, author_id)
 			middle_name = get_author_middle_name(article_id, author_id)
-			initials = middle_name_initials(middle_name)
-			if initials:
-				# Middle initials
-				first_name += " " + initials
+			#initials = middle_name_initials(middle_name)
+			if middle_name.strip() != "":
+				# Middle name add to the first name / given name
+				first_name += " " + middle_name
 			author = eLifePOSContributor(author_type, last_name, first_name)
 			affiliation = ContributorAffiliation()
 
@@ -213,10 +213,10 @@ def set_editor_info(article, article_id):
 		first_name = get_me_first_nm(article_id)
 		last_name = get_me_last_nm(article_id)
 		middle_name = get_me_middle_nm(article_id)
-		initials = middle_name_initials(middle_name)
-		if initials:
-			# Middle initials
-			first_name += " " + initials
+		#initials = middle_name_initials(middle_name)
+		if middle_name.strip() != "":
+			# Middle name add to the first name / given name
+			first_name += " " + middle_name
 		editor = eLifePOSContributor(author_type, last_name, first_name)  # creates an instance of the POSContributor class
 		logger.info("editor is: " + str(editor))
 		logger.info("getting ed id for article " + str(article_id))
