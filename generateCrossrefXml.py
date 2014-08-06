@@ -264,27 +264,42 @@ class crossrefXML(object):
         return reparsed.toprettyxml(indent="\t", encoding = encoding)
         #return reparsed.toxml(encoding = encoding)
 
-if __name__ == '__main__':
+def build_crossref_xml_for_articles(article_xmls):
+    """
+    Given a list of article XML filenames, convert to article objects,
+    and then generate crossref XML from them
+    """
     
-    article_xlms = ["elife_poa_e03011.xml"
-                    ,"elife_poa_e03198.xml"
-                    ,"elife_poa_e03191.xml"
-                    ,"elife_poa_e03300.xml"
-                    ,"elife_poa_e02676.xml"
-                    ,"elife_poa_e02839.xml"
-                    ]
     poa_articles = []
     
-    for article_xml in article_xlms:
+    for article_xml in article_xmls:
         print "working on ", article_xml
-        article,error_count = build_article_from_xml("generated_xml_output" + os.sep + article_xml)
+        article,error_count = build_article_from_xml(article_xml)
         if error_count == 0:
             poa_articles.append(article)
 
     # test the XML generator 
     eXML = crossrefXML(poa_articles)
     prettyXML = eXML.prettyXML()
-    print prettyXML
+    
+    # Write to file
+    f = open(settings.TMP_DIR + os.sep + eXML.elife_doi_batch_id + '.xml', "wb")
+    f.write(prettyXML)
+    f.close()
+    
+    #print prettyXML
+
+if __name__ == '__main__':
+    
+    article_xmls = ["generated_xml_output/elife_poa_e03011.xml"
+                    ,"generated_xml_output/elife_poa_e03198.xml"
+                    ,"generated_xml_output/elife_poa_e03191.xml"
+                    ,"generated_xml_output/elife_poa_e03300.xml"
+                    ,"generated_xml_output/elife_poa_e02676.xml"
+                    ,"generated_xml_output/elife_poa_e02839.xml"
+                    ]
+    
+    build_crossref_xml_for_articles(article_xmls)
 
 
 
