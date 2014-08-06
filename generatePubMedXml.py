@@ -208,7 +208,7 @@ class pubMedPoaXML(object):
 
 if __name__ == '__main__':
     
-    article_xlms = ["elife_poa_e03011.xml"
+    article_xmls = ["elife_poa_e03011.xml"
                     #,"elife_poa_e03198.xml"
                     #,"elife_poa_e03191.xml"
                     #,"elife_poa_e03300.xml"
@@ -216,7 +216,7 @@ if __name__ == '__main__':
                     ]
     poa_articles = []
     
-    for article_xml in article_xlms:
+    for article_xml in article_xmls:
         print "working on ", article_xml
         article,error_count = build_article_from_xml("generated_xml_output" + os.sep + article_xml)
         if error_count == 0:
