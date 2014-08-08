@@ -72,7 +72,7 @@ class crossrefXML(object):
         self.doi_batch_id = SubElement(self.head, 'doi_batch_id')
         self.doi_batch_id.text = self.elife_doi_batch_id
         self.timestamp = SubElement(self.head, 'timestamp')
-        self.timestamp.text = str(calendar.timegm(self.pub_date))
+        self.timestamp.text = time.strftime("%Y%m%d%H%M%S", self.pub_date)
         self.set_depositor(self.head)
         self.registrant = SubElement(self.head, 'registrant')
         self.registrant.text = self.elife_journal_title
