@@ -684,14 +684,14 @@ def decode_brackets(s):
     s = s.replace(settings.GREATER_THAN_ESCAPE_SEQUENCE, '>')
     return s
 
-def replace_tags(s):
+def replace_tags(s, from_tag = 'i', to_tag = 'italic'):
     """
     Replace tags such as <i> to <italic>
     <sup> and <sub> are allowed and do not need to be replaced
     This does not validate markup
     """
-    s = s.replace('<i>', '<italic>')
-    s = s.replace('</i>', '</italic>')
+    s = s.replace('<' + from_tag + '>', '<' + to_tag + '>')
+    s = s.replace('</' + from_tag + '>', '</' + to_tag + '>')
     return s
 
 def escape_unmatched_angle_brackets(s):
