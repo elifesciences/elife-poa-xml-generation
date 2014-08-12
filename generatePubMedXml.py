@@ -44,6 +44,9 @@ class pubMedPoaXML(object):
         if pub_date is None:
             self.pub_date = time.gmtime()
 
+        # Generate batch id
+        self.elife_doi_batch_id = "elife-" + time.strftime("%Y-%m-%d-%H%M%S", self.pub_date) + "-PubMed"
+
         # set comment
         generated = time.strftime("%Y-%m-%d %H:%M:%S")
         last_commit = get_last_commit_to_master()
@@ -52,7 +55,7 @@ class pubMedPoaXML(object):
 
         self.build(self.root, poa_articles)
 
-    def build(self, root, poa_article):
+    def build(self, root, poa_articles):
         
         for poa_article in poa_articles:
             self.article = SubElement(root, "Article")
@@ -206,27 +209,42 @@ class pubMedPoaXML(object):
         return reparsed.toprettyxml(indent="\t", encoding = encoding)
         #return reparsed.toxml(encoding = encoding)
 
-if __name__ == '__main__':
+def build_pubmed_xml_for_articles(article_xmls):
+    """
+    Given a list of article XML filenames, convert to article objects,
+    and then generate pubmed XML from them
+    """
     
-    article_xmls = ["elife_poa_e03011.xml"
-                    #,"elife_poa_e03198.xml"
-                    #,"elife_poa_e03191.xml"
-                    #,"elife_poa_e03300.xml"
-                    #,"elife_poa_e02676.xml"
-                    ]
     poa_articles = []
     
     for article_xml in article_xmls:
         print "working on ", article_xml
-        article,error_count = build_article_from_xml("generated_xml_output" + os.sep + article_xml)
+        article,error_count = build_article_from_xml(article_xml)
         if error_count == 0:
             poa_articles.append(article)
-            
+
     # test the XML generator 
     eXML = pubMedPoaXML(poa_articles)
     prettyXML = eXML.prettyXML()
-    print prettyXML
+    
+    # Write to file
+    f = open(settings.TMP_DIR + os.sep + eXML.elife_doi_batch_id + '.xml', "wb")
+    f.write(prettyXML)
+    f.close()
+    
+    #print prettyXML
 
+if __name__ == '__main__':
+    
+    article_xmls = ["generated_xml_output/elife_poa_e03011.xml"
+                    #,"generated_xml_output/elife_poa_e03198.xml"
+                    #,"generated_xml_output/elife_poa_e03191.xml"
+                    #,"generated_xml_output/elife_poa_e03300.xml"
+                    #,"generated_xml_output/elife_poa_e02676.xml"
+                    ,"generated_xml_output/elife02866.xml"
+                    ]
+    
+    build_pubmed_xml_for_articles(article_xmls)
 
 
 
