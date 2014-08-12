@@ -168,6 +168,34 @@ def get_history_from_xml(root, contrib_type = None):
 
     return history
 
+def get_pub_dates_from_xml(root, contrib_type = None):
+    """
+    Given an xml.etree.ElementTree.Element, get all the
+    pub-date
+    elements and return types of dates and their time.struct_time representation
+    """
+    pub_dates = {}
+    for tag in root.findall('./front/article-meta/pub-date'):
+        pub_type = tag.get("pub-type")
+        for child in tag:
+            if child.tag == 'day':
+                day = child.text
+            elif child.tag == 'month':
+                month = child.text
+            elif child.tag == 'year':   
+                year = child.text
+
+        # Create the time object
+        try:
+            date = datetime.datetime(int(year), int(month), int(day))
+        except:
+            date = None
+            
+        if date:
+            pub_dates[pub_type] = date.timetuple()
+
+    return pub_dates
+
 def get_license_from_xml(root, contrib_type = None):
     """
     Given an xml.etree.ElementTree.Element, get the
@@ -230,6 +258,19 @@ def build_article_from_xml(article_xml_filename):
         except KeyError:
             # date did not exist
             error_count = error_count + 1
+            
+    # Parse the pub-date for VoR articles
+    pub_dates = get_pub_dates_from_xml(root)
+    pub_date_types = ["epub"]
+    for pub_type in pub_date_types:
+        try:
+            if pub_dates[pub_type]:
+                date_instance = eLifeDate(pub_type, pub_dates[pub_type])
+                article.add_date(date_instance)
+        
+        except:
+            # PoA will not have pub-date, quietly continue
+            pass
 
     return article,error_count
 

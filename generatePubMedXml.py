@@ -69,6 +69,21 @@ class pubMedPoaXML(object):
             self.set_abstract(self.article, poa_article)
             self.set_object_list(self.article, poa_article)
 
+    def get_pub_type(self, poa_article):
+        """
+        Given an article object, determine whether the pub_type is for
+        PoA article or VoR article
+        """
+        
+        pub_type = None
+        if poa_article.get_date("epub"):
+            # VoR
+            pub_type = "epublish"
+        else:
+            # PoA
+            pub_type = "aheadofprint"
+        return pub_type
+
     def set_journal(self, parent, poa_article):
         self.journal = SubElement(parent, "Journal")
         
@@ -88,8 +103,12 @@ class pubMedPoaXML(object):
         self.issue.text = self.elife_journal_issue
         
         #self.journal_pubdate = SubElement(self.journal, "PubDate")
-        self.set_pub_date(self.journal, self.pub_date, "aheadofprint")
-
+        pub_type = self.get_pub_type(poa_article)
+        if pub_type == "epublish":
+            a_date = poa_article.get_date("epub").date
+        else:
+            a_date = self.pub_date
+        self.set_pub_date(self.journal, a_date, pub_type)
 
     def set_article_title(self, parent, poa_article):
         """
@@ -144,12 +163,12 @@ class pubMedPoaXML(object):
             self.publication_date = SubElement(parent, "PubDate")
             self.publication_date.set("PubStatus", pub_type)
             year = SubElement(self.publication_date, "Year")
-            year.text = str(self.pub_date.tm_year)
+            year.text = str(pub_date.tm_year)
             month = SubElement(self.publication_date, "Month")
             # Get full text name of month
-            month.text = time.strftime('%B', self.pub_date)
+            month.text = time.strftime('%B', pub_date)
             day = SubElement(self.publication_date, "Day")
-            day.text = str(self.pub_date.tm_mday).zfill(2)
+            day.text = str(pub_date.tm_mday).zfill(2)
 
     def set_date(self, parent, a_date, date_type):
         if a_date:
@@ -170,11 +189,6 @@ class pubMedPoaXML(object):
             if date:
                 self.set_date(self.history, date.date, date_type)
                 
-        # Set aheadofprint date
-        a_date = self.pub_date
-        if a_date:
-            self.set_date(self.history, a_date, "aheadofprint")
-
     def set_abstract(self, parent, poa_article):
 
         tag_name = 'Abstract'
