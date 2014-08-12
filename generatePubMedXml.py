@@ -151,6 +151,10 @@ class pubMedPoaXML(object):
             
             self.surname = SubElement(self.person_name, "LastName")
             self.surname.text = contributor.surname
+            
+            for aff in contributor.affiliations:
+                self.affiliation = SubElement(self.person_name, "Affiliation")
+                self.affiliation.text = aff
 
     def set_article_id_list(self, parent, poa_article):
         self.article_id_list = SubElement(parent, "ArticleIdList")
@@ -246,7 +250,7 @@ def build_pubmed_xml_for_articles(article_xmls):
     f.write(prettyXML)
     f.close()
     
-    #print prettyXML
+    print prettyXML
 
 if __name__ == '__main__':
     

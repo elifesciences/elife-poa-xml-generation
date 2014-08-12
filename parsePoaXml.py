@@ -58,6 +58,20 @@ def convert_element_to_string(parent, xml_string, recursive = False):
             
     return xml_string
 
+def strip_tags_from_string(str):
+    """
+    Given a string of XML, remove all the tags and return
+    the content between the tags
+    """
+    
+    str_stripped = ''
+    # Remove all tags to leave the content behind
+    aff_chunks = re.split('(<.*?>)', str)
+    for chunk in aff_chunks:
+        if chunk.count('<') <= 0 and chunk.count('>') <= 0:
+            str_stripped += chunk
+    return str_stripped
+
 def get_article_id_from_xml(root, pub_id_type = "publisher-id"):
     """
     Given an xml.etree.ElementTree.Element, get the
@@ -94,11 +108,36 @@ def get_abstract_from_xml(root):
     abstract = None
     for tag in root.findall('./front/article-meta/abstract'):
         # Recursively flatten child elements into a string
-        abstract = convert_element_to_string(tag, u'').encode('utf-8')
+        if not tag.get("abstract-type"):
+            abstract = convert_element_to_string(tag, u'').encode('utf-8')
 
     return abstract
 
-def get_contributor_from_contrib_group(root):
+def get_affs_from_xml(root):
+    """
+    Given an xml.etree.ElementTree.Element, get the
+    aff
+    tag content 
+    """
+
+    affs = {}
+    for tag in root.findall('./front/article-meta/contrib-group/aff'):
+        id = tag.get("id")
+        #print id
+        aff_with_tags = convert_element_to_string(tag, '').encode('utf-8')
+        
+        # Remove the <label> tag and contents
+        # TODO!!!!!!
+        
+        # Remove all tags to leave the content behind
+        aff = strip_tags_from_string(aff_with_tags)
+        
+        affs[id] = aff
+
+    return affs
+
+
+def get_contributor_from_contrib_group(root, affs):
     """
     Given an xml.etree.ElementTree.Element, get the
     contributor object details and instantiate and object
@@ -106,15 +145,43 @@ def get_contributor_from_contrib_group(root):
     contributor = None
     
     contrib_type = root.get("contrib-type")
+    affiliations = []
     
     for tag in root.findall('./name/surname'):
         surname = tag.text
         
     for tag in root.findall('./name/given-names'):
         given_name = tag.text
+    
+    # PoA may have aff tags
+    for tag in root.findall('./aff'):
+        aff = ''
+        # 1. Convert all content and tags to a string
+        aff_with_tags = convert_element_to_string(tag, '').encode('utf-8')
+        # 2. Remove all tags to leave the content behind
+        aff = strip_tags_from_string(aff_with_tags)
+        
+        affiliations.append(aff)
+
+    # VoR may have xref to aff tags
+    if len(affs) > 0:
+        
+        for tag in root.findall('./xref'):
+            if tag.get("ref-type") == "aff":
+                
+                rid = tag.get("rid")
+                #print rid
+                try:
+                    affiliations.append(affs[rid])
+                except:
+                    # key error
+                   continue
 
     # Instantiate
     contributor = eLifePOSContributor(contrib_type, surname, given_name)
+    
+    for aff in affiliations:
+        contributor.set_affiliation(aff)
     
     if root.get("corresp") == "yes":
         contributor.corresp = True
@@ -128,15 +195,19 @@ def get_contributors_from_xml(root, contrib_type = None):
     contrib_type can be author, editor, etc.
     """
     contributors = []
+
+    # VoR may have xref to aff tags
+    affs = get_affs_from_xml(root)
+
     for tag in root.findall('./front/article-meta/contrib-group/contrib'):
         contributor = None
         if not contrib_type:
-            contributor = get_contributor_from_contrib_group(tag)
+            contributor = get_contributor_from_contrib_group(tag, affs)
         elif tag.get("contrib-type") == contrib_type:
-            contributor = get_contributor_from_contrib_group(tag)
+            contributor = get_contributor_from_contrib_group(tag, affs)
         
         if contributor:
-            contributors.append(contributor)
+            contributors.append(contributor)  
 
     return contributors
 
