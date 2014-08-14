@@ -260,6 +260,7 @@ if __name__ == '__main__':
                     #,"generated_xml_output/elife_poa_e03300.xml"
                     #,"generated_xml_output/elife_poa_e02676.xml"
                     ,"generated_xml_output/elife02866.xml"
+                    ,"generated_xml_output/elife02619.xml"
                     ]
     
     build_pubmed_xml_for_articles(article_xmls)

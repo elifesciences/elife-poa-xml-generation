@@ -328,7 +328,9 @@ def build_article_from_xml(article_xml_filename):
                 article.add_date(date_instance)
         except KeyError:
             # date did not exist
-            error_count = error_count + 1
+            # Do not log an error because some articles do not have a history
+            # error_count = error_count + 1
+            pass
             
     # Parse the pub-date for VoR articles
     pub_dates = get_pub_dates_from_xml(root)
