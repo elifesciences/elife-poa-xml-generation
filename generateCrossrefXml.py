@@ -45,7 +45,7 @@ class crossrefXML(object):
         self.root.set('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
         self.root.set('xmlns:fr', 'http://www.crossref.org/fundref.xsd')
         self.root.set('xmlns:ai', 'http://www.crossref.org/AccessIndicators.xsd')
-        self.root.set('xmlns:schemaLocation', 'http://www.crossref.org/schema/4.3.2 http://www.crossref.org/schemas/crossref4.3.2.xsd')
+        self.root.set('xmlns:schemaLocation', 'http://www.crossref.org/schemas/crossref4.3.2.xsd')
         self.root.set('xmlns:mml', 'http://www.w3.org/1998/Math/MathML')
 
         # Publication date
