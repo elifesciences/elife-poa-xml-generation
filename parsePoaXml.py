@@ -146,12 +146,18 @@ def get_contributor_from_contrib_group(root, affs):
     
     contrib_type = root.get("contrib-type")
     affiliations = []
+    orcid = None
     
     for tag in root.findall('./name/surname'):
         surname = tag.text
         
     for tag in root.findall('./name/given-names'):
         given_name = tag.text
+    
+    
+    for tag in root.findall('./uri'):
+        if tag.get("content-type") == "orcid":
+            orcid = tag.text
     
     # PoA may have aff tags
     for tag in root.findall('./aff'):
@@ -185,7 +191,8 @@ def get_contributor_from_contrib_group(root, affs):
     
     if root.get("corresp") == "yes":
         contributor.corresp = True
-
+    contributor.orcid = orcid
+    
     return contributor
 
 def get_contributors_from_xml(root, contrib_type = None):

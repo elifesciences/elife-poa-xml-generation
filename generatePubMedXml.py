@@ -155,6 +155,11 @@ class pubMedPoaXML(object):
             for aff in contributor.affiliations:
                 self.affiliation = SubElement(self.person_name, "Affiliation")
                 self.affiliation.text = aff
+                
+            if contributor.orcid:
+                self.orcid = SubElement(self.person_name, "Identifier")
+                self.orcid.set("Source", "ORCID")
+                self.orcid.text = contributor.orcid
 
     def set_article_id_list(self, parent, poa_article):
         self.article_id_list = SubElement(parent, "ArticleIdList")
