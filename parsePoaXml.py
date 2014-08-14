@@ -157,7 +157,7 @@ def get_affs_from_xml(root, raw = False):
     return affs
 
 
-def get_contributor_from_contrib_group(root, affs):
+def get_contributor_from_contrib_group(root, affs, raw = False):
     """
     Given an xml.etree.ElementTree.Element, get the
     contributor object details and instantiate and object
@@ -182,6 +182,12 @@ def get_contributor_from_contrib_group(root, affs):
     # PoA may have aff tags
     for tag in root.findall('./aff'):
         aff = ''
+        
+        if not raw:
+            # Do not need email
+            for remove_tag in tag.findall('./email'):
+                tag.remove(remove_tag)
+        
         # 1. Convert all content and tags to a string
         aff_with_tags = convert_element_to_string(tag, '').encode('utf-8')
         # 2. Remove all tags to leave the content behind
