@@ -100,35 +100,55 @@ def get_title_from_xml(root):
         
     return title
     
-def get_abstract_from_xml(root):
+def get_abstract_from_xml(root, raw = False):
     """
     Given an xml.etree.ElementTree.Element, get the
     abstract
     """
     abstract = None
     for tag in root.findall('./front/article-meta/abstract'):
+        
+        if not raw:
+            # Remove unallowed tags and their contents
+            for remove_tag in tag.findall('./object-id'):
+                tag.remove(remove_tag)
+            # Some tags are nested inside p tag
+            for p_tag in tag.findall('./p'):
+                for remove_tag in p_tag.findall('./bold'):
+                    p_tag.remove(remove_tag)
+                for remove_tag in p_tag.findall('./ext-link'):
+                    p_tag.remove(remove_tag)
+            # Now remove any empty p tags
+            for p_tag in tag.findall('./p'):
+                if p_tag.text is None:
+                    tag.remove(p_tag)
+        
         # Recursively flatten child elements into a string
         if not tag.get("abstract-type"):
             abstract = convert_element_to_string(tag, u'').encode('utf-8')
 
     return abstract
 
-def get_affs_from_xml(root):
+def get_affs_from_xml(root, raw = False):
     """
     Given an xml.etree.ElementTree.Element, get the
     aff
-    tag content 
+    tag content
+    Pass raw = true to not remove certain tags
     """
 
     affs = {}
     for tag in root.findall('./front/article-meta/contrib-group/aff'):
         id = tag.get("id")
+        
+        if not raw:
+            # Remove the <label> tag and contents
+            for remove_tag in tag.findall('./label'):
+                tag.remove(remove_tag)
+        
         #print id
         aff_with_tags = convert_element_to_string(tag, '').encode('utf-8')
-        
-        # Remove the <label> tag and contents
-        # TODO!!!!!!
-        
+
         # Remove all tags to leave the content behind
         aff = strip_tags_from_string(aff_with_tags)
         
