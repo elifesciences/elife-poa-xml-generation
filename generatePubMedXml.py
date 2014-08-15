@@ -216,6 +216,11 @@ class pubMedPoaXML(object):
         # Keywords and others go in Object tags
         self.object_list = SubElement(parent, "ObjectList")
         
+        # Add research organisms
+        for research_organism in poa_article.research_organisms:
+            if research_organism.lower() != 'other':
+                self.set_object(self.object_list, "keyword", "value", research_organism)
+        
         # Add article categories
         for article_category in poa_article.article_categories:
             # Break on "and" and capitalise the first letter
@@ -223,6 +228,10 @@ class pubMedPoaXML(object):
             for category in categories:
                 category = category.strip().capitalize()
                 self.set_object(self.object_list, "keyword", "value", category)
+                
+        # Add keywords
+        for keyword in poa_article.author_keywords:
+            self.set_object(self.object_list, "keyword", "value", keyword)
                 
         # Finally, do not leave an empty ObjectList tag, if present
         if len(self.object_list) <= 0:

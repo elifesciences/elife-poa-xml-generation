@@ -591,6 +591,7 @@ class eLifePOA():
         self.article_categories = []
         self.conflict_default = None
         self.ethics = []
+        self.author_keywords = []
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -625,6 +626,9 @@ class eLifePOA():
     
     def add_ethic(self, ethic):
         self.ethics.append(ethic)
+        
+    def add_author_keyword(self, author_keyword):
+        self.author_keywords.append(author_keyword)
 
 class ElifeDocumentType(minidom.DocumentType):
     """

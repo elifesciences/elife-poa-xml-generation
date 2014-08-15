@@ -338,6 +338,29 @@ def get_subject_groups_from_xml(root, subj_group_type = None):
 
     return subject_groups
 
+def get_keyword_groups_from_xml(root, kwd_group_type = None):
+    """
+    Given an xml.etree.ElementTree.Element, get the
+    kwd-group
+    values, optionally filtered by kwd-group-type
+    """
+    keyword_groups = []
+    
+    for tag in root.findall('./front/article-meta/kwd-group'):
+        add_tag = None
+        
+        if kwd_group_type:
+            if tag.get("kwd-group-type") == kwd_group_type:
+                add_tag = True
+        else:
+            add_tag = True
+            
+        if add_tag:
+            for k_tag in tag.findall('./kwd'):
+                keyword_groups.append(k_tag.text)
+
+    return keyword_groups
+
 def build_article_from_xml(article_xml_filename):
     """
     Parse NLM XML with ElementTree, and populate an
@@ -377,6 +400,14 @@ def build_article_from_xml(article_xml_filename):
     # article_category
     article_categories = get_subject_groups_from_xml(root, subj_group_type = "heading")
     article.article_categories = article_categories
+    
+    # keywords
+    author_keywords = get_keyword_groups_from_xml(root, kwd_group_type = "author-keywords")
+    article.author_keywords = author_keywords
+    
+    # research organisms
+    research_organisms = get_keyword_groups_from_xml(root, kwd_group_type = "research-organism")
+    article.research_organisms = research_organisms
     
     history_dates = get_history_from_xml(root)
     
