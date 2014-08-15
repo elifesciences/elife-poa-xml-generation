@@ -315,6 +315,29 @@ def get_license_from_xml(root, contrib_type = None):
             
     return license
 
+def get_subject_groups_from_xml(root, subj_group_type = None):
+    """
+    Given an xml.etree.ElementTree.Element, get the
+    subj-group
+    values, optionally filtered by subj-group-type
+    """
+    subject_groups = []
+    
+    for tag in root.findall('./front/article-meta/article-categories/subj-group'):
+        add_tag = None
+        
+        if subj_group_type:
+            if tag.get("subj-group-type") == subj_group_type:
+                add_tag = True
+        else:
+            add_tag = True
+            
+        if add_tag:
+            for s_tag in tag.findall('./subject'):
+                subject_groups.append(s_tag.text)
+
+    return subject_groups
+
 def build_article_from_xml(article_xml_filename):
     """
     Parse NLM XML with ElementTree, and populate an
@@ -350,6 +373,10 @@ def build_article_from_xml(article_xml_filename):
     license = eLifeLicense()
     license.href = license_data['href']
     article.license = license
+    
+    # article_category
+    article_categories = get_subject_groups_from_xml(root, subj_group_type = "heading")
+    article.article_categories = article_categories
     
     history_dates = get_history_from_xml(root)
     

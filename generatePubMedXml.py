@@ -213,7 +213,28 @@ class pubMedPoaXML(object):
         )
 
     def set_object_list(self, parent, poa_article):
+        # Keywords and others go in Object tags
         self.object_list = SubElement(parent, "ObjectList")
+        
+        # Add article categories
+        for article_category in poa_article.article_categories:
+            # Break on "and" and capitalise the first letter
+            categories = article_category.split('and')
+            for category in categories:
+                category = category.strip().capitalize()
+                self.set_object(self.object_list, "keyword", "value", category)
+                
+        # Finally, do not leave an empty ObjectList tag, if present
+        if len(self.object_list) <= 0:
+            parent.remove(self.object_list)
+        
+    def set_object(self, parent, object_type, param_name, param):
+        # e.g.  <Object Type="keyword"><Param Name="value">human</Param></Object>
+        self.object = SubElement(parent, "Object")
+        self.object.set("Type", object_type)
+        self.param= SubElement(self.object, "Param")
+        self.param.set("Name", param_name)
+        self.param.text = param
 
     def printXML(self):
         print self.root
