@@ -226,7 +226,7 @@ class pubMedPoaXML(object):
             # Break on "and" and capitalise the first letter
             categories = article_category.split('and')
             for category in categories:
-                category = category.strip().capitalize()
+                category = category.strip().lower()
                 self.set_object(self.object_list, "keyword", "value", category)
                 
         # Add keywords
@@ -263,8 +263,8 @@ class pubMedPoaXML(object):
         if doctype:
             reparsed.insertBefore(doctype, reparsed.documentElement)
 
-        return reparsed.toprettyxml(indent="\t", encoding = encoding)
-        #return reparsed.toxml(encoding = encoding)
+        #return reparsed.toprettyxml(indent="\t", encoding = encoding)
+        return reparsed.toxml(encoding = encoding)
 
 def build_pubmed_xml_for_articles(article_xmls):
     """
