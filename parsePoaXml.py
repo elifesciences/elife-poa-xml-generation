@@ -438,6 +438,22 @@ def build_article_from_xml(article_xml_filename):
 
     return article,error_count
 
+
+def build_articles_from_article_xmls(article_xmls):
+    """
+    Given a list of article XML filenames, convert to article objects
+    """
+
+    poa_articles = []
+    
+    for article_xml in article_xmls:
+        print "working on ", article_xml
+        article,error_count = build_article_from_xml(article_xml)
+        if error_count == 0:
+            poa_articles.append(article)
+            
+    return poa_articles
+
 if __name__ == '__main__':
     
     article_xlms = ["elife_poa_e03011.xml"

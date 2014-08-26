@@ -270,14 +270,8 @@ def build_crossref_xml_for_articles(article_xmls):
     and then generate crossref XML from them
     """
     
-    poa_articles = []
+    poa_articles = build_articles_from_article_xmls(article_xmls)
     
-    for article_xml in article_xmls:
-        print "working on ", article_xml
-        article,error_count = build_article_from_xml(article_xml)
-        if error_count == 0:
-            poa_articles.append(article)
-
     # test the XML generator 
     eXML = crossrefXML(poa_articles)
     prettyXML = eXML.prettyXML()

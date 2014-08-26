@@ -480,9 +480,9 @@ class eLife2XML(object):
         reparsed = minidom.parseString(rough_string)
         if doctype:
             reparsed.insertBefore(doctype, reparsed.documentElement)
-        #return reparsed.toprettyxml(indent="\t", encoding = encoding)
+        return reparsed.toprettyxml(indent="\t", encoding = encoding)
         # Switch to toxml() instead of toprettyxml() to solve extra whitespace issues
-        return reparsed.toxml(encoding = encoding)
+        #return reparsed.toxml(encoding = encoding)
 
 class ContributorAffiliation():
     phone = None
@@ -592,6 +592,8 @@ class eLifePOA():
         self.conflict_default = None
         self.ethics = []
         self.author_keywords = []
+        # For PubMed function a hook to specify if article was ever through PoA pipeline
+        self.was_ever_poa = None
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -629,6 +631,16 @@ class eLifePOA():
         
     def add_author_keyword(self, author_keyword):
         self.author_keywords.append(author_keyword)
+        
+    def is_poa(self):
+        # Based the presence of an epub date whether it is a
+        #  PoA article or VoR article
+        date_type = "epub"
+
+        if self.get_date(date_type) is None:
+            return True
+        elif self.get_date(date_type) is not None:
+            return False
 
 class ElifeDocumentType(minidom.DocumentType):
     """

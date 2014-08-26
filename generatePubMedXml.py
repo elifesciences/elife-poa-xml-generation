@@ -76,10 +76,10 @@ class pubMedPoaXML(object):
         """
         
         pub_type = None
-        if poa_article.get_date("epub"):
+        if poa_article.is_poa() is False:
             # VoR
             pub_type = "epublish"
-        else:
+        elif poa_article.is_poa() is False:
             # PoA
             pub_type = "aheadofprint"
         return pub_type
@@ -266,20 +266,12 @@ class pubMedPoaXML(object):
         #return reparsed.toprettyxml(indent="\t", encoding = encoding)
         return reparsed.toxml(encoding = encoding)
 
-def build_pubmed_xml_for_articles(article_xmls):
+def build_pubmed_xml_for_articles(poa_articles):
     """
-    Given a list of article XML filenames, convert to article objects,
+    Given a list of article article objects,
     and then generate pubmed XML from them
     """
     
-    poa_articles = []
-    
-    for article_xml in article_xmls:
-        print "working on ", article_xml
-        article,error_count = build_article_from_xml(article_xml)
-        if error_count == 0:
-            poa_articles.append(article)
-
     # test the XML generator 
     eXML = pubMedPoaXML(poa_articles)
     prettyXML = eXML.prettyXML()
@@ -302,7 +294,8 @@ if __name__ == '__main__':
                     ,"generated_xml_output/elife02619.xml"
                     ]
     
-    build_pubmed_xml_for_articles(article_xmls)
+    poa_articles = build_articles_from_article_xmls(article_xmls)
+    build_pubmed_xml_for_articles(poa_articles)
 
 
 
