@@ -60,6 +60,7 @@ class pubMedPoaXML(object):
         for poa_article in poa_articles:
             self.article = SubElement(root, "Article")
             self.set_journal(self.article, poa_article)
+            self.set_replaces(self.article, poa_article)
             self.set_article_title(self.article, poa_article)
             self.set_e_location_id(self.article, poa_article)
             self.set_language(self.article, poa_article)
@@ -109,6 +110,16 @@ class pubMedPoaXML(object):
         else:
             a_date = self.pub_date
         self.set_pub_date(self.journal, a_date, pub_type)
+
+    def set_replaces(self, parent, poa_article):
+        """
+        Set the Replaces tag, if applicable
+        """
+        # If the article is VoR and is was ever PoA
+        if poa_article.is_poa() is False and poa_article.was_ever_poa is True:
+            self.replaces = SubElement(parent, 'Replaces')
+            self.replaces.set("IdType", "doi")
+            self.replaces.text = poa_article.doi
 
     def set_article_title(self, parent, poa_article):
         """
@@ -197,6 +208,14 @@ class pubMedPoaXML(object):
         
         for date_type in self.date_types:
             date = poa_article.get_date(date_type)
+            if date:
+                self.set_date(self.history, date.date, date_type)
+                
+        # If the article is VoR and is was ever PoA, then set the aheadofprint history date
+        if poa_article.is_poa() is False and poa_article.was_ever_poa is True:
+            date_value_type = "epub"
+            date_type = "aheadofprint"
+            date = poa_article.get_date(date_value_type)
             if date:
                 self.set_date(self.history, date.date, date_type)
                 
@@ -295,6 +314,12 @@ if __name__ == '__main__':
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
+    
+    # Pretend an article object was PoA'ed for testing
+    for article in poa_articles:
+        if article.doi == '10.7554/eLife.02866':
+            article.was_ever_poa = True
+    
     build_pubmed_xml_for_articles(poa_articles)
 
 
