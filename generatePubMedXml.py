@@ -245,7 +245,7 @@ class pubMedPoaXML(object):
         # Add research organisms
         for research_organism in poa_article.research_organisms:
             if research_organism.lower() != 'other':
-                self.set_object(self.object_list, "keyword", "value", research_organism)
+                self.set_object(self.object_list, "keyword", "value", research_organism.lower())
         
         # Add article categories
         for article_category in poa_article.article_categories:
@@ -319,6 +319,7 @@ if __name__ == '__main__':
                     ,"generated_xml_output/elife02866.xml"
                     ,"generated_xml_output/elife02619.xml"
                     ,"generated_xml_output/elife02725.xml"
+                    ,"generated_xml_output/elife04024.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
