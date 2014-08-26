@@ -318,15 +318,17 @@ if __name__ == '__main__':
                     #,"generated_xml_output/elife_poa_e02676.xml"
                     ,"generated_xml_output/elife02866.xml"
                     ,"generated_xml_output/elife02619.xml"
-                    ,"generated_xml_output/elife02725.xml"
+                    #,"generated_xml_output/elife02725.xml"
                     ,"generated_xml_output/elife04024.xml"
+                    ,"generated_xml_output/elife_poa_e03528-mock-VoR.xml"
+                    #,"generated_xml_output/elife01123.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
     
     # Pretend an article object was PoA'ed for testing
     for article in poa_articles:
-        if article.doi == '10.7554/eLife.02866':
+        if article.doi == '10.7554/eLife.03528':
             article.was_ever_poa = True
     
     build_pubmed_xml_for_articles(poa_articles)

@@ -126,6 +126,11 @@ def get_abstract_from_xml(root, raw = False):
         # Recursively flatten child elements into a string
         if not tag.get("abstract-type"):
             abstract = convert_element_to_string(tag, u'').encode('utf-8')
+            
+        if not raw:
+            # Finally, remove excess <p> and </p> tags because they are bad
+            abstract = abstract.replace('<p>', '')
+            abstract = abstract.replace('</p>', '')
 
     return abstract
 
