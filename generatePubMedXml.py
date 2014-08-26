@@ -79,7 +79,7 @@ class pubMedPoaXML(object):
         if poa_article.is_poa() is False:
             # VoR
             pub_type = "epublish"
-        elif poa_article.is_poa() is False:
+        elif poa_article.is_poa() is True:
             # PoA
             pub_type = "aheadofprint"
         return pub_type
