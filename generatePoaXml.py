@@ -480,9 +480,9 @@ class eLife2XML(object):
         reparsed = minidom.parseString(rough_string)
         if doctype:
             reparsed.insertBefore(doctype, reparsed.documentElement)
-        return reparsed.toprettyxml(indent="\t", encoding = encoding)
+        #return reparsed.toprettyxml(indent="\t", encoding = encoding)
         # Switch to toxml() instead of toprettyxml() to solve extra whitespace issues
-        #return reparsed.toxml(encoding = encoding)
+        return reparsed.toxml(encoding = encoding)
 
 class ContributorAffiliation():
     phone = None
