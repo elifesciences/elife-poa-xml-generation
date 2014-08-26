@@ -167,6 +167,9 @@ def get_contributor_from_contrib_group(root, affs, raw = False):
     contrib_type = root.get("contrib-type")
     affiliations = []
     orcid = None
+    surname = None
+    given_name = None
+    collab = None
     
     for tag in root.findall('./name/surname'):
         surname = tag.text
@@ -174,6 +177,8 @@ def get_contributor_from_contrib_group(root, affs, raw = False):
     for tag in root.findall('./name/given-names'):
         given_name = tag.text
     
+    for tag in root.findall('./collab'):
+        collab = tag.text
     
     for tag in root.findall('./uri'):
         if tag.get("content-type") == "orcid":
@@ -210,7 +215,7 @@ def get_contributor_from_contrib_group(root, affs, raw = False):
                    continue
 
     # Instantiate
-    contributor = eLifePOSContributor(contrib_type, surname, given_name)
+    contributor = eLifePOSContributor(contrib_type, surname, given_name, collab)
     
     for aff in affiliations:
         contributor.set_affiliation(aff)

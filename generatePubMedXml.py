@@ -153,17 +153,24 @@ class pubMedPoaXML(object):
                 # Filter by contrib_type if supplied
                 if contributor.contrib_type != contrib_type:
                     continue
-            # Skip contributors with no surname
-            if contributor.surname == "" or contributor.surname is None:
+            # Skip contributors with no surname and no collab
+            if  (contributor.surname == "" or contributor.surname is None) \
+            and (contributor.collab == "" or contributor.collab is None):
                 continue
                 
             self.person_name = SubElement(self.contributors, "Author")
   
-            self.given_name = SubElement(self.person_name, "FirstName")
-            self.given_name.text = contributor.given_name
+            if contributor.given_name:
+                self.given_name = SubElement(self.person_name, "FirstName")
+                self.given_name.text = contributor.given_name
             
-            self.surname = SubElement(self.person_name, "LastName")
-            self.surname.text = contributor.surname
+            if contributor.surname:
+                self.surname = SubElement(self.person_name, "LastName")
+                self.surname.text = contributor.surname
+            
+            if contributor.collab:
+                self.collective_name = SubElement(self.person_name, "CollectiveName")
+                self.collective_name.text = contributor.collab
             
             for aff in contributor.affiliations:
                 self.affiliation = SubElement(self.person_name, "Affiliation")
@@ -311,6 +318,7 @@ if __name__ == '__main__':
                     #,"generated_xml_output/elife_poa_e02676.xml"
                     ,"generated_xml_output/elife02866.xml"
                     ,"generated_xml_output/elife02619.xml"
+                    ,"generated_xml_output/elife02725.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
