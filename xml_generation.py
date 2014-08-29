@@ -160,6 +160,17 @@ def set_organsims(article, article_id):
 	except:
 		logger.error("could not set organisms")
 		return False
+	
+def set_keywords(article, article_id):
+	logger.info("in set_keywords")
+	try:
+		keywords = get_keywords(article_id)
+		for keyword in keywords:
+			article.add_author_keyword(keyword)
+		return True
+	except:
+		logger.error("could not set keywords")
+		return False
 
 def set_author_info(article, article_id):
 	# author information
@@ -263,6 +274,7 @@ def build_xml_for_article(article_id):
 	if not set_organsims(article, article_id): error_count = error_count + 1
 	if not set_author_info(article, article_id): error_count = error_count + 1
 	if not set_editor_info(article, article_id): error_count = error_count + 1
+	if not set_keywords(article, article_id): error_count = error_count + 1
 
 	print error_count
 
