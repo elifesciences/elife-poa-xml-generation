@@ -172,7 +172,8 @@ class pubMedPoaXML(object):
                 self.collective_name = SubElement(self.person_name, "CollectiveName")
                 self.collective_name.text = contributor.collab
             
-            for aff in contributor.affiliations:
+            # Only add one affiliation per author for Pubmed
+            for aff in contributor.affiliations[:1]:
                 self.affiliation = SubElement(self.person_name, "Affiliation")
                 self.affiliation.text = aff
                 
