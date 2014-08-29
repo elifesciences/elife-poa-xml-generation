@@ -118,7 +118,14 @@
         </license>
       </permissions>
     <abstract><p>Test abstract</p></abstract>
-  <kwd-group kwd-group-type="research-organism">
+      <kwd-group kwd-group-type="author-keywords">
+        <title>Author keywords</title>
+        <kwd>NK cell</kwd>
+        <kwd>innate immunity</kwd>
+        <kwd>IRF</kwd>
+        <kwd>Dectin-1</kwd>
+      </kwd-group>
+      <kwd-group kwd-group-type="research-organism">
         <title>Research organism</title>
           <kwd>E. coli</kwd>
       </kwd-group>
