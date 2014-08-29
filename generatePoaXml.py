@@ -170,6 +170,9 @@ class eLife2XML(object):
         #
         self.set_abstract(self.article_meta, poa_article)
         #
+        if len(poa_article.author_keywords) > 0:
+            self.set_kwd_group_author_keywords(self.article_meta, poa_article)
+        #
         if len(poa_article.research_organisms) > 0:
             self.set_kwd_group_research_organism(self.article_meta, poa_article)
 
@@ -432,6 +435,16 @@ class eLife2XML(object):
         for research_organism in poa_article.research_organisms:
             kwd = SubElement(self.kwd_group, "kwd")
             kwd.text = research_organism
+            
+    def set_kwd_group_author_keywords(self, parent, poa_article):
+        # kwd-group kwd-group-type="author-keywords"
+        self.kwd_group = SubElement(parent, "kwd-group")
+        self.kwd_group.set("kwd-group-type", "author-keywords")
+        title = SubElement(self.kwd_group, "title")
+        title.text = "Author keywords"
+        for author_keyword in poa_article.author_keywords:
+            kwd = SubElement(self.kwd_group, "kwd")
+            kwd.text = author_keyword
 
     def set_pub_date(self, parent, poa_article, pub_type):
         # pub-date pub-type = pub_type

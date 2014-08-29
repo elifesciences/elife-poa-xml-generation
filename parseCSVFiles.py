@@ -239,6 +239,12 @@ def get_license(article_id):
 	attribute = get_article_attributes(article_id, "license", COLUMN_HEADINGS["license_id"])[0]
 	return attribute
 
+# keywords table
+
+def get_keywords(article_id):
+	attribute = get_article_attributes(article_id, "keywords", COLUMN_HEADINGS["keywords"])
+	return attribute
+
 # manuscript table
 
 @entities
