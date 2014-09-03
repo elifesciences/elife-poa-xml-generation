@@ -312,24 +312,32 @@ def build_pubmed_xml_for_articles(poa_articles):
 
 if __name__ == '__main__':
     
-    article_xmls = ["generated_xml_output/elife_poa_e03011.xml"
+    article_xmls = [#"generated_xml_output/elife_poa_e03011.xml"
                     #,"generated_xml_output/elife_poa_e03198.xml"
                     #,"generated_xml_output/elife_poa_e03191.xml"
                     #,"generated_xml_output/elife_poa_e03300.xml"
                     #,"generated_xml_output/elife_poa_e02676.xml"
-                    ,"generated_xml_output/elife02866.xml"
-                    ,"generated_xml_output/elife02619.xml"
+                    #,"generated_xml_output/elife02866.xml"
+                    #,"generated_xml_output/elife02619.xml"
                     #,"generated_xml_output/elife02725.xml"
-                    ,"generated_xml_output/elife04024.xml"
-                    ,"generated_xml_output/elife_poa_e03528-mock-VoR.xml"
+                    #,"generated_xml_output/elife04024.xml"
+                    #,"generated_xml_output/elife_poa_e03528-mock-VoR.xml"
                     #,"generated_xml_output/elife01123.xml"
+                    "generated_xml_output/elife03656.xml"
+                    ,"generated_xml_output/elife03245.xml"
+                    ,"generated_xml_output/elife_poa_e03126-mock-VoR.xml"
+                    ,"generated_xml_output/elife_poa_e03674-mock-VoR.xml"
+                    ,"generated_xml_output/elife_poa_e03125.xml"
+                    ,"generated_xml_output/elife_poa_e03467.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
     
     # Pretend an article object was PoA'ed for testing
     for article in poa_articles:
-        if article.doi == '10.7554/eLife.03528':
+        if (article.doi == '10.7554/eLife.03528'
+            or article.doi == '10.7554/eLife.03126'
+            or article.doi == '10.7554/eLife.03674'):
             article.was_ever_poa = True
     
     build_pubmed_xml_for_articles(poa_articles)
