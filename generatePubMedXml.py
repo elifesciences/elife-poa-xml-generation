@@ -38,7 +38,7 @@ class pubMedPoaXML(object):
         self.elife_publisher_name = "eLife Sciences Publications Limited"
         self.elife_language = "EN"
         self.elife_journal_volume = "3"
-        self.elife_journal_issue = "0"
+        self.elife_journal_issue = ""
 
         # Publication date
         if pub_date is None:
