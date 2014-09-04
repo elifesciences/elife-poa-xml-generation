@@ -72,6 +72,20 @@ def strip_tags_from_string(str):
             str_stripped += chunk
     return str_stripped
 
+def get_article_type_from_xml(root):
+    """
+    Given an xml.etree.ElementTree.Element, get the
+    article-type
+    of a article, the root element
+    """
+    article_type = None
+    try:
+        article_type = root.get("article-type")
+    except:
+        pass
+
+    return article_type
+
 def get_article_id_from_xml(root, pub_id_type = "publisher-id"):
     """
     Given an xml.etree.ElementTree.Element, get the
@@ -389,6 +403,11 @@ def build_article_from_xml(article_xml_filename):
     
     # Create the article object
     article = eLifePOA(doi, title=None)
+    
+    # Set the articleType
+    article_type = get_article_type_from_xml(root)
+    if article_type:
+        article.articleType = article_type
     
     # title
     article.title = get_title_from_xml(root)

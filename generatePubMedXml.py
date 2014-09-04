@@ -65,6 +65,7 @@ class pubMedPoaXML(object):
             self.set_e_location_id(self.article, poa_article)
             self.set_language(self.article, poa_article)
             self.set_author_list(self.article, poa_article)
+            self.set_publication_type(self.article, poa_article)
             self.set_article_id_list(self.article, poa_article)
             self.set_history(self.article, poa_article)
             self.set_abstract(self.article, poa_article)
@@ -181,6 +182,14 @@ class pubMedPoaXML(object):
                 self.orcid = SubElement(self.person_name, "Identifier")
                 self.orcid.set("Source", "ORCID")
                 self.orcid.text = contributor.orcid
+
+    def set_publication_type(self, parent, poa_article):
+        if poa_article.articleType:
+            self.publication_type = SubElement(parent, "PublicationType")
+            if poa_article.articleType == "editorial":
+                self.publication_type.text = "EDITORIAL"
+            elif poa_article.articleType == "research-article": 
+                self.publication_type.text = "JOURNAL ARTICLE"
 
     def set_article_id_list(self, parent, poa_article):
         self.article_id_list = SubElement(parent, "ArticleIdList")
@@ -329,6 +338,7 @@ if __name__ == '__main__':
                     ,"generated_xml_output/elife_poa_e03674-mock-VoR.xml"
                     ,"generated_xml_output/elife_poa_e03125.xml"
                     ,"generated_xml_output/elife_poa_e03467.xml"
+                    ,"generated_xml_output/elife03980.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
