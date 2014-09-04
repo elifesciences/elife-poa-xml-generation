@@ -388,6 +388,14 @@ def get_author_conflict(article_id, author_id):
 	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_conflict"])
 	return attribute 
 
+def get_group_authors(article_id):
+	# Wrap in an exception because some empty rows throws IndexError
+	try:
+		group_authors = get_article_attributes(article_id, "group_authors", COLUMN_HEADINGS["group_author"])
+	except IndexError:
+		group_authors = []
+	return group_authors
+
 ## conversion functions
 def get_elife_doi(article_id):
 	"""
@@ -477,6 +485,31 @@ def parse_ethics(ethic):
 				ethics.append(entity_to_unicode(ethic_text))
 
 	return ethics
+
+def clean_group_author(group_author):
+	"""
+	Given a raw group author value from the data files,
+	check for empty, whitespace, zero
+	If not empty, remove extra numbers from the end of the string
+	"""
+	if group_author.strip == "":
+		group_author = None
+	elif group_author.strip == "0":
+		group_author = None
+	else:
+		# Strip out extra numbers from the end
+		# To be Unicode safe, do no use a regular expression but go char by char
+		index = len(group_author) - 1
+		while index >= 0:
+			try:
+				a_test_int = int(group_author[index])
+				# If it is a number, remove it
+				group_author = group_author[:index] + group_author[(index+1):]
+			except ValueError:
+				break
+			index -= 1
+	
+	return group_author
 
 if __name__ == "__main__":
 
