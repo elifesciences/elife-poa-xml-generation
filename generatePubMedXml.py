@@ -188,7 +188,10 @@ class pubMedPoaXML(object):
             self.publication_type = SubElement(parent, "PublicationType")
             if poa_article.articleType == "editorial":
                 self.publication_type.text = "EDITORIAL"
-            elif poa_article.articleType == "research-article": 
+            elif (poa_article.articleType == "research-article" 
+               or poa_article.articleType == "discussion" 
+               or poa_article.articleType == "article-commentary" 
+               or poa_article.articleType == "correction"):
                 self.publication_type.text = "JOURNAL ARTICLE"
 
     def set_article_id_list(self, parent, poa_article):
