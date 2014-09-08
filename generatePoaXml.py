@@ -497,6 +497,220 @@ class eLife2XML(object):
         # Switch to toxml() instead of toprettyxml() to solve extra whitespace issues
         return reparsed.toxml(encoding = encoding)
 
+class eLife2JATSXML(eLife2XML):
+    """
+    Quick JATS generating object
+    """
+    def __init__(self, poa_article):
+        # Parent constructor
+        eLife2XML.__init__(self, poa_article)
+
+        self.root.set('dtd-version', '1.1d1')
+    
+    def set_journal_meta(self, parent):
+        """
+        take boiler plate values from the init of the class
+        """
+        self.journal_meta = SubElement(parent, "journal-meta")
+
+        # journal-id
+        for journal_id_type in self.journal_id_types:
+            self.journal_id = SubElement(self.journal_meta, "journal-id")
+            if journal_id_type == "nlm-ta":
+                self.journal_id.text = self.elife_journal_id.lower()
+            else:
+                self.journal_id.text = self.elife_journal_id 
+            self.journal_id.set("journal-id-type", journal_id_type) 
+
+        #
+        self.set_journal_title_group(self.journal_meta)
+
+        # title-group
+        self.issn = SubElement(self.journal_meta, "issn")
+        self.issn.text = self.elife_epub_issn
+        # CHANGE BELOW !!!
+        self.issn.set("publication-format", "electronic")
+
+        # publisher
+        self.publisher = SubElement(self.journal_meta, "publisher")
+        self.publisher_name = SubElement(self.publisher, "publisher-name")
+        self.publisher_name.text = self.elife_publisher_name
+    
+    def set_contrib_group(self, parent, poa_article, contrib_type = None):
+        # If contrib_type is None, all contributors will be added regardless of their type
+        self.contrib_group = SubElement(parent, "contrib-group")
+        if contrib_type == "editor":
+            self.contrib_group.set("content-type", "section")
+
+        for contributor in poa_article.contributors:
+            if contrib_type:
+                # Filter by contrib_type if supplied
+                if contributor.contrib_type != contrib_type:
+                    continue
+                
+            self.contrib = SubElement(self.contrib_group, "contrib")
+
+            self.contrib.set("contrib-type", contributor.contrib_type)
+            if contributor.corresp == True:
+                self.contrib.set("corresp", "yes")
+            if contributor.equal_contrib == True:
+                self.contrib.set("equal_contrib", "yes")
+            if contributor.auth_id:
+                self.contrib.set("id", "author-" + str(contributor.auth_id))
+                
+            if contributor.collab:
+                self.collab = SubElement(self.contrib, "collab")
+                self.collab.text = contributor.collab
+            else:
+                self.name = SubElement(self.contrib, "name")
+                self.surname = SubElement(self.name, "surname")
+                self.surname.text = contributor.surname
+                self.given_name = SubElement(self.name, "given-names")
+                self.given_name.text = contributor.given_name
+
+            if contrib_type == "editor":
+                self.role = SubElement(self.contrib, "role")
+                self.role.text = "Reviewing editor"
+
+            if contributor.orcid:
+                self.orcid = SubElement(self.contrib, "uri")
+                self.orcid.set("content-type", "orcid")
+                self.orcid.set("xlink:href", contributor.orcid)
+
+            # Contributor conflict xref tag logic
+            if contributor.conflict:
+                rid = "conf" + str(self.conflict_count + 1)
+                self.conflict_count += 1
+            elif poa_article.conflict_default:
+                rid = "conf1"
+            else:
+                rid = None
+
+            for affiliation in contributor.affiliations:
+                self.aff = SubElement(self.contrib, "aff")
+
+                if contrib_type != "editor":
+                    if affiliation.department:
+                        # CHANGES BELOW 2 lines !!!
+                        #self.addline = SubElement(self.aff, "addr-line")
+                        self.department = SubElement(self.aff, "institution")
+                        # CHANGES BELOW 3 lines !!!
+                        self.department.set("content-type", "dept")
+                        self.department.text = affiliation.department
+                        self.department.tail = ", "
+
+                if affiliation.institution:
+                    self.institution = SubElement(self.aff, "institution")
+                    self.institution.text = affiliation.institution
+                    self.institution.tail = ", "
+
+                if affiliation.city:
+                    self.addline = SubElement(self.aff, "addr-line")
+                    self.city = SubElement(self.addline, "named-content")
+                    self.city.set("content-type", "city")
+                    self.city.text = affiliation.city
+                    self.addline.tail = ", "
+
+                if affiliation.country:
+                    self.country = SubElement(self.aff, "country")
+                    self.country.text = affiliation.country
+
+                if affiliation.phone:
+                    self.phone = SubElement(self.aff, "phone")
+                    self.phone.text = affiliation.phone
+
+                if affiliation.fax:
+                    self.fax = SubElement(self.aff, "fax")
+                    self.fax.text = affiliation.fax                    
+
+                if affiliation.email:
+                    self.email = SubElement(self.aff, "email")
+                    self.email.text = affiliation.email
+
+            # Contrib conflict xref
+            if contrib_type != "editor":
+                if rid:
+                    self.xref = SubElement(self.contrib, "xref")
+                    self.xref.set("ref-type", "fn")
+                    self.xref.set("rid", rid)
+    
+    def set_copyright(self, parent, poa_article):
+        # Count authors (non-editors)
+        non_editor = []
+        for c in poa_article.contributors:
+            if c.contrib_type != "editor":
+                non_editor.append(c)
+        
+        if len(non_editor) > 2:
+            contributor = non_editor[0]
+            copyright_holder = contributor.surname + " et al"
+        elif len(non_editor) == 2:
+            contributor1 = non_editor[0]
+            contributor2 = non_editor[1]
+            copyright_holder = contributor1.surname + " & " + contributor2.surname
+        elif len(non_editor) == 1:
+            contributor = non_editor[0]
+            copyright_holder = contributor.surname
+        else:
+            copyright_holder = ""
+            
+        # copyright-statement
+        copyright_year = ""
+        date = poa_article.get_date("license")
+        if not date:
+            # if no license date specified, use the article accepted date
+            date = poa_article.get_date("accepted")
+        if date:
+            copyright_year = date.date.tm_year
+        
+        # CHANGE BELOW!!!
+        copyright_statement = u'\u00a9 ' + str(copyright_year) + ", " + copyright_holder
+        self.copyright_statement = SubElement(parent, "copyright-statement")
+        self.copyright_statement.text = copyright_statement
+        
+        # copyright-year
+        self.copyright_year = SubElement(parent, "copyright-year")
+        self.copyright_year.text = str(copyright_year)
+        
+        # copyright-holder
+        self.copyright_holder = SubElement(parent, "copyright-holder")
+        self.copyright_holder.text = copyright_holder
+    
+    def set_license(self, parent, poa_article):
+        self.license = SubElement(parent, "license")
+        
+        # CHANGE BELOW!!!
+        #self.license.set("license-type", poa_article.license.license_type)
+        self.license.set("xlink:href", poa_article.license.href)
+        
+        self.license_p = SubElement(self.license, "license-p")
+        self.license_p.text = poa_article.license.p1
+        
+        ext_link = SubElement(self.license_p, "ext-link")
+        ext_link.set("ext-link-type", "uri")
+        ext_link.set("xlink:href", poa_article.license.href)
+        ext_link.text = poa_article.license.name
+        ext_link.tail = poa_article.license.p2
+    
+    def prettyXML(self):
+        # CHANGE BELOW !!! TWO LINES
+        publicId = '-//NLM//DTD JATS (Z39.96) Journal Archiving and Interchange DTD v1.1d1 20130915//EN'
+        systemId = 'JATS-archivearticle1.dtd'
+        encoding = 'utf-8'
+        namespaceURI = None
+        qualifiedName = "article"
+    
+        doctype = ElifeDocumentType(qualifiedName)
+        doctype._identified_mixin_init(publicId, systemId)
+
+        rough_string = ElementTree.tostring(self.root, encoding)
+        reparsed = minidom.parseString(rough_string)
+        if doctype:
+            reparsed.insertBefore(doctype, reparsed.documentElement)
+        return reparsed.toprettyxml(indent="\t", encoding = encoding)
+        # Switch to toxml() instead of toprettyxml() to solve extra whitespace issues
+        #return reparsed.toxml(encoding = encoding)
+
 class ContributorAffiliation():
     phone = None
     fax = None
