@@ -320,7 +320,7 @@ def build_pubmed_xml_for_articles(poa_articles):
     f.write(prettyXML)
     f.close()
     
-    print prettyXML
+    #print prettyXML
 
 if __name__ == '__main__':
     
