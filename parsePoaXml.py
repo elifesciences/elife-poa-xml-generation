@@ -381,7 +381,14 @@ def get_keyword_groups_from_xml(root, kwd_group_type = None):
             
         if add_tag:
             for k_tag in tag.findall('./kwd'):
-                keyword_groups.append(k_tag.text)
+                # Check for nested italic tag
+                child_count = 0
+                for child in k_tag:
+                    keyword_groups.append(child.text)
+                    child_count = child_count + 1
+                # If there are no nested tags use the base text
+                if child_count == 0:
+                    keyword_groups.append(k_tag.text)
 
     return keyword_groups
 
