@@ -129,6 +129,7 @@ class pubMedPoaXML(object):
         tag_name = 'ArticleTitle'
         # Pubmed allows <i> tags, not <italic> tags
         tag_converted_title = replace_tags(poa_article.title, 'italic', 'i')
+        tag_converted_title = escape_unmatched_angle_brackets(tag_converted_title)
         tagged_string = '<' + tag_name + '>' + tag_converted_title + '</' + tag_name + '>'
         reparsed = minidom.parseString(tagged_string)
 
@@ -244,6 +245,7 @@ class pubMedPoaXML(object):
         tag_name = 'Abstract'
         # Pubmed allows <i> tags, not <italic> tags
         tag_converted_abstract = replace_tags(poa_article.abstract, 'italic', 'i')
+        tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
         tagged_string = '<' + tag_name + '>' + tag_converted_abstract + '</' + tag_name + '>'
         reparsed = minidom.parseString(tagged_string)
 
@@ -334,8 +336,8 @@ if __name__ == '__main__':
                     #,"generated_xml_output/elife02725.xml"
                     #,"generated_xml_output/elife04024.xml"
                     #,"generated_xml_output/elife_poa_e03528-mock-VoR.xml"
-                    #,"generated_xml_output/elife01123.xml"
-                    "generated_xml_output/elife03656.xml"
+                    "generated_xml_output/elife01123.xml"
+                    ,"generated_xml_output/elife03656.xml"
                     ,"generated_xml_output/elife03245.xml"
                     ,"generated_xml_output/elife_poa_e03126-mock-VoR.xml"
                     ,"generated_xml_output/elife_poa_e03674-mock-VoR.xml"
