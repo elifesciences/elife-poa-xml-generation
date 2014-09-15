@@ -166,7 +166,7 @@ def get_affs_from_xml(root, raw = False):
                 tag.remove(remove_tag)
         
         #print id
-        aff_with_tags = convert_element_to_string(tag, '').encode('utf-8')
+        aff_with_tags = convert_element_to_string(tag, '')
 
         # Remove all tags to leave the content behind
         aff = strip_tags_from_string(aff_with_tags)
@@ -213,7 +213,7 @@ def get_contributor_from_contrib_group(root, affs, raw = False):
                 tag.remove(remove_tag)
         
         # 1. Convert all content and tags to a string
-        aff_with_tags = convert_element_to_string(tag, '').encode('utf-8')
+        aff_with_tags = convert_element_to_string(tag, '')
         # 2. Remove all tags to leave the content behind
         aff = strip_tags_from_string(aff_with_tags)
         
@@ -381,7 +381,14 @@ def get_keyword_groups_from_xml(root, kwd_group_type = None):
             
         if add_tag:
             for k_tag in tag.findall('./kwd'):
-                keyword_groups.append(k_tag.text)
+                # Check for nested italic tag
+                child_count = 0
+                for child in k_tag:
+                    keyword_groups.append(child.text)
+                    child_count = child_count + 1
+                # If there are no nested tags use the base text
+                if child_count == 0:
+                    keyword_groups.append(k_tag.text)
 
     return keyword_groups
 
