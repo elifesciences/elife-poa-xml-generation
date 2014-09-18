@@ -260,7 +260,9 @@ class pubMedPoaXML(object):
         # Add research organisms
         for research_organism in poa_article.research_organisms:
             if research_organism.lower() != 'other':
-                self.set_object(self.object_list, "keyword", "value", research_organism.lower())
+                # Convert the research organism
+                research_organism_converted = self.convert_research_organism(research_organism)
+                self.set_object(self.object_list, "keyword", "value", research_organism_converted)
         
         # Add article categories
         for article_category in poa_article.article_categories:
@@ -277,6 +279,21 @@ class pubMedPoaXML(object):
         # Finally, do not leave an empty ObjectList tag, if present
         if len(self.object_list) <= 0:
             parent.remove(self.object_list)
+        
+    def convert_research_organism(self, research_organism):
+        # Lower case except for the first letter followed by a dot by a space
+        research_organism_converted = research_organism.lower()
+        try:
+            if re.match('^[a-z]\. ', research_organism_converted):
+                # Upper the first character and add to the remainder
+                research_organism_converted = (
+                    research_organism_converted[0].upper() +
+                    research_organism_converted[1:])
+        except IndexError:
+            pass
+        except UnicodeEncodeError:
+            pass
+        return research_organism_converted
         
     def set_object(self, parent, object_type, param_name, param):
         # e.g.  <Object Type="keyword"><Param Name="value">human</Param></Object>
