@@ -244,14 +244,18 @@ class pubMedPoaXML(object):
 
         tag_name = 'Abstract'
         # Pubmed allows <i> tags, not <italic> tags
-        tag_converted_abstract = replace_tags(poa_article.abstract, 'italic', 'i')
-        tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
-        tagged_string = '<' + tag_name + '>' + tag_converted_abstract + '</' + tag_name + '>'
-        reparsed = minidom.parseString(tagged_string)
+        if poa_article.abstract:
+            tag_converted_abstract = replace_tags(poa_article.abstract, 'italic', 'i')
+            tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
+            tagged_string = '<' + tag_name + '>' + tag_converted_abstract + '</' + tag_name + '>'
+            reparsed = minidom.parseString(tagged_string)
 
-        root_xml_element = append_minidom_xml_to_elementtree_xml(
-            parent, reparsed
-        )
+            root_xml_element = append_minidom_xml_to_elementtree_xml(
+                parent, reparsed
+            )
+        else:
+            # Empty abstract
+            self.abstract = SubElement(parent, tag_name)
 
     def set_object_list(self, parent, poa_article):
         # Keywords and others go in Object tags
