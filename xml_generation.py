@@ -26,8 +26,6 @@ hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
 
-# set output directory
-TARGET_OUTPUT_DIR = settings.TARGET_OUTPUT_DIR
 
 def instantiate_article(article_id):
 	logger.info("in instantiate_article for " + str(article_id))
@@ -296,7 +294,7 @@ def build_xml_for_article(article_id):
 		try:
 			article_xml = eLife2XML(article)
 			logger.info("generated xml for " + str(article_id))
-			write_xml(article_id, article_xml, dir = TARGET_OUTPUT_DIR)
+			write_xml(article_id, article_xml, dir = settings.TARGET_OUTPUT_DIR)
 			logger.info("xml written for " + str(article_id))
 			print "written " + article_id
 			return True
@@ -316,7 +314,6 @@ if __name__ == "__main__":
 	# get a list of active article numbers
 	#article_ids = index_authors_on_article_id().keys()
 	article_ids = index_manuscripts_on_article_id().keys()
-	TARGET_OUTPUT_DIR = settings.TARGET_OUTPUT_DIR
 
 	for article_id in article_ids:
 		print "working on ", article_id
