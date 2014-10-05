@@ -213,6 +213,8 @@ def set_author_info(article, article_id):
 			author.set_affiliation(affiliation)
 			article.add_contributor(author)
 		# Add group author collab contributors, if present
+		# TODO!!!
+		"""
 		group_authors = get_group_authors(article_id)
 		for group_author in group_authors:
 			author_type = "author"
@@ -222,7 +224,7 @@ def set_author_info(article, article_id):
 				collab = clean_group_author(group_author)
 				author = eLifePOSContributor(author_type, last_name, first_name, collab)
 				article.add_contributor(author)
-		
+		"""
 		return True
 	except:
 		logger.error("could not set authors")

@@ -129,4 +129,22 @@ Feature: Generate POA XML
     | C&#x00FC; LTLTiGTGTH&#x00FC;sLTLT/iGTGT&#x03B1; LTLTsupGTGTH&#x00FC;LTLT/supGTGTa    | p         | <?xml version="1.0" ?><p>Cü <italic>Hüs</italic>α <sup>Hü</sup>a</p>  | <?xml version="1.0" ?><root><p>Cü <italic>Hüs</italic>α <sup>Hü</sup>a</p></root>
     | I LTLTiGTGTLTLTsupGTGTmLTLT/supGTGTLTLT/iGTGT        | p         | <?xml version="1.0" ?><p>I <italic><sup>m</sup></italic></p>  | <?xml version="1.0" ?><root><p>I <italic><sup>m</sup></italic></p></root>
     | 2&#x00FC; LTLTiGTGTisLTLT/iGTGT LTLT 3LTLTsupGTGT&#x03B1;LTLT/supGTGT GTGT 4    | p         | <?xml version="1.0" ?><p>2ü <italic>is</italic> &lt; 3<sup>α</sup> &gt; 4</p>  | <?xml version="1.0" ?><root><p>2ü <italic>is</italic> &lt; 3<sup>α</sup> &gt; 4</p></root>
-    | LTLTiGTGTSalmonellaLTLT/iGTGT Typhi and LTLTiGTGTSalmonellaLTLT/iGTGT Paratyphi  | p | <?xml version="1.0" ?><p><italic>Salmonella</italic> Typhi and <italic>Salmonella</italic> Paratyphi</p> | <?xml version="1.0" ?><root><p><italic>Salmonella</italic> Typhi and <italic>Salmonella</italic> Paratyphi</p></root> 
+    | LTLTiGTGTSalmonellaLTLT/iGTGT Typhi and LTLTiGTGTSalmonellaLTLT/iGTGT Paratyphi  | p | <?xml version="1.0" ?><p><italic>Salmonella</italic> Typhi and <italic>Salmonella</italic> Paratyphi</p> | <?xml version="1.0" ?><root><p><italic>Salmonella</italic> Typhi and <italic>Salmonella</italic> Paratyphi</p></root>
+    
+    
+  Scenario: Build POA XML for article
+    Given I have settings
+    And I reload settings
+    And I set settings XLS_PATH to test_data/
+    And I set settings TARGET_OUTPUT_DIR to test_output/
+    And I set json settings XLS_FILES to {"authors" : "poa_author.csv", "license" : "poa_license.csv", "manuscript" : "poa_manuscript.csv", "received" : "poa_received.csv", "subjects" : "poa_subject_area.csv", "organisms": "poa_research_organism.csv", "abstract": "poa_abstract.csv", "title": "poa_title.csv", "keywords": "poa_keywords.csv", "group_authors": "poa_group_authors.csv"}
+    And I reload XML generation libraries
+    And I have article_id <article_id>
+    When I build POA XML for article
+    Then I have attribute <attribute>
+    
+  Examples:
+    | article_id     | attribute
+    | 00003          | True
+    | 02935          | True
+    

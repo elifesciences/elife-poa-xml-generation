@@ -1,6 +1,7 @@
 from lettuce import *
 from generatePoaXml import *
 import parseCSVFiles
+from xml_generation import *
 import json
 from xml.etree import ElementTree
 
@@ -127,8 +128,13 @@ def i_have_attribute_attribute(step, attribute):
     elif type(world.attribute) == list:
         attribute = attribute.split(",")
     # Compare value
-    assert world.attribute == attribute, \
-        "Got attribute %s" % world.attribute
+    if world.attribute is True or world.attribute is False:
+        # Compare strings when it is boolean, seems to be the best working option
+        assert str(world.attribute) == str(attribute), \
+            "Got attribute %s" % world.attribute
+    else:
+        assert world.attribute == attribute, \
+            "Got attribute %s" % world.attribute
     
 @step(u'I tag replace the decoded string')
 def i_tag_replace_the_decoded_string(step):
@@ -204,5 +210,10 @@ def i_have_the_xml_string_xml_string(step, xml_string):
     assert world.xml_string == xml_string, \
         "Got xml_string %s" % world.xml_string
 
+@step(u'I build POA XML for article')
+def i_build_poa_xml_for_article(step):
+    world.attribute = build_xml_for_article(int(world.article_id))
+    assert world.attribute is True, \
+        "Got attribute %s" % world.attribute
     
     
