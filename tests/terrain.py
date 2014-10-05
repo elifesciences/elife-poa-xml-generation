@@ -9,3 +9,7 @@ world.basedir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 os.sys.path.insert(0,world.basedir)
 world.basedir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0,world.basedir)
+
+# Create output directory if not exists
+if not os.path.exists("test_output"):
+    os.makedirs("test_output")
