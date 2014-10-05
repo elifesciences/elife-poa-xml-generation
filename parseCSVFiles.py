@@ -391,10 +391,10 @@ def get_author_conflict(article_id, author_id):
 def get_group_authors(article_id):
 	# Wrap in an exception because some empty rows throws IndexError
 	try:
-		group_authors = get_article_attributes(article_id, "group_authors", COLUMN_HEADINGS["group_author"])
+		attribute = get_article_attributes(article_id, "group_authors", COLUMN_HEADINGS["group_author"])[0]
 	except IndexError:
-		group_authors = []
-	return group_authors
+		attribute = None
+	return attribute
 
 ## conversion functions
 def get_elife_doi(article_id):

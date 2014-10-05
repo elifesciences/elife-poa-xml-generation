@@ -65,7 +65,7 @@ Feature: Generate POA XML
     Given I have settings
     And I reload settings
     And I set settings XLS_PATH to test_data/
-    And I set json settings XLS_FILES to {"authors" : "poa_author.csv", "license" : "poa_license.csv", "manuscript" : "poa_manuscript.csv", "received" : "poa_received.csv", "subjects" : "poa_subject_area.csv", "organisms": "poa_research_organism.csv", "abstract": "poa_abstract.csv", "title": "poa_title.csv"}
+    And I set json settings XLS_FILES to {"authors" : "poa_author.csv", "license" : "poa_license.csv", "manuscript" : "poa_manuscript.csv", "received" : "poa_received.csv", "subjects" : "poa_subject_area.csv", "organisms": "poa_research_organism.csv", "abstract": "poa_abstract.csv", "title": "poa_title.csv", "keywords": "poa_keywords.csv", "group_authors": "poa_group_authors.csv"}
     And I reload XML generation libraries
     And I have article_id <article_id>
     And I have author_id <author_id>
@@ -86,6 +86,8 @@ Feature: Generate POA XML
     | 00003         |            | get_articleType         | 10
     | 00007         |            | get_articleType         | 1
     | 00012         |            | get_articleType         | 14
+    | 00012         |            | get_group_authors       | 0
+    | 02725         |            | get_group_authors       | order_start15order_endANECS111
     
   Scenario: Escape unmatched angle brackets
     Given I have the raw string <string>
