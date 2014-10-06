@@ -486,30 +486,31 @@ def parse_ethics(ethic):
 
 	return ethics
 
-def clean_group_author(group_author):
+def parse_group_authors(group_authors):
 	"""
 	Given a raw group author value from the data files,
 	check for empty, whitespace, zero
 	If not empty, remove extra numbers from the end of the string
+	Return a dictionary of dict[author_position] = collab_name
 	"""
-	if group_author.strip == "":
-		group_author = None
-	elif group_author.strip == "0":
-		group_author = None
+	group_author_dict = {}
+	if group_authors.strip() == "":
+		group_author_dict = None
+	elif group_authors.strip() == "0":
+		group_author_dict = None
 	else:
-		# Strip out extra numbers from the end
-		# To be Unicode safe, do no use a regular expression but go char by char
-		index = len(group_author) - 1
-		while index >= 0:
-			try:
-				a_test_int = int(group_author[index])
-				# If it is a number, remove it
-				group_author = group_author[:index] + group_author[(index+1):]
-			except ValueError:
-				break
-			index -= 1
-	
-	return group_author
+
+		# Parse out elements into a list
+		# TODO !!!!
+		
+		# Temporary
+		author_position = 0
+		
+		# Strip numbers at the end
+		group_author = group_authors.rstrip("1234567890")
+		group_author_dict[int(author_position)] = group_author
+
+	return group_author_dict
 
 if __name__ == "__main__":
 
