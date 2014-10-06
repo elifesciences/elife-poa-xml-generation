@@ -223,18 +223,24 @@ def set_author_info(article, article_id):
 			authors_dict[int(author_position)] = author
 
 		# Add group author collab contributors, if present
-		# TODO!!!
-		"""
 		group_authors = get_group_authors(article_id)
-		for group_author in group_authors:
-			author_type = "author"
-			last_name = None
-			first_name = None
-			if clean_group_author(group_author) is not None:
-				collab = clean_group_author(group_author)
-				author = eLifePOSContributor(author_type, last_name, first_name, collab)
-				article.add_contributor(author)
-		"""
+		if group_authors:
+			# Parse the group authors string
+			group_author_dict = parse_group_authors(group_authors)
+	
+			if group_author_dict:
+				for author_position, collab_name in (
+					sorted(group_author_dict.items(), key=group_author_dict.get)):
+					
+					author_type = "author"
+					last_name = None
+					first_name = None
+					collab = collab_name
+					author = eLifePOSContributor(author_type, last_name, first_name, collab)
+					
+					# Add the author to the dictionary recording their position in the list
+					authors_dict[int(author_position)] = author
+					
 		# Finally add authors to the article sorted by their position
 		for author_position, author in sorted(authors_dict.items(), key=authors_dict.get):
 			#print article_id, author_position, author
