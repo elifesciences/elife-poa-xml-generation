@@ -289,7 +289,11 @@ def write_xml(article_id, xml, dir = ''):
 	f.write(xml.prettyXML())
 	f.close()
 
-def build_xml_for_article(article_id):
+def build_article_for_article(article_id):
+	"""
+	Given an article_id, instantiate and populate the eLifePOA article object
+	Refactored for easier testing, but primarily used by build_xml_for_article
+	"""
 	error_count = 0
 	
 	# Only happy with string article_id - cast it now to be safe!
@@ -312,14 +316,23 @@ def build_xml_for_article(article_id):
 
 	# default conflict text
 	article.conflict_default = "The authors declare that no competing interests exist."
-
+	
 	if error_count == 0:
+		return article, error_count
+	else:
+		return None, error_count
+	
+def build_xml_for_article(article_id):
+	
+	article, error_count = build_article_for_article(article_id)
+
+	if article:
 		try:
 			article_xml = eLife2XML(article)
 			logger.info("generated xml for " + str(article_id))
 			write_xml(article_id, article_xml, dir = settings.TARGET_OUTPUT_DIR)
 			logger.info("xml written for " + str(article_id))
-			print "written " + article_id
+			print "written " + str(article_id)
 			return True
 		except:
 			logger.error("could not generate or write xml for " + str(article_id))
