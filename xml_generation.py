@@ -171,8 +171,14 @@ def set_keywords(article, article_id):
 		return False
 
 def set_author_info(article, article_id):
-	# author information
+	"""
+	author information
+	Save the contributor and their position in the list in a dict,
+	for both authors and group authors,
+	Then add the contributors to the article object in order of their position
+	"""
 	logger.info("in set_author_info")
+	authors_dict = {}
 	try:
 		author_ids = get_author_ids(article_id)
 		for author_id in author_ids:
@@ -211,7 +217,11 @@ def set_author_info(article, article_id):
 
 			author.auth_id = `int(author_id)`
 			author.set_affiliation(affiliation)
-			article.add_contributor(author)
+
+			author_position = get_author_position(article_id, author_id)
+			# Add the author to the dictionary recording their position in the list
+			authors_dict[int(author_position)] = author
+
 		# Add group author collab contributors, if present
 		# TODO!!!
 		"""
@@ -225,6 +235,11 @@ def set_author_info(article, article_id):
 				author = eLifePOSContributor(author_type, last_name, first_name, collab)
 				article.add_contributor(author)
 		"""
+		# Finally add authors to the article sorted by their position
+		for author_position, author in sorted(authors_dict.items(), key=authors_dict.get):
+			#print article_id, author_position, author
+			article.add_contributor(author)
+		
 		return True
 	except:
 		logger.error("could not set authors")
