@@ -26,8 +26,6 @@ hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
 
-# set output directory
-TARGET_OUTPUT_DIR = settings.TARGET_OUTPUT_DIR
 
 def instantiate_article(article_id):
 	logger.info("in instantiate_article for " + str(article_id))
@@ -44,13 +42,13 @@ def instantiate_article(article_id):
 
 def set_title(article, article_id):
 	logger.info("in set_title")
-	#try:
-	title = get_title(article_id)
-	article.title = convert_to_xml_string(title)
-	return True
-	#except:
-	#	logger.error("could not set title ")
-	#	return False
+	try:
+		title = get_title(article_id)
+		article.title = convert_to_xml_string(title)
+		return True
+	except:
+		logger.error("could not set title ")
+		return False
 
 def set_abstract(article, article_id):
 	logger.info("in set_abstract")
@@ -173,8 +171,14 @@ def set_keywords(article, article_id):
 		return False
 
 def set_author_info(article, article_id):
-	# author information
+	"""
+	author information
+	Save the contributor and their position in the list in a dict,
+	for both authors and group authors,
+	Then add the contributors to the article object in order of their position
+	"""
 	logger.info("in set_author_info")
+	authors_dict = {}
 	try:
 		author_ids = get_author_ids(article_id)
 		for author_id in author_ids:
@@ -213,7 +217,35 @@ def set_author_info(article, article_id):
 
 			author.auth_id = `int(author_id)`
 			author.set_affiliation(affiliation)
+
+			author_position = get_author_position(article_id, author_id)
+			# Add the author to the dictionary recording their position in the list
+			authors_dict[int(author_position)] = author
+
+		# Add group author collab contributors, if present
+		group_authors = get_group_authors(article_id)
+		if group_authors:
+			# Parse the group authors string
+			group_author_dict = parse_group_authors(group_authors)
+	
+			if group_author_dict:
+				for author_position, collab_name in (
+					sorted(group_author_dict.items(), key=group_author_dict.get)):
+					
+					author_type = "author"
+					last_name = None
+					first_name = None
+					collab = collab_name
+					author = eLifePOSContributor(author_type, last_name, first_name, collab)
+					
+					# Add the author to the dictionary recording their position in the list
+					authors_dict[int(author_position)] = author
+					
+		# Finally add authors to the article sorted by their position
+		for author_position, author in sorted(authors_dict.items(), key=authors_dict.get):
+			#print article_id, author_position, author
 			article.add_contributor(author)
+		
 		return True
 	except:
 		logger.error("could not set authors")
@@ -257,7 +289,11 @@ def write_xml(article_id, xml, dir = ''):
 	f.write(xml.prettyXML())
 	f.close()
 
-def build_xml_for_article(article_id):
+def build_article_for_article(article_id):
+	"""
+	Given an article_id, instantiate and populate the eLifePOA article object
+	Refactored for easier testing, but primarily used by build_xml_for_article
+	"""
 	error_count = 0
 	
 	# Only happy with string article_id - cast it now to be safe!
@@ -280,14 +316,23 @@ def build_xml_for_article(article_id):
 
 	# default conflict text
 	article.conflict_default = "The authors declare that no competing interests exist."
-
+	
 	if error_count == 0:
+		return article, error_count
+	else:
+		return None, error_count
+	
+def build_xml_for_article(article_id):
+	
+	article, error_count = build_article_for_article(article_id)
+
+	if article:
 		try:
 			article_xml = eLife2XML(article)
 			logger.info("generated xml for " + str(article_id))
-			write_xml(article_id, article_xml, dir = TARGET_OUTPUT_DIR)
+			write_xml(article_id, article_xml, dir = settings.TARGET_OUTPUT_DIR)
 			logger.info("xml written for " + str(article_id))
-			print "written " + article_id
+			print "written " + str(article_id)
 			return True
 		except:
 			logger.error("could not generate or write xml for " + str(article_id))
@@ -305,8 +350,7 @@ if __name__ == "__main__":
 	# get a list of active article numbers
 	#article_ids = index_authors_on_article_id().keys()
 	article_ids = index_manuscripts_on_article_id().keys()
-	TARGET_OUTPUT_DIR = settings.TARGET_OUTPUT_DIR
-
+	article_ids = [2935]
 	for article_id in article_ids:
 		print "working on ", article_id
 		xml = build_xml_for_article(article_id)

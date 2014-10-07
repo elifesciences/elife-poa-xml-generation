@@ -1,8 +1,12 @@
 from lettuce import *
 from generatePoaXml import *
 import parseCSVFiles
+from xml_generation import *
 import json
 from xml.etree import ElementTree
+
+# Default XLS_FILES for using in tests when required
+XLS_FILES = {"authors" : "poa_author.csv", "license" : "poa_license.csv", "manuscript" : "poa_manuscript.csv", "received" : "poa_received.csv", "subjects" : "poa_subject_area.csv", "organisms": "poa_research_organism.csv", "abstract": "poa_abstract.csv", "title": "poa_title.csv", "keywords": "poa_keywords.csv", "group_authors": "poa_group_authors.csv"}
 
 @step(u'I have the string (\S+)')
 def i_have_the_string_string(step, string):
@@ -82,6 +86,15 @@ def i_set_json_settings_property_to_value(step, property, value):
     assert attr is not None, \
         "Got attr %s" % str(attr)
     
+@step(u'I set XLS_FILES to the default')
+def i_set_xls_files_to_the_default(step):
+    # Set to the default so it does not need to be repeated
+    property = "XLS_FILES"
+    setattr(world.settings, property, XLS_FILES)
+    attr = getattr(world.settings, property)
+    assert attr is not None, \
+        "Got attr %s" % str(attr)
+    
 @step(u'I reload settings')
 def i_reload_settings(step):
     reload(world.settings)
@@ -127,8 +140,13 @@ def i_have_attribute_attribute(step, attribute):
     elif type(world.attribute) == list:
         attribute = attribute.split(",")
     # Compare value
-    assert world.attribute == attribute, \
-        "Got attribute %s" % world.attribute
+    if world.attribute is True or world.attribute is False:
+        # Compare strings when it is boolean, seems to be the best working option
+        assert str(world.attribute) == str(attribute), \
+            "Got attribute %s" % world.attribute
+    else:
+        assert world.attribute == attribute, \
+            "Got attribute %s" % world.attribute
     
 @step(u'I tag replace the decoded string')
 def i_tag_replace_the_decoded_string(step):
@@ -204,5 +222,78 @@ def i_have_the_xml_string_xml_string(step, xml_string):
     assert world.xml_string == xml_string, \
         "Got xml_string %s" % world.xml_string
 
+@step(u'I build POA XML for article')
+def i_build_poa_xml_for_article(step):
+    world.attribute = build_xml_for_article(int(world.article_id))
+    assert world.attribute is True, \
+        "Got attribute %s" % world.attribute
+    
+@step(u'I build POA article for article')
+def i_build_poa_article_for_article(step):
+    world.article, error_count = build_article_for_article(int(world.article_id))
+    assert world.article is not None, \
+        "Got article %s" % world.article
+
+@step(u'I have as list index')
+def i_have_as_list_index_none(step):
+    # When no index is supplied set it to None
+    world.index = None
+    assert world.index is None, \
+        "Got index %s" % world.index
+
+@step(u'I have as list index (\d+)')
+def i_have_as_list_index(step, index):
+    world.index = int(index)
+    assert world.index is not None, \
+        "Got index %s" % world.index
+
+@step(u'I have sub property')
+def i_have_sub_property_none(step):
+    # When no subproperty is supplied set it to None
+    world.subproperty = None
+    assert world.subproperty is None, \
+        "Got subproperty %s" % world.subproperty
+
+@step(u'I have sub property (\S+)')
+def i_have_sub_property_subproperty(step, subproperty):
+    if subproperty == "":
+        # When no sub_property is supplied set it to None
+        world.subproperty = None
+        assert world.subproperty is None, \
+            "Got subproperty %s" % world.subproperty
+    else:
+        world.subproperty = subproperty
+        assert world.subproperty is not None, \
+            "Got subproperty %s" % world.subproperty
+
+@step(u'I set attribute to article object property (\S+)')
+def i_set_attribute_to_article_object_property(step, property):
+    # Set the attribute to article object property with optional list index
+    if world.index is not None:
+        list_property = getattr(world.article, property)
+        attribute = list_property[world.index]
+    else:
+        attribute = getattr(world.article, property)
+
+    # Get the property of the attribute if we want a sub_property
+    if world.subproperty is not None:
+        world.attribute = getattr(attribute, world.subproperty)
+    else:
+        world.attribute = attribute
+        
+    assert world.attribute is not None, \
+        "Got attribute %s" % world.attribute
+    
+@step(u'I parse group authors')
+def i_parse_group_authors(step):
+    world.attribute = parse_group_authors(world.string)
+    assert world.attribute is not None, \
+        "Got attribute %s" % world.attribute
+    
+@step(u'I set attribute to attribute index (\d+)')
+def i_set_attribute_to_attribute_index(step, index):
+    world.attribute = world.attribute[index]
+    assert world.attribute is not None, \
+        "Got attribute %s" % world.attribute
     
     
