@@ -42,13 +42,13 @@ def instantiate_article(article_id):
 
 def set_title(article, article_id):
 	logger.info("in set_title")
-	#try:
-	title = get_title(article_id)
-	article.title = convert_to_xml_string(title)
-	return True
-	#except:
-	#	logger.error("could not set title ")
-	#	return False
+	try:
+		title = get_title(article_id)
+		article.title = convert_to_xml_string(title)
+		return True
+	except:
+		logger.error("could not set title ")
+		return False
 
 def set_abstract(article, article_id):
 	logger.info("in set_abstract")
@@ -350,7 +350,7 @@ if __name__ == "__main__":
 	# get a list of active article numbers
 	#article_ids = index_authors_on_article_id().keys()
 	article_ids = index_manuscripts_on_article_id().keys()
-
+	article_ids = [2935]
 	for article_id in article_ids:
 		print "working on ", article_id
 		xml = build_xml_for_article(article_id)
