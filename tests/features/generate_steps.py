@@ -284,4 +284,16 @@ def i_set_attribute_to_article_object_property(step, property):
     assert world.attribute is not None, \
         "Got attribute %s" % world.attribute
     
+@step(u'I parse group authors')
+def i_parse_group_authors(step):
+    world.attribute = parse_group_authors(world.string)
+    assert world.attribute is not None, \
+        "Got attribute %s" % world.attribute
+    
+@step(u'I set attribute to attribute index (\d+)')
+def i_set_attribute_to_attribute_index(step, index):
+    world.attribute = world.attribute[index]
+    assert world.attribute is not None, \
+        "Got attribute %s" % world.attribute
+    
     

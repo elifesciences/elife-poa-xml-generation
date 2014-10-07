@@ -133,6 +133,21 @@ Feature: Generate POA XML
     | LTLTiGTGTSalmonellaLTLT/iGTGT Typhi and LTLTiGTGTSalmonellaLTLT/iGTGT Paratyphi  | p | <?xml version="1.0" ?><p><italic>Salmonella</italic> Typhi and <italic>Salmonella</italic> Paratyphi</p> | <?xml version="1.0" ?><root><p><italic>Salmonella</italic> Typhi and <italic>Salmonella</italic> Paratyphi</p></root>
     
     
+  Scenario: Parse group authors string
+    Given I have the raw string <string>
+    And I have as list index <index>
+    When I parse group authors
+    And I set attribute to attribute index <index>
+    Then I have attribute <attribute>
+    
+  Examples:
+    | string                            | index  | attribute
+    | order_start15order_endANECS111    | 15     | ANECS
+    | order_start34order_endICGC Breast Cancer Group1order_start35order_endICGC Chronic Myeloid Disorders Group2order_start36order_endICGC Prostate Cancer Group313  | 34     | ICGC Breast Cancer Group
+    | order_start34order_endICGC Breast Cancer Group1order_start35order_endICGC Chronic Myeloid Disorders Group2order_start36order_endICGC Prostate Cancer Group313  | 35     | ICGC Chronic Myeloid Disorders Group
+    | order_start34order_endICGC Breast Cancer Group1order_start35order_endICGC Chronic Myeloid Disorders Group2order_start36order_endICGC Prostate Cancer Group313  | 36     | ICGC Prostate Cancer Group
+    
+    
   Scenario: Build eLifePOA article object for article
     Given I have settings
     And I reload settings
@@ -150,7 +165,13 @@ Feature: Generate POA XML
     | article_id     | property       | index    | subproperty   | attribute
     | 00003          | title          |          |               | This, 'title, includes "quotation", marks
     | 00003          | contributors   | 0        | surname       | Anand
-
+    | 02935          | contributors   | 0        | surname       | Ju
+    | 02935          | contributors   | 32       | surname       | Malkin
+    | 02935          | contributors   | 33       | collab        | ICGC Breast Cancer Group
+    | 02935          | contributors   | 34       | collab        | ICGC Chronic Myeloid Disorders Group
+    | 02935          | contributors   | 35       | collab        | ICGC Prostate Cancer Group
+    | 02935          | contributors   | 36       | surname       | Foster
+    
         
   Scenario: Build POA XML for article
     Given I have settings
