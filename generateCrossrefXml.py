@@ -220,23 +220,29 @@ class crossrefXML(object):
                     continue
             # Skip contributors with no surname
             if contributor.surname == "" or contributor.surname is None:
-                continue
-                
-            self.person_name = SubElement(self.contributors, "person_name")
-
-            self.person_name.set("contributor_role", contributor.contrib_type)
+                # Most likely a group author
+                if contributor.collab:
+                    self.organization = SubElement(self.contributors, "organization")
+                    self.organization.text = contributor.collab
+                    self.organization.set("contributor_role", contributor.contrib_type)
+                    self.organization.set("sequence", sequence)
             
-            if contributor.corresp == True or contributor.equal_contrib == True:
-                self.person_name.set("sequence", sequence)
             else:
-                self.person_name.set("sequence", sequence)
+                self.person_name = SubElement(self.contributors, "person_name")
+    
+                self.person_name.set("contributor_role", contributor.contrib_type)
                 
-            self.given_name = SubElement(self.person_name, "given_name")
-            self.given_name.text = contributor.given_name
+                if contributor.corresp == True or contributor.equal_contrib == True:
+                    self.person_name.set("sequence", sequence)
+                else:
+                    self.person_name.set("sequence", sequence)
+                    
+                self.given_name = SubElement(self.person_name, "given_name")
+                self.given_name.text = contributor.given_name
             
-            self.surname = SubElement(self.person_name, "surname")
-            self.surname.text = contributor.surname
-            
+                self.surname = SubElement(self.person_name, "surname")
+                self.surname.text = contributor.surname
+    
             # Reset sequence value after the first sucessful loop
             sequence = "additional"
 
