@@ -230,7 +230,7 @@ def i_build_poa_xml_for_article(step):
     
 @step(u'I build POA article for article')
 def i_build_poa_article_for_article(step):
-    world.article = build_article_for_article(int(world.article_id))
+    world.article, error_count = build_article_for_article(int(world.article_id))
     assert world.article is not None, \
         "Got article %s" % world.article
 
