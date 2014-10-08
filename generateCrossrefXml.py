@@ -134,7 +134,8 @@ class crossrefXML(object):
         self.identifier.set("id_type", "doi")
         self.identifier.text = poa_article.doi
         
-        self.set_crossmark(self.journal_article, poa_article)
+        # Disable crossmark for now
+        #self.set_crossmark(self.journal_article, poa_article)
         
         #self.archive_locations = SubElement(self.journal_article, 'archive_locations')
         #self.archive = SubElement(self.archive_locations, 'archive')
