@@ -136,6 +136,13 @@ def get_abstract_from_xml(root, raw = False):
             for p_tag in tag.findall('./p'):
                 if p_tag.text is None:
                     tag.remove(p_tag)
+                # Remove nested xref tags but leave the text inside
+                for xref_tag in p_tag.findall('./xref'):
+                    # Two step process
+                    # One, remove all attributes of the xref tag
+                    # Two (later) remove empty xref tags from the converted string
+                    for attr in xref_tag.keys():
+                        xref_tag.set(attr, None)
         
         # Recursively flatten child elements into a string
         if not tag.get("abstract-type"):
@@ -145,6 +152,8 @@ def get_abstract_from_xml(root, raw = False):
             # Finally, remove excess <p> and </p> tags because they are bad
             abstract = abstract.replace('<p>', '')
             abstract = abstract.replace('</p>', '')
+            abstract = abstract.replace('<xref>', '')
+            abstract = abstract.replace('</xref>', '')
 
     return abstract
 
