@@ -366,9 +366,8 @@ class eLife2XML(object):
 
                 if contrib_type != "editor":
                     if affiliation.department:
-                        self.addline = SubElement(self.aff, "addr-line")
-                        self.department = SubElement(self.addline, "named-content")
-                        self.department.set("content-type", "department")
+                        self.department = SubElement(self.aff, "institution")
+                        self.department.set("content-type", "dept")
                         self.department.text = affiliation.department
                         self.addline.tail = ", "
 
