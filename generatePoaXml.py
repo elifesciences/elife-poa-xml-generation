@@ -235,7 +235,7 @@ class eLife2XML(object):
 
     def set_license(self, parent, poa_article):
         self.license = SubElement(parent, "license")
-        self.license.set("license-type", poa_article.license.license_type)
+
         self.license.set("xlink:href", poa_article.license.href)
         
         self.license_p = SubElement(self.license, "license-p")
