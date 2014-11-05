@@ -226,7 +226,7 @@ class eLife2XML(object):
         # title-group
         self.issn = SubElement(self.journal_meta, "issn")
         self.issn.text = self.elife_epub_issn
-        self.issn.set("pub-type", "epub")
+        self.issn.set("publication-format", "electronic")
 
         # publisher
         self.publisher = SubElement(self.journal_meta, "publisher")
