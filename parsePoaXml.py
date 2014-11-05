@@ -313,7 +313,7 @@ def get_pub_dates_from_xml(root, contrib_type = None):
     """
     pub_dates = {}
     for tag in root.findall('./front/article-meta/pub-date'):
-        pub_type = tag.get("pub-type")
+        pub_type = tag.get("date-type")
         for child in tag:
             if child.tag == 'day':
                 day = child.text
@@ -470,7 +470,7 @@ def build_article_from_xml(article_xml_filename):
             
     # Parse the pub-date for VoR articles
     pub_dates = get_pub_dates_from_xml(root)
-    pub_date_types = ["epub"]
+    pub_date_types = ["pub"]
     for pub_type in pub_date_types:
         try:
             if pub_dates[pub_type]:
@@ -501,11 +501,8 @@ def build_articles_from_article_xmls(article_xmls):
 
 if __name__ == '__main__':
     
-    article_xlms = ["elife_poa_e03011.xml"
-                    ,"elife_poa_e03198.xml"
-                    ,"elife_poa_e03191.xml"
-                    ,"elife_poa_e03300.xml"
-                    ,"elife_poa_e02676.xml"
+    article_xlms = ["elife_poa_e02935.xml"
+                    ,"Feature.xml"
                     ]
     poa_articles = []
     

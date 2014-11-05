@@ -648,7 +648,7 @@ class eLifePOA():
     def is_poa(self):
         # Based the presence of an epub date whether it is a
         #  PoA article or VoR article
-        date_type = "epub"
+        date_type = "pub"
 
         if self.get_date(date_type) is None:
             return True
