@@ -276,7 +276,7 @@ class eLife2XML(object):
         if date:
             copyright_year = date.date.tm_year
             
-        copyright_statement = u'Copyright \u00a9 ' + str(copyright_year) + ", " + copyright_holder
+        copyright_statement = u'\u00a9 ' + str(copyright_year) + ", " + copyright_holder
         self.copyright_statement = SubElement(parent, "copyright-statement")
         self.copyright_statement.text = copyright_statement
         
