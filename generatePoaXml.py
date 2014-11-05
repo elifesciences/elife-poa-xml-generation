@@ -48,6 +48,7 @@ class eLife2XML(object):
         self.root.set('article-type', poa_article.articleType)
         self.root.set('xmlns:mml', 'http://www.w3.org/1998/Math/MathML')
         self.root.set('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+        self.root.set('dtd-version', '1.1d1')
 
         # set comment
         generated = time.strftime("%Y-%m-%d %H:%M:%S")
