@@ -388,6 +388,14 @@ def get_author_conflict(article_id, author_id):
 	attribute = get_author_attribute(article_id, author_id, COLUMN_HEADINGS["author_conflict"])
 	return attribute 
 
+def get_group_authors(article_id):
+	# Wrap in an exception because some empty rows throws IndexError
+	try:
+		attribute = get_article_attributes(article_id, "group_authors", COLUMN_HEADINGS["group_author"])[0]
+	except IndexError:
+		attribute = None
+	return attribute
+
 ## conversion functions
 def get_elife_doi(article_id):
 	"""
@@ -477,6 +485,43 @@ def parse_ethics(ethic):
 				ethics.append(entity_to_unicode(ethic_text))
 
 	return ethics
+
+def parse_group_authors(group_authors):
+	"""
+	Given a raw group author value from the data files,
+	check for empty, whitespace, zero
+	If not empty, remove extra numbers from the end of the string
+	Return a dictionary of dict[author_position] = collab_name
+	"""
+	group_author_dict = {}
+	if group_authors.strip() == "":
+		group_author_dict = None
+	elif group_authors.strip() == "0":
+		group_author_dict = None
+	else:
+
+		# Parse out elements into a list, clean and
+		#  add the the dictionary using some steps
+		
+		# Split the string on the first delimiter
+		group_author_list = group_authors.split('order_start')
+		
+		for group_author_string in group_author_list:
+			if group_author_string == "":
+				continue
+			
+			# Now split on the second delimiter
+			position_and_name = group_author_string.split('order_end')
+			
+			author_position = position_and_name[0]
+			
+			# Strip numbers at the end
+			group_author = position_and_name[1].rstrip("1234567890")
+
+			# Finally, add to the dict noting the authors position
+			group_author_dict[author_position] = group_author
+
+	return group_author_dict
 
 if __name__ == "__main__":
 

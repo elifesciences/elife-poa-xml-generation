@@ -819,6 +819,8 @@ class eLifePOA():
         self.conflict_default = None
         self.ethics = []
         self.author_keywords = []
+        # For PubMed function a hook to specify if article was ever through PoA pipeline
+        self.was_ever_poa = None
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -856,6 +858,16 @@ class eLifePOA():
         
     def add_author_keyword(self, author_keyword):
         self.author_keywords.append(author_keyword)
+        
+    def is_poa(self):
+        # Based the presence of an epub date whether it is a
+        #  PoA article or VoR article
+        date_type = "epub"
+
+        if self.get_date(date_type) is None:
+            return True
+        elif self.get_date(date_type) is not None:
+            return False
 
 class ElifeDocumentType(minidom.DocumentType):
     """

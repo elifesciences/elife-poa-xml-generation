@@ -47,7 +47,8 @@ Feature: Generate POA XML
     | Edit&#x00F3;rial&#x00F3; Department&#x00F3; | Editórialó Departmentó
     
   Scenario: Angle bracket escape sequence conversion
-    Given I have the raw string <string>
+    Given I have settings
+    And I have the raw string <string>
     And I reload settings
     When I decode the string with decode brackets
     Then I have the decoded string <decoded_string>
@@ -65,7 +66,7 @@ Feature: Generate POA XML
     Given I have settings
     And I reload settings
     And I set settings XLS_PATH to test_data/
-    And I set json settings XLS_FILES to {"authors" : "poa_author.csv", "license" : "poa_license.csv", "manuscript" : "poa_manuscript.csv", "received" : "poa_received.csv", "subjects" : "poa_subject_area.csv", "organisms": "poa_research_organism.csv", "abstract": "poa_abstract.csv", "title": "poa_title.csv"}
+    And I set XLS_FILES to the default
     And I reload XML generation libraries
     And I have article_id <article_id>
     And I have author_id <author_id>
@@ -86,6 +87,8 @@ Feature: Generate POA XML
     | 00003         |            | get_articleType         | 10
     | 00007         |            | get_articleType         | 1
     | 00012         |            | get_articleType         | 14
+    | 00012         |            | get_group_authors       | 0
+    | 02725         |            | get_group_authors       | order_start15order_endANECS111
     
   Scenario: Escape unmatched angle brackets
     Given I have the raw string <string>
@@ -127,4 +130,62 @@ Feature: Generate POA XML
     | C&#x00FC; LTLTiGTGTH&#x00FC;sLTLT/iGTGT&#x03B1; LTLTsupGTGTH&#x00FC;LTLT/supGTGTa    | p         | <?xml version="1.0" ?><p>Cü <italic>Hüs</italic>α <sup>Hü</sup>a</p>  | <?xml version="1.0" ?><root><p>Cü <italic>Hüs</italic>α <sup>Hü</sup>a</p></root>
     | I LTLTiGTGTLTLTsupGTGTmLTLT/supGTGTLTLT/iGTGT        | p         | <?xml version="1.0" ?><p>I <italic><sup>m</sup></italic></p>  | <?xml version="1.0" ?><root><p>I <italic><sup>m</sup></italic></p></root>
     | 2&#x00FC; LTLTiGTGTisLTLT/iGTGT LTLT 3LTLTsupGTGT&#x03B1;LTLT/supGTGT GTGT 4    | p         | <?xml version="1.0" ?><p>2ü <italic>is</italic> &lt; 3<sup>α</sup> &gt; 4</p>  | <?xml version="1.0" ?><root><p>2ü <italic>is</italic> &lt; 3<sup>α</sup> &gt; 4</p></root>
-    | LTLTiGTGTSalmonellaLTLT/iGTGT Typhi and LTLTiGTGTSalmonellaLTLT/iGTGT Paratyphi  | p | <?xml version="1.0" ?><p><italic>Salmonella</italic> Typhi and <italic>Salmonella</italic> Paratyphi</p> | <?xml version="1.0" ?><root><p><italic>Salmonella</italic> Typhi and <italic>Salmonella</italic> Paratyphi</p></root> 
+    | LTLTiGTGTSalmonellaLTLT/iGTGT Typhi and LTLTiGTGTSalmonellaLTLT/iGTGT Paratyphi  | p | <?xml version="1.0" ?><p><italic>Salmonella</italic> Typhi and <italic>Salmonella</italic> Paratyphi</p> | <?xml version="1.0" ?><root><p><italic>Salmonella</italic> Typhi and <italic>Salmonella</italic> Paratyphi</p></root>
+    
+    
+  Scenario: Parse group authors string
+    Given I have the raw string <string>
+    And I have as list index <index>
+    When I parse group authors
+    And I set attribute to attribute index <index>
+    Then I have attribute <attribute>
+    
+  Examples:
+    | string                            | index  | attribute
+    | order_start15order_endANECS111    | 15     | ANECS
+    | order_start34order_endICGC Breast Cancer Group1order_start35order_endICGC Chronic Myeloid Disorders Group2order_start36order_endICGC Prostate Cancer Group313  | 34     | ICGC Breast Cancer Group
+    | order_start34order_endICGC Breast Cancer Group1order_start35order_endICGC Chronic Myeloid Disorders Group2order_start36order_endICGC Prostate Cancer Group313  | 35     | ICGC Chronic Myeloid Disorders Group
+    | order_start34order_endICGC Breast Cancer Group1order_start35order_endICGC Chronic Myeloid Disorders Group2order_start36order_endICGC Prostate Cancer Group313  | 36     | ICGC Prostate Cancer Group
+    
+    
+  Scenario: Build eLifePOA article object for article
+    Given I have settings
+    And I reload settings
+    And I set settings XLS_PATH to test_data/
+    And I set XLS_FILES to the default
+    And I reload XML generation libraries
+    And I have article_id <article_id>
+    When I build POA article for article
+    And I have as list index <index>
+    And I have sub property <subproperty>
+    And I set attribute to article object property <property>
+    Then I have attribute <attribute>
+    
+  Examples:
+    | article_id     | property       | index    | subproperty   | attribute
+    | 00003          | title          |          |               | This, 'title, includes "quotation", marks
+    | 00003          | contributors   | 0        | surname       | Anand
+    | 02935          | contributors   | 0        | surname       | Ju
+    | 02935          | contributors   | 32       | surname       | Malkin
+    | 02935          | contributors   | 33       | collab        | ICGC Breast Cancer Group
+    | 02935          | contributors   | 34       | collab        | ICGC Chronic Myeloid Disorders Group
+    | 02935          | contributors   | 35       | collab        | ICGC Prostate Cancer Group
+    | 02935          | contributors   | 36       | surname       | Foster
+    
+        
+  Scenario: Build POA XML for article
+    Given I have settings
+    And I reload settings
+    And I set settings XLS_PATH to test_data/
+    And I set settings TARGET_OUTPUT_DIR to test_output/
+    And I set XLS_FILES to the default
+    And I reload XML generation libraries
+    And I have article_id <article_id>
+    When I build POA XML for article
+    Then I have attribute <attribute>
+    
+  Examples:
+    | article_id     | attribute
+    | 00003          | True
+    | 02935          | True
+    
