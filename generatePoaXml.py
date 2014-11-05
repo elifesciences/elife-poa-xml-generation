@@ -480,8 +480,8 @@ class eLife2XML(object):
         print self.root
 
     def prettyXML(self):
-        publicId = '-//NLM//DTD Journal Archiving and Interchange DTD v3.0 20080202//EN'
-        systemId = 'http://dtd.nlm.nih.gov/archiving/3.0/archivearticle3.dtd'
+        publicId = '-//NLM//DTD JATS (Z39.96) Journal Archiving and Interchange DTD v1.1d1 20130915//EN'
+        systemId = 'JATS-archivearticle1.dtd'
         encoding = 'utf-8'
         namespaceURI = None
         qualifiedName = "article"
