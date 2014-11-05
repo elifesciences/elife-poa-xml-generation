@@ -370,7 +370,7 @@ class eLife2XML(object):
                         self.department = SubElement(self.aff, "institution")
                         self.department.set("content-type", "dept")
                         self.department.text = affiliation.department
-                        self.addline.tail = ", "
+                        self.department.tail = ", "
 
                 if affiliation.institution:
                     self.institution = SubElement(self.aff, "institution")
