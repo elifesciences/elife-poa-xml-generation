@@ -292,12 +292,7 @@ def build_crossref_xml_for_articles(article_xmls):
 
 if __name__ == '__main__':
     
-    article_xmls = ["generated_xml_output/elife_poa_e03011.xml"
-                    ,"generated_xml_output/elife_poa_e03198.xml"
-                    ,"generated_xml_output/elife_poa_e03191.xml"
-                    ,"generated_xml_output/elife_poa_e03300.xml"
-                    ,"generated_xml_output/elife_poa_e02676.xml"
-                    ,"generated_xml_output/elife_poa_e02839.xml"
+    article_xmls = ["generated_xml_output/elife_poa_e02935.xml"
                     ]
     
     build_crossref_xml_for_articles(article_xmls)
