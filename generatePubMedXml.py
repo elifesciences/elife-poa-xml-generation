@@ -270,8 +270,14 @@ class pubMedPoaXML(object):
         
         # Add article categories
         for article_category in poa_article.article_categories:
-            # Break on "and" and capitalise the first letter
-            categories = article_category.split('and')
+            
+            if article_category.lower().strip() == 'computational and systems biology':
+                # Edge case category needs special treatment
+                categories = ['Computational biology','Systems biology']
+            else:
+                # Break on "and" and capitalise the first letter
+                categories = article_category.split('and')
+                
             for category in categories:
                 category = category.strip().lower()
                 self.set_object(self.object_list, "keyword", "value", category)
