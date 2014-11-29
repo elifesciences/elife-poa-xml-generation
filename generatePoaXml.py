@@ -48,6 +48,7 @@ class eLife2XML(object):
         self.root.set('article-type', poa_article.articleType)
         self.root.set('xmlns:mml', 'http://www.w3.org/1998/Math/MathML')
         self.root.set('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+        self.root.set('dtd-version', '1.1d1')
 
         # set comment
         generated = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -226,7 +227,7 @@ class eLife2XML(object):
         # title-group
         self.issn = SubElement(self.journal_meta, "issn")
         self.issn.text = self.elife_epub_issn
-        self.issn.set("pub-type", "epub")
+        self.issn.set("publication-format", "electronic")
 
         # publisher
         self.publisher = SubElement(self.journal_meta, "publisher")
@@ -235,7 +236,7 @@ class eLife2XML(object):
 
     def set_license(self, parent, poa_article):
         self.license = SubElement(parent, "license")
-        self.license.set("license-type", poa_article.license.license_type)
+
         self.license.set("xlink:href", poa_article.license.href)
         
         self.license_p = SubElement(self.license, "license-p")
@@ -276,7 +277,7 @@ class eLife2XML(object):
         if date:
             copyright_year = date.date.tm_year
             
-        copyright_statement = u'Copyright \u00a9 ' + str(copyright_year) + ", " + copyright_holder
+        copyright_statement = u'\u00a9 ' + str(copyright_year) + ", " + copyright_holder
         self.copyright_statement = SubElement(parent, "copyright-statement")
         self.copyright_statement.text = copyright_statement
         
@@ -366,11 +367,10 @@ class eLife2XML(object):
 
                 if contrib_type != "editor":
                     if affiliation.department:
-                        self.addline = SubElement(self.aff, "addr-line")
-                        self.department = SubElement(self.addline, "named-content")
-                        self.department.set("content-type", "department")
+                        self.department = SubElement(self.aff, "institution")
+                        self.department.set("content-type", "dept")
                         self.department.text = affiliation.department
-                        self.addline.tail = ", "
+                        self.department.tail = ", "
 
                 if affiliation.institution:
                     self.institution = SubElement(self.aff, "institution")
@@ -480,8 +480,8 @@ class eLife2XML(object):
         print self.root
 
     def prettyXML(self):
-        publicId = '-//NLM//DTD Journal Archiving and Interchange DTD v3.0 20080202//EN'
-        systemId = 'http://dtd.nlm.nih.gov/archiving/3.0/archivearticle3.dtd'
+        publicId = '-//NLM//DTD JATS (Z39.96) Journal Archiving and Interchange DTD v1.1d1 20130915//EN'
+        systemId = 'JATS-archivearticle1.dtd'
         encoding = 'utf-8'
         namespaceURI = None
         qualifiedName = "article"
@@ -648,7 +648,7 @@ class eLifePOA():
     def is_poa(self):
         # Based the presence of an epub date whether it is a
         #  PoA article or VoR article
-        date_type = "epub"
+        date_type = "pub"
 
         if self.get_date(date_type) is None:
             return True
