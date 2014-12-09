@@ -89,6 +89,8 @@ Feature: Generate POA XML
     | 00012         |            | get_articleType         | 14
     | 00012         |            | get_group_authors       | 0
     | 02725         |            | get_group_authors       | order_start15order_endANECS111
+    | 04969         |            | get_received_date       | " "
+    | 04969         |            | get_receipt_date        | 2014-09-30 03:44:10.960
     
   Scenario: Escape unmatched angle brackets
     Given I have the raw string <string>
