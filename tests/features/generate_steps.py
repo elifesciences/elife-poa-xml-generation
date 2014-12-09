@@ -134,6 +134,9 @@ def i_set_attribute_to_parsecsvfiles_method(step, method_name):
 def i_have_attribute_attribute(step, attribute):
     # Type convert the value as required
     if type(world.attribute) == str:
+        # Test for explicit empty string
+        if attribute == '" "':
+            attribute = " "
         attribute = str(attribute)
     elif type(world.attribute) == int:
         attribute = int(attribute)
