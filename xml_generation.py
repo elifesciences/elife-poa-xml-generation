@@ -111,6 +111,9 @@ def set_dates(article, article_id):
 		logger.info(str(accepted_date))
 		
 		received_date = get_received_date(article_id)
+		if received_date.strip() == "":
+			# Use the alternate date column receipt_date if received_date is blank
+			received_date = get_receipt_date(article_id)
 		t_received = time.strptime(received_date.split()[0], "%Y-%m-%d")
 		received = eLifeDate("received", t_received)
 		article.add_date(received)
