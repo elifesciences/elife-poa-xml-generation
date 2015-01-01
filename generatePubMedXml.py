@@ -37,7 +37,7 @@ class pubMedPoaXML(object):
         self.elife_epub_issn = "2050-084X"
         self.elife_publisher_name = "eLife Sciences Publications Limited"
         self.elife_language = "EN"
-        self.elife_journal_volume = "3"
+        self.elife_journal_volume = "4"
         self.elife_journal_issue = ""
 
         # Publication date

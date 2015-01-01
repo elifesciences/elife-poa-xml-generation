@@ -33,7 +33,7 @@ class crossrefXML(object):
         self.contrib_types = ["author"]
         self.elife_journal_id = "eLife"
         self.elife_journal_title = "eLife"
-        self.elife_journal_volume = "3"
+        self.elife_journal_volume = "4"
         self.elife_email_address = 'production@elifesciences.org'
         self.elife_epub_issn = "2050-084X"
         self.elife_publisher_name = "eLife Sciences Publications, Ltd"
