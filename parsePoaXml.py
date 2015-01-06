@@ -132,9 +132,9 @@ def get_abstract_from_xml(root, raw = False):
                     p_tag.remove(remove_tag)
                 for remove_tag in p_tag.findall('./ext-link'):
                     p_tag.remove(remove_tag)
-            # Now remove any empty p tags
+            # Now remove any empty p tags with no child tags
             for p_tag in tag.findall('./p'):
-                if p_tag.text is None:
+                if p_tag.text is None and len(p_tag) <= 0:
                     tag.remove(p_tag)
                 # Remove nested xref tags but leave the text inside
                 for xref_tag in p_tag.findall('./xref'):
