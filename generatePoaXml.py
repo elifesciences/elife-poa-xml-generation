@@ -184,8 +184,11 @@ class eLife2XML(object):
         root_tag_name = 'title-group'
         tag_name = 'article-title'
         root_xml_element = Element(root_tag_name)
+        # Escape any unescaped ampersands
+        title = xml_escape_ampersand(poa_article.title)
+        
         # XML
-        tagged_string = '<' + tag_name + '>' + poa_article.title + '</' + tag_name + '>'
+        tagged_string = '<' + tag_name + '>' + title + '</' + tag_name + '>'
         reparsed = minidom.parseString(tagged_string)
 
         root_xml_element = append_minidom_xml_to_elementtree_xml(
@@ -302,8 +305,11 @@ class eLife2XML(object):
         root_tag_name = 'abstract'
         tag_name = 'p'
         root_xml_element = Element(root_tag_name)
+        # Escape any unescaped ampersands
+        abstract = xml_escape_ampersand(poa_article.abstract)
+        
         # XML
-        tagged_string = '<' + tag_name + '>' + poa_article.abstract + '</' + tag_name + '>'
+        tagged_string = '<' + tag_name + '>' + abstract + '</' + tag_name + '>'
         reparsed = minidom.parseString(tagged_string)
 
         root_xml_element = append_minidom_xml_to_elementtree_xml(
@@ -702,6 +708,16 @@ def entity_to_unicode(s):
     using a regular expression replacement
     """
     s = re.sub(r"&#x(....);", repl, s)
+    return s
+
+def xml_escape_ampersand(s):
+    """
+    Quick convert unicode ampersand characters not associated with
+    a numbered entity to a plain &amp;
+    """
+
+    # The pattern below is match & that is not immediately followed by #
+    s = re.sub(r"&(?!\#)", '&amp;', s)
     return s
 
 def decode_brackets(s):
