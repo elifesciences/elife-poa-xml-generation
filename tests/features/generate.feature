@@ -75,7 +75,7 @@ Feature: Generate POA XML
     
   Examples:
     | article_id    | author_id  | method_name             | attribute
-    | 00003         |            | get_title               | This, 'title, includes "quotation", marks
+    | 00003         |            | get_title               | This, 'title, includes "quotation", marks & more ü
     | 00007         |            | get_title               | Herbivory-induced "volatiles" function as defenses increasing fitness of the native plant LTLTiGTGTNicotiana attenuataLTLT/iGTGT in nature
     | 00003         | 1258       | get_author_first_name   | Preetha
     | 00012         |            | get_license             | 1
@@ -165,8 +165,8 @@ Feature: Generate POA XML
     
   Examples:
     | article_id     | property       | index    | subproperty   | attribute
-    | 00003          | title          |          |               | This, 'title, includes "quotation", marks
-    | 00003          | contributors   | 0        | surname       | Anand
+    | 00003          | title          |          |               | This, 'title, includes "quotation", marks & more ü
+    | 00003          | contributors   | 0        | surname       | Anand 
     | 02935          | contributors   | 0        | surname       | Ju
     | 02935          | contributors   | 32       | surname       | Malkin
     | 02935          | contributors   | 33       | collab        | ICGC Breast Cancer Group
