@@ -137,7 +137,11 @@ def i_have_attribute_attribute(step, attribute):
         # Test for explicit empty string
         if attribute == '" "':
             attribute = " "
-        attribute = str(attribute)
+        try:
+            attribute = str(attribute)
+        except UnicodeEncodeError:
+            attribute = attribute.encode('utf-8')
+        
     elif type(world.attribute) == int:
         attribute = int(attribute)
     elif type(world.attribute) == list:
