@@ -435,6 +435,8 @@ def build_article_from_xml(article_xml_filename):
     # contributors
     contributors = get_contributors_from_xml(root, contrib_type = "author")
     article.contributors = contributors
+    contributors_non_byline = get_contributors_from_xml(root, contrib_type = "author non-byline")
+    article.contributors = article.contributors + contributors_non_byline
     
     # license href
     license_data = get_license_from_xml(root)

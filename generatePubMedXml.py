@@ -31,7 +31,7 @@ class pubMedPoaXML(object):
         self.root = Element('ArticleSet')
 
         # set the boiler plate values
-        self.contrib_types = ["author"]
+        self.contrib_types = ["author", "author non-byline"]
         self.date_types = ["received", "accepted"]
         self.elife_journal_title = "eLife"
         self.elife_epub_issn = "2050-084X"
@@ -64,7 +64,8 @@ class pubMedPoaXML(object):
             self.set_article_title(self.article, poa_article)
             self.set_e_location_id(self.article, poa_article)
             self.set_language(self.article, poa_article)
-            self.set_author_list(self.article, poa_article)
+            for contrib_type in self.contrib_types:
+                self.set_author_list(self.article, poa_article, contrib_type)
             self.set_publication_type(self.article, poa_article)
             self.set_article_id_list(self.article, poa_article)
             self.set_history(self.article, poa_article)
@@ -148,7 +149,10 @@ class pubMedPoaXML(object):
 
     def set_author_list(self, parent, poa_article, contrib_type = None):
         # If contrib_type is None, all contributors will be added regardless of their type
-        self.contributors = SubElement(parent, "AuthorList")
+        
+        if not hasattr(self, "contributors"):
+            # Create the XML element on first use
+            self.contributors = SubElement(parent, "AuthorList")
 
         for contributor in poa_article.contributors:
             if contrib_type:
@@ -353,8 +357,9 @@ def build_pubmed_xml_for_articles(poa_articles):
 
 if __name__ == '__main__':
     
-    article_xmls = ["generated_xml_output/elife_poa_e02935.xml"
-                    ,"generated_xml_output/Feature.xml"
+    article_xmls = [#"generated_xml_output/elife_poa_e02935.xml"
+                    #,"generated_xml_output/Feature.xml"
+                    "generated_xml_output/elife02935.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
@@ -363,7 +368,8 @@ if __name__ == '__main__':
     for article in poa_articles:
         if (article.doi == '10.7554/eLife.03528'
             or article.doi == '10.7554/eLife.03126'
-            or article.doi == '10.7554/eLife.03401'):
+            or article.doi == '10.7554/eLife.03401'
+            or article.doi == '10.7554/eLife.02935'):
             article.was_ever_poa = True
     
     build_pubmed_xml_for_articles(poa_articles)
