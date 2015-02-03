@@ -210,6 +210,17 @@ class pubMedPoaXML(object):
                 
             self.group = SubElement(self.groups, "Group")
             
+            # Set the GroupName
+            if contributor.group_author_key:
+                # The contributor has a contrib-id contrib-id-type="group-author-key"
+                #  Match this value to article contributors of type collab having the same id
+                for collab_contrib in poa_article.contributors:
+                    if (collab_contrib.collab is not None
+                        and collab_contrib.group_author_key == contributor.group_author_key):
+                        # Set the individual GroupName to the collab name
+                        self.group_name = SubElement(self.group, "GroupName")
+                        self.group_name.text = collab_contrib.collab
+            
             individual = SubElement(self.group, "IndividualName")
   
             if contributor.given_name:
