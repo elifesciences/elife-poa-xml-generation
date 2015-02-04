@@ -234,6 +234,10 @@ class pubMedPoaXML(object):
             if contributor.surname:
                 self.surname = SubElement(individual, "LastName")
                 self.surname.text = contributor.surname
+        
+        # Remove a completely empty GroupList element, if empty
+        if len(self.groups) <= 0:
+            parent.remove(self.groups)
   
     def set_publication_type(self, parent, poa_article):
         if poa_article.articleType:
