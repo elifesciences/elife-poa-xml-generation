@@ -407,6 +407,19 @@ def get_keyword_groups_from_xml(root, kwd_group_type = None):
 
     return keyword_groups
 
+def get_volume_from_xml(root, contrib_type = None):
+    """
+    Given an xml.etree.ElementTree.Element, get the
+    volume
+    if present and return it
+    """
+    volume = None
+    
+    for tag in root.findall('./front/article-meta/volume'):
+        volume = tag.text
+
+    return volume
+
 def build_article_from_xml(article_xml_filename):
     """
     Parse NLM XML with ElementTree, and populate an
@@ -488,6 +501,11 @@ def build_article_from_xml(article_xml_filename):
         except:
             # PoA will not have pub-date, quietly continue
             pass
+
+    # Set the volume if present
+    volume = get_volume_from_xml(root)
+    if volume:
+        article.volume = volume
 
     return article,error_count
 
