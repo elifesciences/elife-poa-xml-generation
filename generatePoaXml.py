@@ -613,6 +613,7 @@ class eLifePOA():
         self.author_keywords = []
         # For PubMed function a hook to specify if article was ever through PoA pipeline
         self.was_ever_poa = None
+        self.volume = None
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)

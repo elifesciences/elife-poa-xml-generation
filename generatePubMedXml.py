@@ -37,6 +37,7 @@ class pubMedPoaXML(object):
         self.elife_epub_issn = "2050-084X"
         self.elife_publisher_name = "eLife Sciences Publications Limited"
         self.elife_language = "EN"
+        # Default volume value
         self.elife_journal_volume = "4"
         self.elife_journal_issue = ""
 
@@ -99,7 +100,11 @@ class pubMedPoaXML(object):
         self.issn.text = self.elife_epub_issn
         
         self.volume = SubElement(self.journal, "Volume")
-        self.volume.text = self.elife_journal_volume
+        # Use volume from the article unless not present then use the default
+        if poa_article.volume:
+            self.volume.text = poa_article.volume
+        else:
+            self.volume.text = self.elife_journal_volume
 
         self.issue = SubElement(self.journal, "Issue")
         self.issue.text = self.elife_journal_issue
