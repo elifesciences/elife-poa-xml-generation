@@ -59,6 +59,10 @@ class pubMedPoaXML(object):
     def build(self, root, poa_articles):
         
         for poa_article in poa_articles:
+            # Initialise these as None for each loop
+            self.contributors = None
+            self.groups = None
+            
             self.article = SubElement(root, "Article")
             self.set_journal(self.article, poa_article)
             self.set_replaces(self.article, poa_article)
@@ -153,7 +157,7 @@ class pubMedPoaXML(object):
     def set_author_list(self, parent, poa_article, contrib_type = None):
         # If contrib_type is None, all contributors will be added regardless of their type
         
-        if not hasattr(self, "contributors"):
+        if self.contributors is None:
             # Create the XML element on first use
             self.contributors = SubElement(parent, "AuthorList")
 
@@ -194,7 +198,7 @@ class pubMedPoaXML(object):
     def set_group_list(self, parent, poa_article, contrib_type = None):
         # If contrib_type is None, all contributors will be added regardless of their type
         
-        if not hasattr(self, "groups"):
+        if self.groups is None:
             # Create the XML element on first use
             self.groups = SubElement(parent, "GroupList")
 
@@ -403,6 +407,8 @@ if __name__ == '__main__':
     article_xmls = [#"generated_xml_output/elife_poa_e02935.xml"
                     #,"generated_xml_output/Feature.xml"
                     "generated_xml_output/elife02935.xml"
+                    ,"generated_xml_output/elife02725.xml"
+                    ,"generated_xml_output/elife04024.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
