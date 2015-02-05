@@ -217,9 +217,7 @@ class pubMedPoaXML(object):
             and (contributor.collab == "" or contributor.collab is None):
                 continue
                 
-            self.group = SubElement(self.groups, "Group")
-            
-            # Set the GroupName
+            # Set the GroupName value
             if contributor.group_author_key:
                 # The contributor has a contrib-id contrib-id-type="group-author-key"
                 #  Match this value to article contributors of type collab having the same id
@@ -227,9 +225,26 @@ class pubMedPoaXML(object):
                     if (collab_contrib.collab is not None
                         and collab_contrib.group_author_key == contributor.group_author_key):
                         # Set the individual GroupName to the collab name
-                        self.group_name = SubElement(self.group, "GroupName")
-                        self.group_name.text = collab_contrib.collab
+                        self.group_name_text = collab_contrib.collab
+    
+            # Find existing group with the same name or create it if not exists
+            self.group = None
+            for group in self.groups.findall('./Group'):
+                for group_name in group.findall('./GroupName'):
+                    if group_name.text == self.group_name_text:
+                        # Matched an existing group tag, use it
+                        self.group = group
+                        break
+                    
+            if self.group is None:
+                # Create a new group
+                self.group = SubElement(self.groups, "Group")
+                
+                # Set the GroupName of the group
+                self.group_name = SubElement(self.group, "GroupName")
+                self.group_name.text = self.group_name_text   
             
+            # Add the individual to the group
             individual = SubElement(self.group, "IndividualName")
   
             if contributor.given_name:
@@ -416,8 +431,12 @@ if __name__ == '__main__':
     article_xmls = [#"generated_xml_output/elife_poa_e02935.xml"
                     #,"generated_xml_output/Feature.xml"
                     "generated_xml_output/elife02935.xml"
-                    ,"generated_xml_output/elife02725.xml"
                     ,"generated_xml_output/elife04024.xml"
+                    ,"generated_xml_output/elife04034.xml"
+                    ,"generated_xml_output/elife04037.xml"
+                    ,"generated_xml_output/elife04105.xml"
+                    ,"generated_xml_output/elife04180.xml"
+                    ,"generated_xml_output/elife04586.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
