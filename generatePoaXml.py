@@ -526,6 +526,7 @@ class eLifePOSContributor():
     orcid = None
     collab = None
     conflict = None
+    group_author_key = None
 
     def __init__(self, contrib_type, surname, given_name, collab = None):
         self.contrib_type = contrib_type

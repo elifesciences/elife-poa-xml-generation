@@ -32,6 +32,7 @@ class pubMedPoaXML(object):
 
         # set the boiler plate values
         self.contrib_types = ["author"]
+        self.group_contrib_types = ["author non-byline"]
         self.date_types = ["received", "accepted"]
         self.elife_journal_title = "eLife"
         self.elife_epub_issn = "2050-084X"
@@ -59,13 +60,20 @@ class pubMedPoaXML(object):
     def build(self, root, poa_articles):
         
         for poa_article in poa_articles:
+            # Initialise these as None for each loop
+            self.contributors = None
+            self.groups = None
+            
             self.article = SubElement(root, "Article")
             self.set_journal(self.article, poa_article)
             self.set_replaces(self.article, poa_article)
             self.set_article_title(self.article, poa_article)
             self.set_e_location_id(self.article, poa_article)
             self.set_language(self.article, poa_article)
-            self.set_author_list(self.article, poa_article)
+            for contrib_type in self.contrib_types:
+                self.set_author_list(self.article, poa_article, contrib_type)
+            for contrib_type in self.group_contrib_types:
+                self.set_group_list(self.article, poa_article, contrib_type)
             self.set_publication_type(self.article, poa_article)
             self.set_article_id_list(self.article, poa_article)
             self.set_history(self.article, poa_article)
@@ -153,7 +161,10 @@ class pubMedPoaXML(object):
 
     def set_author_list(self, parent, poa_article, contrib_type = None):
         # If contrib_type is None, all contributors will be added regardless of their type
-        self.contributors = SubElement(parent, "AuthorList")
+        
+        if self.contributors is None:
+            # Create the XML element on first use
+            self.contributors = SubElement(parent, "AuthorList")
 
         for contributor in poa_article.contributors:
             if contrib_type:
@@ -189,6 +200,65 @@ class pubMedPoaXML(object):
                 self.orcid.set("Source", "ORCID")
                 self.orcid.text = contributor.orcid
 
+    def set_group_list(self, parent, poa_article, contrib_type = None):
+        # If contrib_type is None, all contributors will be added regardless of their type
+        
+        if self.groups is None:
+            # Create the XML element on first use
+            self.groups = SubElement(parent, "GroupList")
+
+        for contributor in poa_article.contributors:
+            if contrib_type:
+                # Filter by contrib_type if supplied
+                if contributor.contrib_type != contrib_type:
+                    continue
+            # Skip contributors with no surname and no collab
+            if  (contributor.surname == "" or contributor.surname is None) \
+            and (contributor.collab == "" or contributor.collab is None):
+                continue
+                
+            # Set the GroupName value
+            if contributor.group_author_key:
+                # The contributor has a contrib-id contrib-id-type="group-author-key"
+                #  Match this value to article contributors of type collab having the same id
+                for collab_contrib in poa_article.contributors:
+                    if (collab_contrib.collab is not None
+                        and collab_contrib.group_author_key == contributor.group_author_key):
+                        # Set the individual GroupName to the collab name
+                        self.group_name_text = collab_contrib.collab
+    
+            # Find existing group with the same name or create it if not exists
+            self.group = None
+            for group in self.groups.findall('./Group'):
+                for group_name in group.findall('./GroupName'):
+                    if group_name.text == self.group_name_text:
+                        # Matched an existing group tag, use it
+                        self.group = group
+                        break
+                    
+            if self.group is None:
+                # Create a new group
+                self.group = SubElement(self.groups, "Group")
+                
+                # Set the GroupName of the group
+                self.group_name = SubElement(self.group, "GroupName")
+                self.group_name.text = self.group_name_text   
+            
+            # Add the individual to the group
+            individual = SubElement(self.group, "IndividualName")
+  
+            if contributor.given_name:
+                self.given_name = SubElement(individual, "FirstName")
+                self.given_name.text = contributor.given_name
+          
+            if contributor.surname:
+                self.surname = SubElement(individual, "LastName")
+                self.surname.text = contributor.surname
+        
+        # Remove a completely empty GroupList element, if empty
+        if len(self.groups) <= 0:
+            parent.remove(self.groups)
+  
     def set_publication_type(self, parent, poa_article):
         if poa_article.articleType:
             self.publication_type = SubElement(parent, "PublicationType")
@@ -358,8 +428,15 @@ def build_pubmed_xml_for_articles(poa_articles):
 
 if __name__ == '__main__':
     
-    article_xmls = ["generated_xml_output/elife_poa_e02935.xml"
-                    ,"generated_xml_output/Feature.xml"
+    article_xmls = [#"generated_xml_output/elife_poa_e02935.xml"
+                    #,"generated_xml_output/Feature.xml"
+                    "generated_xml_output/elife02935.xml"
+                    ,"generated_xml_output/elife04024.xml"
+                    ,"generated_xml_output/elife04034.xml"
+                    ,"generated_xml_output/elife04037.xml"
+                    ,"generated_xml_output/elife04105.xml"
+                    ,"generated_xml_output/elife04180.xml"
+                    ,"generated_xml_output/elife04586.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
@@ -368,7 +445,8 @@ if __name__ == '__main__':
     for article in poa_articles:
         if (article.doi == '10.7554/eLife.03528'
             or article.doi == '10.7554/eLife.03126'
-            or article.doi == '10.7554/eLife.03401'):
+            or article.doi == '10.7554/eLife.03401'
+            or article.doi == '10.7554/eLife.02935'):
             article.was_ever_poa = True
     
     build_pubmed_xml_for_articles(poa_articles)

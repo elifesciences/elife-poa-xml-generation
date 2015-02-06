@@ -198,6 +198,7 @@ def get_contributor_from_contrib_group(root, affs, raw = False):
     surname = None
     given_name = None
     collab = None
+    group_author_key = None
     
     for tag in root.findall('./name/surname'):
         surname = tag.text
@@ -211,6 +212,10 @@ def get_contributor_from_contrib_group(root, affs, raw = False):
     for tag in root.findall('./uri'):
         if tag.get("content-type") == "orcid":
             orcid = tag.text
+    
+    for tag in root.findall('./contrib-id'):
+        if tag.get("contrib-id-type") == "group-author-key":
+            group_author_key = tag.text
     
     # PoA may have aff tags
     for tag in root.findall('./aff'):
@@ -251,6 +256,7 @@ def get_contributor_from_contrib_group(root, affs, raw = False):
     if root.get("corresp") == "yes":
         contributor.corresp = True
     contributor.orcid = orcid
+    contributor.group_author_key = group_author_key
     
     return contributor
 
@@ -448,6 +454,8 @@ def build_article_from_xml(article_xml_filename):
     # contributors
     contributors = get_contributors_from_xml(root, contrib_type = "author")
     article.contributors = contributors
+    contributors_non_byline = get_contributors_from_xml(root, contrib_type = "author non-byline")
+    article.contributors = article.contributors + contributors_non_byline
     
     # license href
     license_data = get_license_from_xml(root)
