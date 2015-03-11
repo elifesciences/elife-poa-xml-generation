@@ -173,6 +173,7 @@ Feature: Generate POA XML
     | 02935          | contributors   | 34       | collab        | ICGC Chronic Myeloid Disorders Group
     | 02935          | contributors   | 35       | collab        | ICGC Prostate Cancer Group
     | 02935          | contributors   | 36       | surname       | Foster
+    | 02935          | is_poa         |          |               | True
     
         
   Scenario: Build POA XML for article
