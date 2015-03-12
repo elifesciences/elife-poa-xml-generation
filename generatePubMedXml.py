@@ -87,10 +87,10 @@ class pubMedPoaXML(object):
         """
         
         pub_type = None
-        if poa_article.is_poa() is False:
+        if poa_article.is_poa is False:
             # VoR
             pub_type = "epublish"
-        elif poa_article.is_poa() is True:
+        elif poa_article.is_poa is True:
             # PoA
             pub_type = "aheadofprint"
         return pub_type
@@ -130,7 +130,7 @@ class pubMedPoaXML(object):
         Set the Replaces tag, if applicable
         """
         # If the article is VoR and is was ever PoA
-        if poa_article.is_poa() is False and poa_article.was_ever_poa is True:
+        if poa_article.is_poa is False and poa_article.was_ever_poa is True:
             self.replaces = SubElement(parent, 'Replaces')
             self.replaces.set("IdType", "doi")
             self.replaces.text = poa_article.doi
@@ -308,7 +308,7 @@ class pubMedPoaXML(object):
                 self.set_date(self.history, date.date, date_type)
                 
         # If the article is VoR and is was ever PoA, then set the aheadofprint history date
-        if poa_article.is_poa() is False and poa_article.was_ever_poa is True:
+        if poa_article.is_poa is False and poa_article.was_ever_poa is True:
             date_value_type = "epub"
             date_type = "aheadofprint"
             date = poa_article.get_date(date_value_type)

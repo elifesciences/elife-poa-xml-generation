@@ -420,6 +420,25 @@ def get_volume_from_xml(root, contrib_type = None):
 
     return volume
 
+def get_is_poa_from_xml(root, contrib_type = None):
+    """
+    Given an xml.etree.ElementTree.Element, get the
+    pub-date pub-type="collection"
+    if present then is_poa is false, if not present then is_poa is True
+    """
+    # Default value
+    is_poa = True
+    
+    # When parsing the file, use the presence of a
+    #   pub-date pub-type="collection"   as is_poa is False, other wise is_poa is True
+
+    for tag in root.findall('./front/article-meta/pub-date'):
+        pub_type = tag.get("pub-type")
+        if pub_type == "collection":
+            is_poa = False
+    
+    return is_poa
+
 def build_article_from_xml(article_xml_filename):
     """
     Parse NLM XML with ElementTree, and populate an
@@ -507,6 +526,8 @@ def build_article_from_xml(article_xml_filename):
     if volume:
         article.volume = volume
 
+    article.is_poa = get_is_poa_from_xml(root)
+
     return article,error_count
 
 
@@ -527,8 +548,10 @@ def build_articles_from_article_xmls(article_xmls):
 
 if __name__ == '__main__':
     
-    article_xlms = ["elife_poa_e02935.xml"
-                    ,"Feature.xml"
+    article_xlms = [#"elife_poa_e02935.xml"
+                    #,"Feature.xml"
+                    "elife_poa_e02923.xml"
+                    ,"elife00003.xml"
                     ]
     poa_articles = []
     

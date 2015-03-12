@@ -315,6 +315,9 @@ def build_article_for_article(article_id):
 	if not set_editor_info(article, article_id): error_count = error_count + 1
 	if not set_keywords(article, article_id): error_count = error_count + 1
 
+	# Building from CSV data it must be a POA type, set it
+	article.is_poa = True
+
 	print error_count
 
 	# default conflict text
