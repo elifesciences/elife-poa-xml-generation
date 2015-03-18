@@ -40,12 +40,12 @@ class crossrefXML(object):
         self.elife_crossmark_policy = "10.7554/eLife/crossmark_policy"
         self.elife_crossmark_domain = "www.elifesciences.org"
 
-        self.root.set('version', "4.3.2")
-        self.root.set('xmlns', 'http://www.crossref.org/schema/4.3.2')
+        self.root.set('version', "4.3.5")
+        self.root.set('xmlns', 'http://www.crossref.org/schema/4.3.5')
         self.root.set('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
         self.root.set('xmlns:fr', 'http://www.crossref.org/fundref.xsd')
         self.root.set('xmlns:ai', 'http://www.crossref.org/AccessIndicators.xsd')
-        self.root.set('xmlns:schemaLocation', 'http://www.crossref.org/schemas/crossref4.3.2.xsd')
+        self.root.set('xsi:schemaLocation', 'http://www.crossref.org/schema/4.3.5 http://www.crossref.org/schemas/crossref4.3.5.xsd')
         self.root.set('xmlns:mml', 'http://www.w3.org/1998/Math/MathML')
 
         # Publication date
@@ -79,7 +79,7 @@ class crossrefXML(object):
 
     def set_depositor(self, parent):
         self.depositor = SubElement(parent, 'depositor')
-        self.name = SubElement(self.depositor, 'name')
+        self.name = SubElement(self.depositor, 'depositor_name')
         self.name.text = self.elife_journal_title
         self.email_address = SubElement(self.depositor, 'email_address')
         self.email_address.text = self.elife_email_address
@@ -292,7 +292,10 @@ def build_crossref_xml_for_articles(article_xmls):
 
 if __name__ == '__main__':
     
-    article_xmls = ["generated_xml_output/elife_poa_e02935.xml"
+    article_xmls = ["generated_xml_output/elife_poa_e04871.xml",
+                    "generated_xml_output/elife_poa_e04872.xml",
+                    "generated_xml_output/elife_poa_e05224.xml",
+                    "generated_xml_output/elife_poa_e06179.xml"
                     ]
     
     build_crossref_xml_for_articles(article_xmls)
