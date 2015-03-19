@@ -86,7 +86,12 @@ class crossrefXML(object):
 
     def set_body(self, parent, poa_articles):
         self.body = SubElement(parent, 'body')
-        self.set_journal(self.body, poa_articles)
+        
+        for poa_article in poa_articles:
+            # Create a new journal record for each article
+            # Use a list of one for now
+            poa_article_list = [poa_article]
+            self.set_journal(self.body, poa_article_list)
         
     def get_pub_date(self, poa_article):
         """
@@ -109,7 +114,9 @@ class crossrefXML(object):
         
         #self.publication_date = self.set_date(self.journal_issue, poa_article, 'publication_date')
         
-        self.set_publication_date(self.journal_issue, self.pub_date)
+        # Get the issue date from the first article in the list when doing one article per issue
+        pub_date = self.get_pub_date(poa_articles[0])
+        self.set_publication_date(self.journal_issue, pub_date)
 
         self.journal_volume = SubElement(self.journal_issue, 'journal_volume')
         self.volume = SubElement(self.journal_volume, 'volume')
@@ -140,8 +147,8 @@ class crossrefXML(object):
             self.set_contributors(self.journal_article, poa_article, contrib_type)
         
         # Journal publication date
-        
-        self.set_publication_date(self.journal_article, self.get_pub_date(poa_article))
+        pub_date = self.get_pub_date(poa_article)
+        self.set_publication_date(self.journal_article, pub_date)
         
         self.publisher_item = SubElement(self.journal_article, 'publisher_item')
         self.identifier = SubElement(self.publisher_item, 'identifier')
