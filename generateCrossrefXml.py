@@ -88,6 +88,19 @@ class crossrefXML(object):
         self.body = SubElement(parent, 'body')
         self.set_journal(self.body, poa_articles)
         
+    def get_pub_date(self, poa_article):
+        """
+        For using in XML generation, use the article pub date
+        or by default use the run time pub date
+        """
+        pub_date = None
+        try:
+            pub_date = poa_article.get_date("pub").date
+        except:
+            # Default use the run time date
+            pub_date = self.pub_date
+        return pub_date
+        
     def set_journal(self, parent, poa_articles):
         self.journal = SubElement(parent, 'journal')
         self.set_journal_metadata(self.journal)
@@ -127,7 +140,8 @@ class crossrefXML(object):
             self.set_contributors(self.journal_article, poa_article, contrib_type)
         
         # Journal publication date
-        self.set_publication_date(self.journal_article, self.pub_date)
+        
+        self.set_publication_date(self.journal_article, self.get_pub_date(poa_article))
         
         self.publisher_item = SubElement(self.journal_article, 'publisher_item')
         self.identifier = SubElement(self.publisher_item, 'identifier')
@@ -253,11 +267,11 @@ class crossrefXML(object):
             self.publication_date = SubElement(parent, 'publication_date')
             self.publication_date.set("media_type", "online")
             month = SubElement(self.publication_date, "month")
-            month.text = str(self.pub_date.tm_mon).zfill(2)
+            month.text = str(pub_date.tm_mon).zfill(2)
             day = SubElement(self.publication_date, "day")
-            day.text = str(self.pub_date.tm_mday).zfill(2)
+            day.text = str(pub_date.tm_mday).zfill(2)
             year = SubElement(self.publication_date, "year")
-            year.text = str(self.pub_date.tm_year)
+            year.text = str(pub_date.tm_year)
 
     def printXML(self):
         print self.root
@@ -271,14 +285,12 @@ class crossrefXML(object):
         #return reparsed.toprettyxml(indent="\t", encoding = encoding)
         return reparsed.toxml(encoding = encoding)
 
-def build_crossref_xml_for_articles(article_xmls):
+def build_crossref_xml_for_articles(poa_articles):
     """
-    Given a list of article XML filenames, convert to article objects,
+    Given a list of article article objects,
     and then generate crossref XML from them
     """
-    
-    poa_articles = build_articles_from_article_xmls(article_xmls)
-    
+
     # test the XML generator 
     eXML = crossrefXML(poa_articles)
     prettyXML = eXML.prettyXML()
@@ -298,7 +310,19 @@ if __name__ == '__main__':
                     "generated_xml_output/elife_poa_e06179.xml"
                     ]
     
-    build_crossref_xml_for_articles(article_xmls)
+    poa_articles = build_articles_from_article_xmls(article_xmls)
+    
+    # Extra sample data for testing
+    for article in poa_articles:
+        if article.doi == '10.7554/eLife.04871':
+            # Pretend it is v2 POA, which will have a pub date
+            date = datetime.datetime(2015, 2, 3)
+            pub_date = date.timetuple()
+            pub_type = "pub"
+            date_instance = eLifeDate(pub_type, pub_date)
+            article.add_date(date_instance)
+    
+    build_crossref_xml_for_articles(poa_articles)
 
 
 
