@@ -95,6 +95,22 @@ class pubMedPoaXML(object):
             pub_type = "aheadofprint"
         return pub_type
 
+    def get_has_date(self, poa_article, date_type):
+        """
+        Given an article object, determine whether the
+        date of type date_type's date object exists
+        Useful in generating Replaces tag for POA articles
+        """
+        
+        has_date = None
+        try:
+            poa_article.get_date(date_type).date
+            has_date = True
+        except:
+            has_date = False
+            
+        return has_date
+
     def set_journal(self, parent, poa_article):
         self.journal = SubElement(parent, "Journal")
         
@@ -134,8 +150,9 @@ class pubMedPoaXML(object):
         """
         Set the Replaces tag, if applicable
         """
-        # If the article is VoR and is was ever PoA
-        if poa_article.is_poa is False and poa_article.was_ever_poa is True:
+            
+        if ((poa_article.is_poa is False and poa_article.was_ever_poa is True)
+            or (poa_article.is_poa is True and self.get_has_date(poa_article, "pub") is True)):
             self.replaces = SubElement(parent, 'Replaces')
             self.replaces.set("IdType", "doi")
             self.replaces.text = poa_article.doi
