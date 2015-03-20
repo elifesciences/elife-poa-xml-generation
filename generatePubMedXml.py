@@ -95,6 +95,22 @@ class pubMedPoaXML(object):
             pub_type = "aheadofprint"
         return pub_type
 
+    def get_has_date(self, poa_article, date_type):
+        """
+        Given an article object, determine whether the
+        date of type date_type's date object exists
+        Useful in generating Replaces tag for POA articles
+        """
+        
+        has_date = None
+        try:
+            poa_article.get_date(date_type).date
+            has_date = True
+        except:
+            has_date = False
+            
+        return has_date
+
     def set_journal(self, parent, poa_article):
         self.journal = SubElement(parent, "Journal")
         
@@ -122,15 +138,21 @@ class pubMedPoaXML(object):
         if pub_type == "epublish":
             a_date = poa_article.get_date("pub").date
         else:
-            a_date = self.pub_date
+            # POA type, use the pub date if it is set, for when processing version 2, version 3, etc.
+            try:
+                a_date = poa_article.get_date("pub").date
+            except:
+                # Default use the run time date
+                a_date = self.pub_date
         self.set_pub_date(self.journal, a_date, pub_type)
 
     def set_replaces(self, parent, poa_article):
         """
         Set the Replaces tag, if applicable
         """
-        # If the article is VoR and is was ever PoA
-        if poa_article.is_poa is False and poa_article.was_ever_poa is True:
+            
+        if ((poa_article.is_poa is False and poa_article.was_ever_poa is True)
+            or (poa_article.is_poa is True and self.get_has_date(poa_article, "pub") is True)):
             self.replaces = SubElement(parent, 'Replaces')
             self.replaces.set("IdType", "doi")
             self.replaces.text = poa_article.doi
@@ -437,6 +459,8 @@ if __name__ == '__main__':
                     ,"generated_xml_output/elife04105.xml"
                     ,"generated_xml_output/elife04180.xml"
                     ,"generated_xml_output/elife04586.xml"
+                    ,"generated_xml_output/elife_poa_e00662.xml"
+                    ,"generated_xml_output/elife_poa_e02923.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
@@ -448,6 +472,13 @@ if __name__ == '__main__':
             or article.doi == '10.7554/eLife.03401'
             or article.doi == '10.7554/eLife.02935'):
             article.was_ever_poa = True
+        if article.doi == '10.7554/eLife.00662':
+            # Pretend it is v2 POA, which will have a pub date
+            date = datetime.datetime(2015, 2, 3)
+            pub_date = date.timetuple()
+            pub_type = "pub"
+            date_instance = eLifeDate(pub_type, pub_date)
+            article.add_date(date_instance)
     
     build_pubmed_xml_for_articles(poa_articles)
 
