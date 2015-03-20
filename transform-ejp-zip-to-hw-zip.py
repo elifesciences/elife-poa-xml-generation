@@ -16,7 +16,8 @@ from git import *
 import settings
 import os
 import shutil
-from decapitatePDF import decapitate_pdf_with_error_check
+#from decapitatePDF import decapitate_pdf_with_error_check
+from decapitatePDF2 import decapitate_pdf_with_error_check
 
 """
 open the zip file from EJP,
