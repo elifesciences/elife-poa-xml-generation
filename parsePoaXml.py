@@ -209,8 +209,8 @@ def get_contributor_from_contrib_group(root, affs, raw = False):
     for tag in root.findall('./collab'):
         collab = tag.text
     
-    for tag in root.findall('./uri'):
-        if tag.get("content-type") == "orcid":
+    for tag in root.findall('./contrib-id'):
+        if tag.get("contrib-id-type") == "orcid":
             orcid = tag.text
     
     for tag in root.findall('./contrib-id'):
