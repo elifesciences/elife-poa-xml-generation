@@ -265,6 +265,11 @@ class crossrefXML(object):
                 self.surname = SubElement(self.person_name, "surname")
                 self.surname.text = contributor.surname
     
+                if contributor.orcid:
+                    self.orcid = SubElement(self.person_name, "ORCID")
+                    self.orcid.set("authenticated", "true")
+                    self.orcid.text = contributor.orcid
+    
             # Reset sequence value after the first sucessful loop
             sequence = "additional"
 
@@ -314,7 +319,8 @@ if __name__ == '__main__':
     article_xmls = ["generated_xml_output/elife_poa_e04871.xml",
                     "generated_xml_output/elife_poa_e04872.xml",
                     "generated_xml_output/elife_poa_e05224.xml",
-                    "generated_xml_output/elife_poa_e06179.xml"
+                    "generated_xml_output/elife_poa_e06179.xml",
+                    "generated_xml_output/elife02619.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
