@@ -618,6 +618,32 @@ class eLifeFundingAward():
         # Alias for award_id parsed from the XML
         return self.award_id
 
+class eLifeRef():
+    """
+    A ref or citation in the article to support crossref VOR deposits initially
+    """
+    def __init__(self):
+        self.publication_type = None
+        self.authors = []
+        # For journals
+        self.article_title = None
+        self.source = None
+        self.volume = None
+        self.fpage = None
+        self.lpage = None
+        self.doi = None
+        self.year = None
+        # For books
+        self.volume_title = None
+
+    def add_author(self, author):
+        # Author is a dict of values
+        self.authors.append(author)
+        
+    def get_journal_title(self):
+        # Alias for source
+        return self.source
+
 class eLifePOA():
     """
     We include some boiler plate in the init, namely articleType
@@ -640,6 +666,7 @@ class eLifePOA():
         self.ethics = []
         self.author_keywords = []
         self.funding_awards = []
+        self.ref_list = []
         # For PubMed function a hook to specify if article was ever through PoA pipeline
         self.was_ever_poa = None
         self.is_poa = None

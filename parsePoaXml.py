@@ -432,6 +432,65 @@ def get_funding_awards_from_xml(root):
 
     return funding_awards
 
+def get_ref_list_from_xml(root):
+    """
+    Given an xml.etree.ElementTree.Element, get the
+    ref-list ref
+    """
+    ref_list = []
+
+    for ref_tag in root.findall('./back/ref-list/ref'):
+        ref = eLifeRef()
+        
+        # Publcation Type
+        for citation_tag in ref_tag.findall('./element-citation'):
+            if citation_tag.get("publication-type"):
+                ref.publication_type = citation_tag.get("publication-type")
+                
+        # Article title
+        for tag in citation_tag.findall('./article-title'):
+            ref.article_title = tag.text
+                
+        # Source
+        for tag in citation_tag.findall('./source'):
+            ref.source = tag.text
+            
+        # Volume
+        for tag in citation_tag.findall('./volume'):
+            ref.volume = tag.text
+            
+        # First page
+        for tag in citation_tag.findall('./fpage'):
+            ref.fpage = tag.text
+            
+        # Last page
+        for tag in citation_tag.findall('./lpage'):
+            ref.lpage = tag.text
+            
+        # DOI
+        for pub_id_tag in citation_tag.findall('./pub-id'):
+            if pub_id_tag.get("pub-id-type") == "doi":
+                ref.doi = pub_id_tag.text
+            
+        # Year
+        for tag in citation_tag.findall('./year'):
+            ref.year = tag.text
+
+        # Authors
+        for person_group_tag in citation_tag.findall('./person-group'):
+            if person_group_tag.get("person-group-type") == "author":
+                for name_tag in person_group_tag.findall('./name'):
+                    author = {}
+                    for surname_tag in name_tag.findall('./surname'): 
+                        author["surname"] = surname_tag.text
+                    for given_names_tag in name_tag.findall('./given-names'): 
+                        author["given_names"] = given_names_tag.text
+                    ref.add_author(author)
+        
+        ref_list.append(ref)
+
+    return ref_list
+
 def get_volume_from_xml(root, contrib_type = None):
     """
     Given an xml.etree.ElementTree.Element, get the
@@ -522,6 +581,10 @@ def build_article_from_xml(article_xml_filename):
     # funding awards
     funding_awards = get_funding_awards_from_xml(root)
     article.funding_awards = funding_awards
+    
+    # references or citations
+    ref_list = get_ref_list_from_xml(root)
+    article.ref_list = ref_list
     
     # history
     history_dates = get_history_from_xml(root)

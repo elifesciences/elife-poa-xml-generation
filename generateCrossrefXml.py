@@ -166,6 +166,8 @@ class crossrefXML(object):
         
         self.set_doi_data(self.journal_article, poa_article)
         
+        self.set_citation_list(self.journal_article, poa_article)
+        
     def set_titles(self, parent, poa_article):
         """
         Set the titles and title tags allowing sub tags within title
@@ -312,7 +314,46 @@ class crossrefXML(object):
                     for award_id in award.award_ids:
                         self.fr_award_number = SubElement(self.fr_fundgroup, 'fr:assertion')
                         self.fr_award_number.set("name", "award_number")
-                        self.fr_award_number.text = award_id               
+                        self.fr_award_number.text = award_id
+                        
+    def set_citation_list(self, parent, poa_article):
+        """
+        Set the citation_list from the author object ref_list objects
+        """
+        if len(poa_article.ref_list) > 0:
+            self.citation_list = SubElement(parent, 'citation_list')
+            ref_index = 0
+            for ref in poa_article.ref_list:
+                # Increment
+                ref_index = ref_index + 1
+                self.citation = SubElement(self.citation_list, 'citation')
+                self.citation.set("key", str(ref_index))
+                
+                if ref.get_journal_title():
+                    self.journal_title = SubElement(self.citation, 'journal_title')
+                    self.journal_title.text = ref.get_journal_title()
+                
+                # Only set the first author surname
+                if len(ref.authors) > 0:
+                    author_surname = ref.authors[0]["surname"]
+                    self.author = SubElement(self.citation, 'author')
+                    self.author.text = author_surname
+                    
+                if ref.volume:
+                    self.volume = SubElement(self.citation, 'volume')
+                    self.volume.text = ref.volume
+                    
+                if ref.fpage:
+                    self.first_page = SubElement(self.citation, 'first_page')
+                    self.first_page.text = ref.fpage
+                    
+                if ref.year:
+                    self.cyear = SubElement(self.citation, 'cYear')
+                    self.cyear.text = ref.year
+                    
+                if ref.doi:
+                    self.doi = SubElement(self.citation, 'doi')
+                    self.doi.text = ref.doi
 
     def printXML(self):
         print self.root
@@ -350,7 +391,8 @@ if __name__ == '__main__':
                     "generated_xml_output/elife_poa_e05224.xml",
                     "generated_xml_output/elife_poa_e06179.xml",
                     "generated_xml_output/elife02619.xml",
-                    "generated_xml_output/elife02676.xml"
+                    "generated_xml_output/elife02676.xml",
+                    "generated_xml_output/elife01856.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
