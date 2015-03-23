@@ -591,6 +591,33 @@ class eLifeLicense():
             self.p1 = "This is an open-access article, free of all copyright, and may be freely reproduced, distributed, transmitted, modified, built upon, or otherwise used by anyone for any lawful purpose. The work is made available under the "
             self.p2 = " public domain dedication."
 
+class eLifeFundingAward():
+    """
+    An award group as part of a funding group
+    """
+    def __init__(self):
+        self.award_ids = []
+        self.institution_name = None
+        self.institution_id = None
+
+    def add_award_id(self, award_id):
+        self.award_ids.append(award_id)
+
+    def get_funder_identifier(self):
+        # Funder identifier is the unique id found in the institution_id DOI
+        try:
+            return self.institution_id.split('/')[-1]
+        except:
+            return None
+
+    def get_funder_name(self):
+        # Alias for institution_name parsed from the XML
+        return self.institution_name
+        
+    def get_award_number(self):
+        # Alias for award_id parsed from the XML
+        return self.award_id
+
 class eLifePOA():
     """
     We include some boiler plate in the init, namely articleType
@@ -612,6 +639,7 @@ class eLifePOA():
         self.conflict_default = None
         self.ethics = []
         self.author_keywords = []
+        self.funding_awards = []
         # For PubMed function a hook to specify if article was ever through PoA pipeline
         self.was_ever_poa = None
         self.is_poa = None

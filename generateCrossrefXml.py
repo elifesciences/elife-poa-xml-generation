@@ -162,6 +162,8 @@ class crossrefXML(object):
         #self.archive = SubElement(self.archive_locations, 'archive')
         #self.archive.set("name", "CLOCKSS")
         
+        self.set_fundref(self.journal_article, poa_article)
+        
         self.set_doi_data(self.journal_article, poa_article)
         
     def set_titles(self, parent, poa_article):
@@ -285,6 +287,33 @@ class crossrefXML(object):
             year = SubElement(self.publication_date, "year")
             year.text = str(pub_date.tm_year)
 
+    def set_fundref(self, parent, poa_article):
+        """
+        Set the fundref data from the article funding_awards list
+        """
+        if len(poa_article.funding_awards) > 0:
+            self.fr_program = SubElement(parent, 'fr:program')
+            self.fr_program.set("name", "fundref")
+            for award in poa_article.funding_awards:
+                self.fr_fundgroup = SubElement(self.fr_program, 'fr:assertion')
+                self.fr_fundgroup.set("name", "fundgroup")
+                
+                if award.get_funder_name():
+                    self.fr_funder_name = SubElement(self.fr_fundgroup, 'fr:assertion')
+                    self.fr_funder_name.set("name", "funder_name")
+                    self.fr_funder_name.text = award.get_funder_name()
+                    
+                if award.get_funder_name() and award.get_funder_identifier():
+                    self.fr_funder_identifier = SubElement(self.fr_funder_name, 'fr:assertion')
+                    self.fr_funder_identifier.set("name", "funder_identifier")
+                    self.fr_funder_identifier.text = award.get_funder_identifier()
+                
+                if len(award.award_ids) > 0:
+                    for award_id in award.award_ids:
+                        self.fr_award_number = SubElement(self.fr_fundgroup, 'fr:assertion')
+                        self.fr_award_number.set("name", "award_number")
+                        self.fr_award_number.text = award_id               
+
     def printXML(self):
         print self.root
 
@@ -320,7 +349,8 @@ if __name__ == '__main__':
                     "generated_xml_output/elife_poa_e04872.xml",
                     "generated_xml_output/elife_poa_e05224.xml",
                     "generated_xml_output/elife_poa_e06179.xml",
-                    "generated_xml_output/elife02619.xml"
+                    "generated_xml_output/elife02619.xml",
+                    "generated_xml_output/elife02676.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)

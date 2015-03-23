@@ -407,6 +407,31 @@ def get_keyword_groups_from_xml(root, kwd_group_type = None):
 
     return keyword_groups
 
+def get_funding_awards_from_xml(root):
+    """
+    Given an xml.etree.ElementTree.Element, get the
+    award-group funding-source etc.
+    from the funding-group
+    """
+    funding_awards = []
+
+    for tag in root.findall('./front/article-meta/funding-group/award-group'):
+        award = eLifeFundingAward()
+        
+        for id_tag in tag.findall('./funding-source/institution-wrap/institution-id'):
+            if id_tag.get("institution-id-type") == "FundRef":
+                award.institution_id = id_tag.text
+        
+        for institution_tag in tag.findall('./funding-source/institution-wrap/institution'):
+            award.institution_name = institution_tag.text
+            
+        for award_id_tag in tag.findall('./award-id'):
+            award.add_award_id(award_id_tag.text)
+        
+        funding_awards.append(award)
+
+    return funding_awards
+
 def get_volume_from_xml(root, contrib_type = None):
     """
     Given an xml.etree.ElementTree.Element, get the
@@ -494,6 +519,11 @@ def build_article_from_xml(article_xml_filename):
     research_organisms = get_keyword_groups_from_xml(root, kwd_group_type = "research-organism")
     article.research_organisms = research_organisms
     
+    # funding awards
+    funding_awards = get_funding_awards_from_xml(root)
+    article.funding_awards = funding_awards
+    
+    # history
     history_dates = get_history_from_xml(root)
     
     date_types = ["received", "accepted"]
@@ -552,6 +582,7 @@ if __name__ == '__main__':
                     #,"Feature.xml"
                     "elife_poa_e02923.xml"
                     ,"elife00003.xml"
+                    ,"elife02676.xml"
                     ]
     poa_articles = []
     
