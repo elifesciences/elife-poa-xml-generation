@@ -20,7 +20,9 @@ def decapitate_pdf_with_error_check(pdf_in, pdf_out):
 
     stderr = f.stderr.read()
     stdout = f.stdout.read()
-    
+
+    # subprocess.Popen doesn't interleave pipe output,
+    # so neither will these log messages
     map(logger.info, stdout.splitlines())
     map(logger.error, stderr.splitlines())
 
@@ -32,5 +34,11 @@ if __name__ == '__main__':
     if len(args) < 2:
         print 'Usage: decapitatePDF2.py <pdf-in> <pdf-out>'
         exit(1)
+    
+    h2 = logging.StreamHandler()
+    h2.setLevel(logging.DEBUG)
+    h2.setFormatter(FORMAT)
+    logger.addHandler(h2)
+    
     pin, pout = args[:2]
     decapitate_pdf_with_error_check(pin, pout)
