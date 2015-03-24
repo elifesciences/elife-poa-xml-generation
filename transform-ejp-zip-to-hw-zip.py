@@ -58,6 +58,7 @@ input_dir = settings.EJP_INPUT_DIR
 output_dir = settings.STAGING_TO_HW_DIR
 hw_ftp_dir = settings.FTP_TO_HW_DIR
 tmp_dir = settings.TMP_DIR
+decap_dir = settings.STAGING_DECAPITATE_PDF_DIR
 
 class manifestXML(object):
 
@@ -372,9 +373,9 @@ def copy_pdf_to_hw_staging_dir(file_title_map, output_dir, doi, current_zipfile)
 			temp_file.write(file)
 			temp_file.close()
 
-	if decapitate_pdf_with_error_check(decap_name_plus_path, "./" + settings.STAGING_DECAPITATE_PDF_DIR + "/"):
+	if decapitate_pdf_with_error_check(decap_name_plus_path, decap_dir + "/"):
 		# pass the local file path, and teh path to a temp dir, to the decapiation script
-		move_file = open("./" + settings.STAGING_DECAPITATE_PDF_DIR + "/" + decap_name, "rb").read()
+		move_file = open(decap_dir + "/" + decap_name, "rb").read()
 		out_handler = open(output_dir + "/" + new_name, "wb")
 		out_handler.write(move_file)
 		out_handler.close()
