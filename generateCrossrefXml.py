@@ -168,6 +168,8 @@ class crossrefXML(object):
         
         self.set_citation_list(self.journal_article, poa_article)
         
+        self.set_component_list(self.journal_article, poa_article)
+        
     def set_titles(self, parent, poa_article):
         """
         Set the titles and title tags allowing sub tags within title
@@ -318,7 +320,7 @@ class crossrefXML(object):
                         
     def set_citation_list(self, parent, poa_article):
         """
-        Set the citation_list from the author object ref_list objects
+        Set the citation_list from the article object ref_list objects
         """
         if len(poa_article.ref_list) > 0:
             self.citation_list = SubElement(parent, 'citation_list')
@@ -354,6 +356,55 @@ class crossrefXML(object):
                 if ref.doi:
                     self.doi = SubElement(self.citation, 'doi')
                     self.doi.text = ref.doi
+
+    def set_component_list(self, parent, poa_article):
+        """
+        Set the component_list from the article object component_list objects
+        """
+        if len(poa_article.component_list) <= 0:
+            return
+
+        self.component_list = SubElement(parent, 'component_list')
+        for comp in poa_article.component_list:
+            self.component = SubElement(self.component_list, 'component')
+            self.component.set("parent_relation", "isPartOf")
+            
+            self.titles = SubElement(self.component, 'titles')
+            
+            self.title = SubElement(self.titles, 'title')
+            self.title.text = comp.title
+            
+            if comp.subtitle:
+                self.set_subtitle(self.titles, comp)
+            
+            if comp.mime_type:
+                self.format = SubElement(self.component, 'format')
+                self.format.set("mime_type", comp.mime_type)
+                
+            if comp.doi:
+                self.doi_data = SubElement(self.component, 'doi_data')
+                self.doi_tag = SubElement(self.doi_data, 'doi')
+                self.doi_tag.text = comp.doi
+                if comp.doi_resource:
+                    self.resource = SubElement(self.doi_data, 'resource')
+                    self.resource.text = comp.doi_resource
+  
+    def set_subtitle(self, parent, component):
+        tag_name = 'subtitle'
+        # Use <i> tags, not <italic> tags, <b> tags not <bold>
+        if component.subtitle:
+            tag_converted_string = replace_tags(component.subtitle, 'italic', 'i')
+            tag_converted_string = replace_tags(tag_converted_string, 'bold', 'b')
+            tag_converted_string = escape_unmatched_angle_brackets(tag_converted_string)
+            tagged_string = '<' + tag_name + '>' + tag_converted_string + '</' + tag_name + '>'
+            reparsed = minidom.parseString(tagged_string)
+
+            root_xml_element = append_minidom_xml_to_elementtree_xml(
+                parent, reparsed
+            )
+        else:
+            # Empty
+            self.subtitle = SubElement(parent, tag_name)
 
     def printXML(self):
         print self.root
@@ -392,7 +443,8 @@ if __name__ == '__main__':
                     "generated_xml_output/elife_poa_e06179.xml",
                     "generated_xml_output/elife02619.xml",
                     "generated_xml_output/elife02676.xml",
-                    "generated_xml_output/elife01856.xml"
+                    "generated_xml_output/elife01856.xml",
+                    "generated_xml_output/elife00178.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)

@@ -491,6 +491,89 @@ def get_ref_list_from_xml(root):
 
     return ref_list
 
+def get_component_list_from_xml(root, raw = False):
+    """
+    Given an xml.etree.ElementTree.Element,
+    look for object-id of type DOI that is a component DOI
+    then its parent tag to get some more details
+    """
+    component_list = []
+    
+    # TODO!!!
+    #  Find object-tags inside abstracts, they do not seem to match
+    
+    # Look for the parent tag of any object-id tag
+    for parent_tag in root.findall('.//object-id/..'):
+        component = eLifeComponent()
+        
+        for doi_tag in parent_tag.findall('./object-id'):
+            doi = doi_tag.text
+        
+        component.doi = doi
+        
+        # Depending on the type of parent tag, extract different content
+        if parent_tag.tag == 'table-wrap':
+            # TODO!!!
+            pass
+        elif parent_tag.tag == 'supplementary-material':
+            # TODO!!!
+            pass   
+        elif parent_tag.tag == 'fig':
+            # Figures
+            
+            # Title is the label text plus the title text
+            # Title may contain italic tag, etc.
+            label_text = u''
+            title_text = u''
+            
+            for label_tag in parent_tag.findall('./label'):
+                label_text = label_tag.text
+                
+            for title_tag in parent_tag.findall('./caption/title'):
+                # TODO!!! Parse italic tags
+                title_text = title_tag.text
+                
+            component.title = unicode(label_text) + ' ' + unicode(title_text)
+                
+            if not raw:
+                for subtitle_tag in parent_tag.findall('./caption/p[1]'):
+                    # Remove nested xref tags but leave the text inside
+                    for xref_tag in subtitle_tag.findall('./xref'):
+                        # Two step process
+                        # One, remove all attributes of the xref tag
+                        # Two (later) remove empty xref tags from the converted string
+                        for attr in xref_tag.keys():
+                            xref_tag.set(attr, None)
+                    
+                    # Convert to string
+                    subtitle = convert_element_to_string(subtitle_tag, u'').encode('utf-8')
+                    
+                    # Remove empty tags we do not want
+                    subtitle = subtitle.replace('<xref>', '')
+                    subtitle = subtitle.replace('</xref>', '')
+                    
+                    component.subtitle = subtitle
+            
+            # Mime type
+            for graphic_tag in parent_tag.findall('./graphic'):
+                # There is a graphic tag, set as tiff
+                component.mime_type = 'image/tiff'
+            for media_tag in parent_tag.findall('./media'):
+                # There is a media tag i.e. video
+                # TODO!!!
+                pass
+        
+        for doi_link_tag in parent_tag.findall('.//ext-link'):
+            if doi_link_tag.get('ext-link-type') == 'doi':
+                doi_resource = doi_link_tag.text
+                component.doi_resource = doi_resource
+        
+        # Append it to our list of components
+        component_list.append(component)
+
+    return component_list
+
+
 def get_volume_from_xml(root, contrib_type = None):
     """
     Given an xml.etree.ElementTree.Element, get the
@@ -585,6 +668,10 @@ def build_article_from_xml(article_xml_filename):
     # references or citations
     ref_list = get_ref_list_from_xml(root)
     article.ref_list = ref_list
+    
+    # components with component DOI
+    component_list = get_component_list_from_xml(root)
+    article.component_list = component_list
     
     # history
     history_dates = get_history_from_xml(root)

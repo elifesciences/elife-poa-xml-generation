@@ -644,6 +644,17 @@ class eLifeRef():
         # Alias for source
         return self.source
 
+class eLifeComponent():
+    """
+    An article component with a component DOI, primarily for crossref VOR deposits
+    """
+    def __init__(self):
+        self.title = None
+        self.subtitle = None
+        self.mime_type = None
+        self.doi = None
+        self.doi_resource = None
+
 class eLifePOA():
     """
     We include some boiler plate in the init, namely articleType
@@ -667,6 +678,7 @@ class eLifePOA():
         self.author_keywords = []
         self.funding_awards = []
         self.ref_list = []
+        self.component_list = []
         # For PubMed function a hook to specify if article was ever through PoA pipeline
         self.was_ever_poa = None
         self.is_poa = None
@@ -797,6 +809,8 @@ def escape_unmatched_angle_brackets(s):
     """
     allowed_tags = ['<i>','</i>',
                     '<italic>','</italic>',
+                    '<b>','</b>',
+                    '<bold>','</bold>',
                     '<sup>','</sup>',
                     '<sub>','</sub>']
     
