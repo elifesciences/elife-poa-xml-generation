@@ -96,7 +96,7 @@ def get_article_id_from_xml(root, pub_id_type = "publisher-id"):
     for tag in root.findall('./front/article-meta/article-id'):
         if tag.get("pub-id-type") == "publisher-id":
             #print "article_id: " + tag.text
-            article_id = int(tag.text)
+            article_id = tag.text
         elif tag.get("pub-id-type") == "doi":
             #print "doi: " + tag.text
             article_id = tag.text
