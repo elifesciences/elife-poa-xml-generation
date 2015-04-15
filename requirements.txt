@@ -1,0 +1,5 @@
+GitPython==0.3.2.1
+xlrd==0.9.3
+requests==2.5.3
+elementtree
+PyPDF2==1.20
