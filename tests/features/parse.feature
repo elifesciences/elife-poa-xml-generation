@@ -23,5 +23,8 @@ Feature: Parse article XML
     
   Examples:
     | document              | attribute      | value  
-    | elife00013.xml        | doi            | 10.7554/eLife.00013 
+    | elife00013.xml        | doi            | 10.7554/eLife.00013
+    | elife00013.xml        | manuscript     | 00013 
     | elife_poa_e06828.xml  | doi            | 10.7554/eLife.06828 
+    | elife_poa_e06828.xml  | manuscript     | 06828
+    

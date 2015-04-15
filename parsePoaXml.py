@@ -94,12 +94,10 @@ def get_article_id_from_xml(root, pub_id_type = "publisher-id"):
     """
     article_id = None
     for tag in root.findall('./front/article-meta/article-id'):
-        if tag.get("pub-id-type") == "publisher-id":
+        if tag.get("pub-id-type") == pub_id_type:
             #print "article_id: " + tag.text
             article_id = tag.text
-        elif tag.get("pub-id-type") == "doi":
-            #print "doi: " + tag.text
-            article_id = tag.text
+            
     return article_id
 
 def get_title_from_xml(root):
@@ -451,12 +449,15 @@ def build_article_from_xml(article_xml_filename):
     tree = ElementTree.parse(article_xml_filename)
     root = tree.getroot()
 
-    # Get DOI and article_id
-    article_id = get_article_id_from_xml(root, "publisher-id")
+    # Get DOI
     doi = get_article_id_from_xml(root, "doi")
     
     # Create the article object
     article = eLifePOA(doi, title=None)
+    
+    # Get publisher_id and set object manuscript value
+    publisher_id = get_article_id_from_xml(root, "publisher-id")
+    article.manuscript = publisher_id
     
     # Set the articleType
     article_type = get_article_type_from_xml(root)
