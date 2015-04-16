@@ -42,7 +42,7 @@ def i_have_the_attribute(step, attribute):
 def i_set_the_object_to_the_article(step):
     world.object = world.article
     assert world.object is not None, \
-        "Got contributor %s" % world.object
+        "Got article %s" % world.object
 
 @step(u'I set the object to article contributor index (.*)')
 def i_set_the_object_to_article_contributor_index(step, index):
@@ -55,26 +55,29 @@ def i_set_the_object_to_article_license_index(step, index):
     # Index is ignored
     world.object = world.article.license
     assert world.object is not None, \
-        "Got contributor %s" % world.object
+        "Got license object %s" % world.object
     
 @step(u'I set the object to article article_categories index (.*)')
 def i_set_the_object_to_article_article_categories_index(step, index):
     world.object = world.article.article_categories[int(index)]
     assert world.object is not None, \
-        "Got contributor %s" % world.object
+        "Got article_categories object %s" % world.object
     
 @step(u'I set the object to article author_keywords index (.*)')
 def i_set_the_object_to_article_author_keywords_index(step, index):
     world.object = world.article.author_keywords[int(index)]
     assert world.object is not None, \
-        "Got contributor %s" % world.object 
+        "Got author_keywords object %s" % world.object 
     
 @step(u'I set the object to article research_organisms index (.*)')
 def i_set_the_object_to_article_research_organisms_index(step, index):
     world.object = world.article.research_organisms[int(index)]
     assert world.object is not None, \
-        "Got contributor %s" % world.object
+        "Got research_organisms object %s" % world.object
     
+@step(u'I set the object to article date type (\S+)')
+def i_set_the_object_to_article_date_type(step, type):
+    world.object = world.article.get_date(type)
 
 
 @step(u'I have object attribute value (.*)')
@@ -91,6 +94,27 @@ def i_have_object_attribute_value(step, value):
     else:
         object_value = world.object
         
+    assert value == object_value, \
+        "Got object value %s" % object_value
+
+@step(u'I have date object attribute value (\S+)')
+def i_have_date_object_attribute_value_value(step, value):
+    if value == "None":
+        value = None
+    else:
+        value = int(value)
+    
+    # Parse eLifeDate object to values
+    if world.object:
+        if world.attribute == "day":
+            object_value = int(time.strftime("%d", world.object.date))
+        elif world.attribute == "month":
+            object_value = int(time.strftime("%m", world.object.date))
+        elif world.attribute == "year":
+            object_value = int(time.strftime("%Y", world.object.date))
+    else:
+        object_value = None
+    
     assert value == object_value, \
         "Got object value %s" % object_value
 

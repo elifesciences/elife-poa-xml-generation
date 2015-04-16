@@ -106,6 +106,53 @@ Feature: Parse article XML
     | elife02935.xml        | contributor        | 53      | contrib_type   | author non-byline
     | elife02935.xml        | contributor        | 53      | surname        | Provenzano
 
-# TODO!!!
-# history_dates
-# pub_dates
+  Scenario: Parse article XML file dates
+    Given I have the document <document>
+    When I build article from xml
+    And I set the object to article date type <date_type>
+    And I have the attribute <attribute>
+    Then I have date object attribute value <value>
+
+  Examples:
+    | document              | date_type  | attribute      | value
+    | elife00013.xml        | accepted   | day            | 18
+    | elife00013.xml        | accepted   | month          | 7
+    | elife00013.xml        | accepted   | year           | 2012
+    | elife00013.xml        | received   | day            | 22
+    | elife00013.xml        | received   | month          | 5
+    | elife00013.xml        | received   | year           | 2012
+    | elife00013.xml        | pub        | day            | 15
+    | elife00013.xml        | pub        | month          | 10
+    | elife00013.xml        | pub        | year           | 2012
+    
+    | elife_poa_e06828.xml  | accepted   | day            | 1
+    | elife_poa_e06828.xml  | accepted   | month          | 4
+    | elife_poa_e06828.xml  | accepted   | year           | 2015
+    | elife_poa_e06828.xml  | received   | day            | 3
+    | elife_poa_e06828.xml  | received   | month          | 2
+    | elife_poa_e06828.xml  | received   | year           | 2015
+    | elife_poa_e06828.xml  | pub        | day            | None
+    | elife_poa_e06828.xml  | pub        | month          | None
+    | elife_poa_e06828.xml  | pub        | year           | None
+    
+    | elife_poa_e02923.xml  | accepted   | day            | 7
+    | elife_poa_e02923.xml  | accepted   | month          | 1
+    | elife_poa_e02923.xml  | accepted   | year           | 2015
+    | elife_poa_e02923.xml  | received   | day            | 27
+    | elife_poa_e02923.xml  | received   | month          | 3
+    | elife_poa_e02923.xml  | received   | year           | 2014
+    | elife_poa_e02923.xml  | pub        | day            | None
+    | elife_poa_e02923.xml  | pub        | month          | None
+    | elife_poa_e02923.xml  | pub        | year           | None
+
+    | elife02935.xml        | accepted   | day            | 26
+    | elife02935.xml        | accepted   | month          | 9
+    | elife02935.xml        | accepted   | year           | 2014
+    | elife02935.xml        | received   | day            | 28
+    | elife02935.xml        | received   | month          | 3
+    | elife02935.xml        | received   | year           | 2014
+    | elife02935.xml        | pub        | day            | 1
+    | elife02935.xml        | pub        | month          | 10
+    | elife02935.xml        | pub        | year           | 2014
+    
+
