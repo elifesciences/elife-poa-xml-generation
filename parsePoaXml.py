@@ -108,7 +108,7 @@ def get_title_from_xml(root):
     title = None
     for tag in root.findall('./front/article-meta/title-group/article-title'):
         # Recursively flatten child elements into a string
-        title = convert_element_to_string(tag, '').encode('utf-8')
+        title = convert_element_to_string(tag, '')
         
     return title
     
@@ -144,7 +144,7 @@ def get_abstract_from_xml(root, raw = False):
         
         # Recursively flatten child elements into a string
         if not tag.get("abstract-type"):
-            abstract = convert_element_to_string(tag, u'').encode('utf-8')
+            abstract = convert_element_to_string(tag, '')
             
         if not raw:
             # Finally, remove excess <p> and </p> tags because they are bad
