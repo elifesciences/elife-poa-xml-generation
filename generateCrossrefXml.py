@@ -174,7 +174,7 @@ class crossrefXML(object):
         # Crossref allows <i> tags, not <italic> tags
         tag_converted_title = replace_tags(poa_article.title, 'italic', 'i')
         tagged_string = '<' + tag_name + '>' + tag_converted_title + '</' + tag_name + '>'
-        reparsed = minidom.parseString(tagged_string)
+        reparsed = minidom.parseString(tagged_string.encode('utf-8'))
 
         root_xml_element = append_minidom_xml_to_elementtree_xml(
             root_xml_element, reparsed
@@ -314,7 +314,8 @@ if __name__ == '__main__':
     article_xmls = ["generated_xml_output/elife_poa_e04871.xml",
                     "generated_xml_output/elife_poa_e04872.xml",
                     "generated_xml_output/elife_poa_e05224.xml",
-                    "generated_xml_output/elife_poa_e06179.xml"
+                    "generated_xml_output/elife_poa_e06179.xml",
+                    "generated_xml_output/elife_poa_e02923.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
