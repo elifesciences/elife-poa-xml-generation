@@ -13,7 +13,8 @@ Feature: Parse article XML
     | document              | errors
     | elife00013.xml        | False            
     | elife_poa_e06828.xml  | False             
-    | elife_poa_e02923.xml  | False 
+    | elife_poa_e02923.xml  | False
+    | elife02935.xml        | False 
 
   Scenario: Parse article XML files attributes
     Given I have the document <document>
@@ -47,6 +48,14 @@ Feature: Parse article XML
     | elife_poa_e02923.xml  | title          | Potassium dependent rescue of a myopathy with core-like structures in mouse
     | elife_poa_e02923.xml  | abstract       | Myopathies decrease muscle functionality. Mutations in ryanodine receptor 1 (RyR1) are often associated with myopathies with microscopic core-like structures in the muscle fiber. Here we identify a mouse RyR1 model in which heterozygous animals display clinical and pathological hallmarks of myopathy with core-like structures. The RyR1 mutation decreases sensitivity to activated calcium release and myoplasmic calcium levels, subsequently affecting mitochondrial calcium and ATP production. Mutant muscle shows a persistent potassium leak and disrupted expression of regulators of potassium homeostasis. Inhibition of K<sub>ATP</sub> channels or increasing interstitial potassium by diet or FDA-approved drugs can reverse the muscle weakness, fatigue-like physiology and pathology. We identify regulators of potassium homeostasis as biomarkers of disease that may reveal therapeutic targets in human patients with myopathy of central core disease (CCD). Altogether, our results suggest that amelioration of potassium leaks through potassium homeostasis mechanisms may minimize muscle damage of myopathies due to certain RyR1 mutations.
     | elife_poa_e02923.xml  | is_poa         | True
+  
+    | elife02935.xml        | doi            | 10.7554/eLife.02935
+    | elife02935.xml        | manuscript     | 02935
+    | elife02935.xml        | volume         | 3
+    | elife02935.xml        | articleType    | research-article
+    | elife02935.xml        | title          | Origins and functional consequences of somatic mitochondrial DNA mutations in human cancer
+    | elife02935.xml        | abstract       | Recent sequencing studies have extensively explored the somatic alterations present in the nuclear genomes of cancers. Although mitochondria control energy metabolism and apoptosis, the origins and impact of cancer-associated mutations in mtDNA are unclear. In this study, we analyzed somatic alterations in mtDNA from 1675 tumors. We identified 1907 somatic substitutions, which exhibited dramatic replicative strand bias, predominantly C > T and A > G on the mitochondrial heavy strand. This strand-asymmetric signature differs from those found in nuclear cancer genomes but matches the inferred germline process shaping primate mtDNA sequence content. A number of mtDNA mutations showed considerable heterogeneity across tumor types. Missense mutations were selectively neutral and often gradually drifted towards homoplasmy over time. In contrast, mutations resulting in protein truncation undergo negative selection and were almost exclusively heteroplasmic. Our findings indicate that the endogenous mutational mechanism has far greater impact than any other external mutagens in mitochondria and is fundamentally linked to mtDNA replication.
+    | elife02935.xml        | is_poa         | False 
   
 
   Scenario: Parse article XML file properties
@@ -90,6 +99,12 @@ Feature: Parse article XML
     | elife_poa_e02923.xml  | author_keywords    | 0       |                | ryanodine receptor
     | elife_poa_e02923.xml  | research_organisms | 0       |                | Human
 
+    | elife02935.xml        | contributor        | 0       | contrib_type   | author
+    | elife02935.xml        | contributor        | 33      | collab         | ICGC Breast Cancer Group
+    | elife02935.xml        | contributor        | 52      | contrib_type   | author
+    | elife02935.xml        | contributor        | 52      | surname        | Campbell
+    | elife02935.xml        | contributor        | 53      | contrib_type   | author non-byline
+    | elife02935.xml        | contributor        | 53      | surname        | Provenzano
 
 # TODO!!!
 # history_dates
