@@ -106,6 +106,22 @@ Feature: Parse article XML
     | elife02935.xml        | contributor        | 53      | contrib_type   | author non-byline
     | elife02935.xml        | contributor        | 53      | surname        | Provenzano
 
+  Scenario: Parse article XML file contributor affiliations
+    Given I have the document <document>
+    When I build article from xml
+    And I set the object to article <property> index <index>
+    And I set the object to contributor affiliation index <aff_index>
+    And I have the attribute <attribute>
+    Then I have object attribute value <value>
+    
+  Examples:
+    | document              | property      | index | aff_index  | attribute      | value
+    | elife00013.xml        | contributor   | 0     | 0          | text           | Department of Molecular and Cell Biology, University of California, Berkeley, Berkeley, United States
+    | elife_poa_e06828.xml  | contributor   | 0     | 0          | text           | Department of Neuroscience, Perelman School of Medicine, University of Pennsylvania, Philadelphia, United States
+    | elife_poa_e02923.xml  | contributor   | 0     | 0          | text           | Department of Pediatrics, University of Colorado, Anschutz Medical Campus, Aurora, United States
+    | elife02935.xml        | contributor   | 0     | 0          | text           | Cancer Genome Project, Wellcome Trust Sanger Institute, Hinxton, United Kingdom
+    
+
   Scenario: Parse article XML file dates
     Given I have the document <document>
     When I build article from xml
