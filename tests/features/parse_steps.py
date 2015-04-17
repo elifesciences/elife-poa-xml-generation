@@ -79,7 +79,15 @@ def i_set_the_object_to_article_research_organisms_index(step, index):
 def i_set_the_object_to_article_date_type(step, type):
     world.object = world.article.get_date(type)
 
-
+@step(u'I set the object to contributor affiliation index (.*)')
+def i_set_the_object_to_contributor_affiliation(step, index):
+    print len(world.object.affiliations)
+    import json
+    #print json.dumps(world.object.affiliations)
+    world.object = world.object.affiliations[int(index)]
+    assert world.object is not None, \
+        "Got contributor affiliation object %s" % world.object
+    
 @step(u'I have object attribute value (.*)')
 def i_have_object_attribute_value(step, value):
     if value == "None":

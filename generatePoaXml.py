@@ -512,7 +512,9 @@ class ContributorAffiliation():
     institution = None
     city = None 
     country = None
-
+    
+    text = None
+    
 class eLifePOSContributor():
     """
     Currently we are not sure that we can get an auth_id for 

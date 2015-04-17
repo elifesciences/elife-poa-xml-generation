@@ -176,7 +176,8 @@ def get_affs_from_xml(root, raw = False):
         aff_with_tags = convert_element_to_string(tag, '')
 
         # Remove all tags to leave the content behind
-        aff = strip_tags_from_string(aff_with_tags)
+        aff = {}
+        aff["text"] = strip_tags_from_string(aff_with_tags)
         
         affs[id] = aff
 
@@ -227,7 +228,8 @@ def get_contributor_from_contrib_group(root, affs, raw = False):
         # 1. Convert all content and tags to a string
         aff_with_tags = convert_element_to_string(tag, '')
         # 2. Remove all tags to leave the content behind
-        aff = strip_tags_from_string(aff_with_tags)
+        aff = {}
+        aff["text"] = strip_tags_from_string(aff_with_tags)
         
         affiliations.append(aff)
 
@@ -249,7 +251,9 @@ def get_contributor_from_contrib_group(root, affs, raw = False):
     contributor = eLifePOSContributor(contrib_type, surname, given_name, collab)
     
     for aff in affiliations:
-        contributor.set_affiliation(aff)
+        affiliation = ContributorAffiliation()
+        affiliation.text = aff["text"]
+        contributor.set_affiliation(affiliation)
     
     if root.get("corresp") == "yes":
         contributor.corresp = True

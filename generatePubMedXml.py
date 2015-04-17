@@ -215,7 +215,7 @@ class pubMedPoaXML(object):
             # Only add one affiliation per author for Pubmed
             for aff in contributor.affiliations[:1]:
                 self.affiliation = SubElement(self.person_name, "Affiliation")
-                self.affiliation.text = aff
+                self.affiliation.text = aff.text
                 
             if contributor.orcid:
                 self.orcid = SubElement(self.person_name, "Identifier")
