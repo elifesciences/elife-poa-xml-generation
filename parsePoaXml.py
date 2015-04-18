@@ -8,6 +8,7 @@ import re
 import os
 from generatePoaXml import *
 import settings
+from elifetools import parseJATS as parser
 
 """
 Parse PoA XML file and can instantiate a eLifePOA object from the data
@@ -453,27 +454,29 @@ def build_article_from_xml(article_xml_filename):
     tree = ElementTree.parse(article_xml_filename)
     root = tree.getroot()
 
+    soup = parser.parse_document(article_xml_filename)
+    
     # Get DOI
-    doi = get_article_id_from_xml(root, "doi")
+    doi = parser.doi(soup)
     
     # Create the article object
     article = eLifePOA(doi, title=None)
     
     # Get publisher_id and set object manuscript value
-    publisher_id = get_article_id_from_xml(root, "publisher-id")
+    publisher_id = parser.publisher_id(soup)
     article.manuscript = publisher_id
     
     # Set the articleType
-    article_type = get_article_type_from_xml(root)
+    article_type = parser.article_type(soup)
     if article_type:
         article.articleType = article_type
     
     # title
-    article.title = get_title_from_xml(root)
+    article.title = parser.full_title(soup)
     #print article.title
         
     # abstract
-    article.abstract = get_abstract_from_xml(root)
+    article.abstract = parser.full_abstract(soup)
     
     # contributors
     contributors = get_contributors_from_xml(root, contrib_type = "author")
@@ -482,56 +485,39 @@ def build_article_from_xml(article_xml_filename):
     article.contributors = article.contributors + contributors_non_byline
     
     # license href
-    license_data = get_license_from_xml(root)
     license = eLifeLicense()
-    license.href = license_data['href']
+    license.href = parser.license_url(soup)
     article.license = license
     
     # article_category
-    article_categories = get_subject_groups_from_xml(root, subj_group_type = "heading")
-    article.article_categories = article_categories
+    article.article_categories = parser.category(soup)
     
     # keywords
-    author_keywords = get_keyword_groups_from_xml(root, kwd_group_type = "author-keywords")
-    article.author_keywords = author_keywords
+    article.author_keywords = parser.keywords(soup)
     
     # research organisms
-    research_organisms = get_keyword_groups_from_xml(root, kwd_group_type = "research-organism")
-    article.research_organisms = research_organisms
+    article.research_organisms = parser.research_organism(soup)
     
-    history_dates = get_history_from_xml(root)
-    
+    # History dates   
     date_types = ["received", "accepted"]
     for date_type in date_types:
-        try:
-            if history_dates[date_type]:
-                date_instance = eLifeDate(date_type, history_dates[date_type])
-                article.add_date(date_instance)
-        except KeyError:
-            # date did not exist
-            # Do not log an error because some articles do not have a history
-            # error_count = error_count + 1
-            pass
-            
-    # Parse the pub-date for VoR articles
-    pub_dates = get_pub_dates_from_xml(root)
-    pub_date_types = ["pub"]
-    for pub_type in pub_date_types:
-        try:
-            if pub_dates[pub_type]:
-                date_instance = eLifeDate(pub_type, pub_dates[pub_type])
-                article.add_date(date_instance)
-        
-        except:
-            # PoA will not have pub-date, quietly continue
-            pass
+        history_date = parser.history_date(soup, date_type)
+        if history_date:
+            date_instance = eLifeDate(date_type, history_date)
+            article.add_date(date_instance)
 
+    # Pub date
+    pub_date = parser.pub_date(soup)
+    if pub_date:
+        date_instance = eLifeDate("pub", pub_date)
+        article.add_date(date_instance)
+    
     # Set the volume if present
-    volume = get_volume_from_xml(root)
+    volume = parser.volume(soup)
     if volume:
         article.volume = volume
 
-    article.is_poa = get_is_poa_from_xml(root)
+    article.is_poa = parser.is_poa(soup)
 
     return article,error_count
 
