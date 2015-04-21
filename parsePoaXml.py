@@ -442,6 +442,88 @@ def get_is_poa_from_xml(root, contrib_type = None):
     
     return is_poa
 
+def text_from_affiliation_elements(department, institution, city, country):
+    """
+    Given an author affiliation from
+    """
+    text = ""
+    
+    for element in (department, institution, city, country):
+        if text != "":
+            text += ", "
+        
+        if element:
+            text += element
+    
+    return text
+
+def build_contributors(authors, contrib_type):
+    """
+    Given a list of authors from the parser, instantiate contributors
+    objects and build them
+    """
+
+    contributors = []
+    
+    for author in authors:
+        contributor = None
+        
+        surname = author.get("surname")
+        given_name = author.get("given_names")
+        collab = author.get("collab")
+        
+        if surname or collab:
+            contributor = eLifePOSContributor(contrib_type, surname, given_name, collab)
+        else:
+            continue
+        
+        contributor.group_author_key = author.get("group_author_key")
+        contributor.orcid = author.get("orcid")
+        if author.get("corresponding"):
+            contributor.corresp = True
+        else:
+            contributor.corresp = False
+            
+        # Affiliations, compile text for each
+        department = []
+        institution = []
+        city = []
+        country = []
+        
+        if type(author.get("institution")) == list:
+            for index in range(0, len(author.get("institution"))):
+                department.append(author.get("department")[index])
+                institution.append(author.get("institution")[index])
+                city.append(author.get("city")[index])
+                country.append(author.get("country")[index])
+        else:
+            department.append(author.get("department"))
+            institution.append(author.get("institution"))
+            city.append(author.get("city"))
+            country.append(author.get("country"))
+        
+        # Turn the set of lists into ContributorAffiliation
+        for index in range(0, len(institution)):
+            affiliation = ContributorAffiliation()
+            affiliation.department = department[index]
+            affiliation.institution = institution[index]
+            affiliation.city = city[index]
+            affiliation.country = country[index]
+            
+            affiliation.text = text_from_affiliation_elements(
+                affiliation.department,
+                affiliation.institution,
+                affiliation.city,
+                affiliation.country)
+            
+            contributor.set_affiliation(affiliation)
+        
+        # Finally add the contributor to the list
+        if contributor:
+            contributors.append(contributor)
+        
+    return contributors
+
 def build_article_from_xml(article_xml_filename):
     """
     Parse NLM XML with ElementTree, and populate an
@@ -479,9 +561,14 @@ def build_article_from_xml(article_xml_filename):
     article.abstract = parser.full_abstract(soup)
     
     # contributors
-    contributors = get_contributors_from_xml(root, contrib_type = "author")
+    contrib_type = "author"
+    authors = parser.authors(soup, contrib_type)
+    contributors = build_contributors(authors, contrib_type)
     article.contributors = contributors
-    contributors_non_byline = get_contributors_from_xml(root, contrib_type = "author non-byline")
+    
+    contrib_type = "author non-byline"
+    authors = parser.authors(soup, contrib_type)
+    contributors_non_byline = build_contributors(authors, contrib_type)
     article.contributors = article.contributors + contributors_non_byline
     
     # license href
