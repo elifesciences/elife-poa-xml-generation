@@ -536,8 +536,12 @@ def remove_tag(tag_name, string):
     for tag in tags:
         tag.unwrap()
     
+    # If the abstract starts with a tag, then it will not be enclosed in a p tag
     if hasattr(soup.body.p, "children"):
         return "".join(map(unicode, soup.body.p.children)) or None
+    elif hasattr(soup.body, "children"):
+        # No p tag, use all the children
+        return "".join(map(unicode, soup.body.children)) or None
     else:
         return None
 
