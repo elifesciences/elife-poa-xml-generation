@@ -9,6 +9,7 @@ import os
 from generatePoaXml import *
 import settings
 from elifetools import parseJATS as parser
+from bs4 import BeautifulSoup
 
 """
 Parse PoA XML file and can instantiate a eLifePOA object from the data
@@ -524,6 +525,35 @@ def build_contributors(authors, contrib_type):
         
     return contributors
 
+def remove_tag(tag_name, string):
+    """
+    Remove unwanted tags from the string, keeping the contents it surrounds,
+    parsing it as HTML, then only keep the body paragraph contents
+    """
+    soup = BeautifulSoup(string)
+
+    tags = soup.find_all(tag_name)
+    for tag in tags:
+        tag.unwrap()
+    
+    if hasattr(soup.body.p, "children"):
+        return "".join(map(unicode, soup.body.p.children)) or None
+    else:
+        return None
+
+def clean_abstract(abstract):
+    """
+    Remove unwanted tags from abstract string,
+    parsing it as HTML, then only keep the body paragraph contents
+    """
+
+    remove_tags = ['xref']
+    for tag_name in remove_tags:
+        abstract = remove_tag(tag_name, abstract)
+    
+    return abstract
+
+
 def build_article_from_xml(article_xml_filename):
     """
     Parse NLM XML with ElementTree, and populate an
@@ -558,7 +588,7 @@ def build_article_from_xml(article_xml_filename):
     #print article.title
         
     # abstract
-    article.abstract = parser.full_abstract(soup)
+    article.abstract = clean_abstract(parser.full_abstract(soup))
     
     # contributors
     contrib_type = "author"
