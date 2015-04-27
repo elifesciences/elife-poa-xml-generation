@@ -530,6 +530,9 @@ def remove_tag(tag_name, string):
     Remove unwanted tags from the string, keeping the contents it surrounds,
     parsing it as HTML, then only keep the body paragraph contents
     """
+    if string is None:
+        return None
+    
     soup = BeautifulSoup(string)
 
     tags = soup.find_all(tag_name)
