@@ -124,7 +124,7 @@ def clean_abstract(abstract):
     parsing it as HTML, then only keep the body paragraph contents
     """
 
-    remove_tags = ['xref']
+    remove_tags = ['xref', 'ext-link']
     for tag_name in remove_tags:
         abstract = remove_tag(tag_name, abstract)
     
