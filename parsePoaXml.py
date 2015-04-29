@@ -133,16 +133,13 @@ def clean_abstract(abstract):
 
 def build_article_from_xml(article_xml_filename):
     """
-    Parse NLM XML with ElementTree, and populate an
+    Parse JATS XML with elifetools parser, and populate an
     eLifePOA article object
     Basic data crossref needs: article_id, doi, title, contributors with names set
     """
     
     error_count = 0
     
-    tree = ElementTree.parse(article_xml_filename)
-    root = tree.getroot()
-
     soup = parser.parse_document(article_xml_filename)
     
     # Get DOI
