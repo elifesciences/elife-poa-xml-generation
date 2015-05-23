@@ -37,6 +37,10 @@ def convert_element_to_string(parent, xml_string, recursive = False):
         # Add text to start of the string and tail to the end
         if parent.text:
             xml_string = parent.text + xml_string
+        
+        else:
+            if recursive is True:
+                xml_string = '<' + parent.tag + '>' + xml_string + '</' + parent.tag + '>'
 
         if parent.tail:
             xml_string = xml_string + parent.tail 
