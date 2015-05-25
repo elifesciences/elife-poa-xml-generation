@@ -131,7 +131,8 @@ def get_abstract_from_xml(root, raw = False):
             # Some tags are nested inside p tag
             for p_tag in tag.findall('./p'):
                 for remove_tag in p_tag.findall('./bold'):
-                    p_tag.remove(remove_tag)
+                    if remove_tag.text == "DOI:":
+                        p_tag.remove(remove_tag)
                 for remove_tag in p_tag.findall('./ext-link'):
                     p_tag.remove(remove_tag)
             # Now remove any empty p tags with no child tags
