@@ -42,7 +42,7 @@ def build_contributors(authors, contrib_type):
         surname = author.get("surname")
         given_name = author.get("given_names")
         collab = author.get("collab")
-        
+
         if surname or collab:
             contributor = eLifePOSContributor(contrib_type, surname, given_name, collab)
         else:

@@ -172,7 +172,10 @@ class crossrefXML(object):
         tag_name = 'title'
         root_xml_element = Element(root_tag_name)
         # Crossref allows <i> tags, not <italic> tags
-        tag_converted_title = replace_tags(poa_article.title, 'italic', 'i')
+        tag_converted_title = poa_article.title
+        tag_converted_title = replace_tags(tag_converted_title, 'italic', 'i')
+        tag_converted_title = replace_tags(tag_converted_title, 'bold', 'b')
+        tag_converted_title = replace_tags(tag_converted_title, 'underline', 'u')
         tagged_string = '<' + tag_name + '>' + tag_converted_title + '</' + tag_name + '>'
         reparsed = minidom.parseString(tagged_string.encode('utf-8'))
 

@@ -163,7 +163,10 @@ class pubMedPoaXML(object):
         """
         tag_name = 'ArticleTitle'
         # Pubmed allows <i> tags, not <italic> tags
-        tag_converted_title = replace_tags(poa_article.title, 'italic', 'i')
+        tag_converted_title = poa_article.title
+        tag_converted_title = replace_tags(tag_converted_title, 'italic', 'i')
+        tag_converted_title = replace_tags(tag_converted_title, 'bold', 'b')
+        tag_converted_title = replace_tags(tag_converted_title, 'underline', 'u')
         tag_converted_title = escape_unmatched_angle_brackets(tag_converted_title)
         tagged_string = '<' + tag_name + '>' + tag_converted_title + '</' + tag_name + '>'
         reparsed = minidom.parseString(tagged_string.encode('utf-8'))
@@ -342,7 +345,10 @@ class pubMedPoaXML(object):
         tag_name = 'Abstract'
         # Pubmed allows <i> tags, not <italic> tags
         if poa_article.abstract:
-            tag_converted_abstract = replace_tags(poa_article.abstract, 'italic', 'i')
+            tag_converted_abstract = poa_article.abstract
+            tag_converted_abstract = replace_tags(tag_converted_abstract, 'italic', 'i')
+            tag_converted_abstract = replace_tags(tag_converted_abstract, 'bold', 'b')
+            tag_converted_abstract = replace_tags(tag_converted_abstract, 'underline', 'u')
             tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
             tagged_string = '<' + tag_name + '>' + tag_converted_abstract + '</' + tag_name + '>'
             reparsed = minidom.parseString(tagged_string.encode('utf-8'))
