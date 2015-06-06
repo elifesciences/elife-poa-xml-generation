@@ -1,6 +1,4 @@
 import xml
-from xml.etree.ElementTree import Element, SubElement, Comment, tostring
-from xml.etree import ElementTree
 import time
 import datetime
 import calendar
@@ -8,488 +6,173 @@ import re
 import os
 from generatePoaXml import *
 import settings
+from elifetools import parseJATS as parser
+from bs4 import BeautifulSoup
 
 """
 Parse PoA XML file and can instantiate a eLifePOA object from the data
 """
 
-def convert_element_to_string(parent, xml_string, recursive = False):
+def text_from_affiliation_elements(department, institution, city, country):
     """
-    Recursively,
-    Given an ElementTree.Element as parent,
-    append the tags and content from xml to the string
-    Used primarily for parsing XML with <italic> tags
-    Does not include tag attributes
+    Given an author affiliation from
     """
-
-    tag_count = 0
-    sub_xml_string = ''
+    text = ""
     
-    # Iterate over child tags, if present, and call recursively
-    for child in parent:
-        sub_xml_string += convert_element_to_string(child, xml_string, True)
-        tag_count = tag_count + 1
-    
-    # Add the recursive xml to the main xml_string
-    xml_string += sub_xml_string
-
-    if tag_count > 0:
-        # Add text to start of the string and tail to the end
-        if parent.text:
-            xml_string = parent.text + xml_string
-
-        if parent.tail:
-            xml_string = xml_string + parent.tail 
-
-    elif tag_count == 0:
-        # No nested tags, add the tag to the string
-        if recursive is True:
-            # Only add nested tags, not the parent tag
-            xml_string += '<' + parent.tag + '>'
-
-        if parent.text:
-            xml_string += parent.text
+    for element in (department, institution, city, country):
+        if text != "":
+            text += ", "
         
-        if recursive is True:
-            xml_string += '</' + parent.tag + '>'
-     
-        if parent.tail:
-            xml_string += parent.tail
-            
-    return xml_string
-
-def strip_tags_from_string(str):
-    """
-    Given a string of XML, remove all the tags and return
-    the content between the tags
-    """
+        if element:
+            text += element
     
-    str_stripped = ''
-    # Remove all tags to leave the content behind
-    aff_chunks = re.split('(<.*?>)', str)
-    for chunk in aff_chunks:
-        if chunk.count('<') <= 0 and chunk.count('>') <= 0:
-            str_stripped += chunk
-    return str_stripped
+    return text
 
-def get_article_type_from_xml(root):
+def build_contributors(authors, contrib_type):
     """
-    Given an xml.etree.ElementTree.Element, get the
-    article-type
-    of a article, the root element
-    """
-    article_type = None
-    try:
-        article_type = root.get("article-type")
-    except:
-        pass
-
-    return article_type
-
-def get_article_id_from_xml(root, pub_id_type = "publisher-id"):
-    """
-    Given an xml.etree.ElementTree.Element, get the
-    article_id
-    of a pub_id_type
-    """
-    article_id = None
-    for tag in root.findall('./front/article-meta/article-id'):
-        if tag.get("pub-id-type") == "publisher-id":
-            #print "article_id: " + tag.text
-            article_id = int(tag.text)
-        elif tag.get("pub-id-type") == "doi":
-            #print "doi: " + tag.text
-            article_id = tag.text
-    return article_id
-
-def get_title_from_xml(root):
-    """
-    Given an xml.etree.ElementTree.Element, get the
-    title
-    """
-    title = None
-    for tag in root.findall('./front/article-meta/title-group/article-title'):
-        # Recursively flatten child elements into a string
-        title = convert_element_to_string(tag, '').encode('utf-8')
-        
-    return title
-    
-def get_abstract_from_xml(root, raw = False):
-    """
-    Given an xml.etree.ElementTree.Element, get the
-    abstract
-    """
-    abstract = None
-    for tag in root.findall('./front/article-meta/abstract'):
-        
-        if not raw:
-            # Remove unallowed tags and their contents
-            for remove_tag in tag.findall('./object-id'):
-                tag.remove(remove_tag)
-            # Some tags are nested inside p tag
-            for p_tag in tag.findall('./p'):
-                for remove_tag in p_tag.findall('./bold'):
-                    p_tag.remove(remove_tag)
-                for remove_tag in p_tag.findall('./ext-link'):
-                    p_tag.remove(remove_tag)
-            # Now remove any empty p tags with no child tags
-            for p_tag in tag.findall('./p'):
-                if p_tag.text is None and len(p_tag) <= 0:
-                    tag.remove(p_tag)
-                # Remove nested xref tags but leave the text inside
-                for xref_tag in p_tag.findall('./xref'):
-                    # Two step process
-                    # One, remove all attributes of the xref tag
-                    # Two (later) remove empty xref tags from the converted string
-                    for attr in xref_tag.keys():
-                        xref_tag.set(attr, None)
-        
-        # Recursively flatten child elements into a string
-        if not tag.get("abstract-type"):
-            abstract = convert_element_to_string(tag, u'').encode('utf-8')
-            
-        if not raw:
-            # Finally, remove excess <p> and </p> tags because they are bad
-            abstract = abstract.replace('<p>', '')
-            abstract = abstract.replace('</p>', '')
-            abstract = abstract.replace('<xref>', '')
-            abstract = abstract.replace('</xref>', '')
-
-    return abstract
-
-def get_affs_from_xml(root, raw = False):
-    """
-    Given an xml.etree.ElementTree.Element, get the
-    aff
-    tag content
-    Pass raw = true to not remove certain tags
+    Given a list of authors from the parser, instantiate contributors
+    objects and build them
     """
 
-    affs = {}
-    for tag in root.findall('./front/article-meta/contrib-group/aff'):
-        id = tag.get("id")
-        
-        if not raw:
-            # Remove the <label> tag and contents
-            for remove_tag in tag.findall('./label'):
-                tag.remove(remove_tag)
-        
-        #print id
-        aff_with_tags = convert_element_to_string(tag, '')
-
-        # Remove all tags to leave the content behind
-        aff = strip_tags_from_string(aff_with_tags)
-        
-        affs[id] = aff
-
-    return affs
-
-
-def get_contributor_from_contrib_group(root, affs, raw = False):
-    """
-    Given an xml.etree.ElementTree.Element, get the
-    contributor object details and instantiate and object
-    """
-    contributor = None
-    
-    contrib_type = root.get("contrib-type")
-    affiliations = []
-    orcid = None
-    surname = None
-    given_name = None
-    collab = None
-    group_author_key = None
-    
-    for tag in root.findall('./name/surname'):
-        surname = tag.text
-        
-    for tag in root.findall('./name/given-names'):
-        given_name = tag.text
-    
-    for tag in root.findall('./collab'):
-        collab = tag.text
-    
-    for tag in root.findall('./contrib-id'):
-        if tag.get("contrib-id-type") == "orcid":
-            orcid = tag.text
-    
-    for tag in root.findall('./contrib-id'):
-        if tag.get("contrib-id-type") == "group-author-key":
-            group_author_key = tag.text
-    
-    # PoA may have aff tags
-    for tag in root.findall('./aff'):
-        aff = ''
-        
-        if not raw:
-            # Do not need email
-            for remove_tag in tag.findall('./email'):
-                tag.remove(remove_tag)
-        
-        # 1. Convert all content and tags to a string
-        aff_with_tags = convert_element_to_string(tag, '')
-        # 2. Remove all tags to leave the content behind
-        aff = strip_tags_from_string(aff_with_tags)
-        
-        affiliations.append(aff)
-
-    # VoR may have xref to aff tags
-    if len(affs) > 0:
-        
-        for tag in root.findall('./xref'):
-            if tag.get("ref-type") == "aff":
-                
-                rid = tag.get("rid")
-                #print rid
-                try:
-                    affiliations.append(affs[rid])
-                except:
-                    # key error
-                   continue
-
-    # Instantiate
-    contributor = eLifePOSContributor(contrib_type, surname, given_name, collab)
-    
-    for aff in affiliations:
-        contributor.set_affiliation(aff)
-    
-    if root.get("corresp") == "yes":
-        contributor.corresp = True
-    contributor.orcid = orcid
-    contributor.group_author_key = group_author_key
-    
-    return contributor
-
-def get_contributors_from_xml(root, contrib_type = None):
-    """
-    Given an xml.etree.ElementTree.Element, get the
-    contributors
-    contrib_type can be author, editor, etc.
-    """
     contributors = []
-
-    # VoR may have xref to aff tags
-    affs = get_affs_from_xml(root)
-
-    for tag in root.findall('./front/article-meta/contrib-group/contrib'):
+    
+    for author in authors:
         contributor = None
-        if not contrib_type:
-            contributor = get_contributor_from_contrib_group(tag, affs)
-        elif tag.get("contrib-type") == contrib_type:
-            contributor = get_contributor_from_contrib_group(tag, affs)
         
-        if contributor:
-            contributors.append(contributor)  
+        surname = author.get("surname")
+        given_name = author.get("given_names")
+        collab = author.get("collab")
 
+        if surname or collab:
+            contributor = eLifePOSContributor(contrib_type, surname, given_name, collab)
+        else:
+            continue
+        
+        contributor.group_author_key = author.get("group_author_key")
+        contributor.orcid = author.get("orcid")
+        if author.get("corresponding"):
+            contributor.corresp = True
+        else:
+            contributor.corresp = False
+            
+        # Affiliations, compile text for each
+        department = []
+        institution = []
+        city = []
+        country = []
+        
+        if type(author.get("institution")) == list:
+            for index in range(0, len(author.get("institution"))):
+                department.append(author.get("department")[index])
+                institution.append(author.get("institution")[index])
+                city.append(author.get("city")[index])
+                country.append(author.get("country")[index])
+        else:
+            department.append(author.get("department"))
+            institution.append(author.get("institution"))
+            city.append(author.get("city"))
+            country.append(author.get("country"))
+        
+        # Turn the set of lists into ContributorAffiliation
+        for index in range(0, len(institution)):
+            affiliation = ContributorAffiliation()
+            affiliation.department = department[index]
+            affiliation.institution = institution[index]
+            affiliation.city = city[index]
+            affiliation.country = country[index]
+            
+            affiliation.text = text_from_affiliation_elements(
+                affiliation.department,
+                affiliation.institution,
+                affiliation.city,
+                affiliation.country)
+            
+            contributor.set_affiliation(affiliation)
+        
+        # Finally add the contributor to the list
+        if contributor:
+            contributors.append(contributor)
+        
     return contributors
 
-def get_history_from_xml(root, contrib_type = None):
+def build_funding(award_groups):
     """
-    Given an xml.etree.ElementTree.Element, get the
-    history
-    and return types of dates and their time.struct_time representation
+    Given a funding data, format it
     """
-    history = {}
-    for tag in root.findall('./front/article-meta/history/date'):
-        date_type = tag.get("date-type")
-        for child in tag:
-            if child.tag == 'day':
-                day = child.text
-            elif child.tag == 'month':
-                month = child.text
-            elif child.tag == 'year':   
-                year = child.text
-
-        # Create the time object
-        try:
-            date = datetime.datetime(int(year), int(month), int(day))
-        except:
-            date = None
-            
-        if date:
-            history[date_type] = date.timetuple()
-
-    return history
-
-def get_pub_dates_from_xml(root, contrib_type = None):
-    """
-    Given an xml.etree.ElementTree.Element, get all the
-    pub-date
-    elements and return types of dates and their time.struct_time representation
-    """
-    pub_dates = {}
-    for tag in root.findall('./front/article-meta/pub-date'):
-        pub_type = tag.get("date-type")
-        for child in tag:
-            if child.tag == 'day':
-                day = child.text
-            elif child.tag == 'month':
-                month = child.text
-            elif child.tag == 'year':   
-                year = child.text
-
-        # Create the time object
-        try:
-            date = datetime.datetime(int(year), int(month), int(day))
-        except:
-            date = None
-            
-        if date:
-            pub_dates[pub_type] = date.timetuple()
-
-    return pub_dates
-
-def get_license_from_xml(root, contrib_type = None):
-    """
-    Given an xml.etree.ElementTree.Element, get the
-    license
-    and return the license details
-    """
-    license = {}
-    license['href'] = None
     
-    # Get the license href
-    for tag in root.findall('./front/article-meta/permissions/license'):
-        license['href'] = tag.get("{http://www.w3.org/1999/xlink}href")
-            
-    return license
-
-def get_subject_groups_from_xml(root, subj_group_type = None):
-    """
-    Given an xml.etree.ElementTree.Element, get the
-    subj-group
-    values, optionally filtered by subj-group-type
-    """
-    subject_groups = []
-    
-    for tag in root.findall('./front/article-meta/article-categories/subj-group'):
-        add_tag = None
-        
-        if subj_group_type:
-            if tag.get("subj-group-type") == subj_group_type:
-                add_tag = True
-        else:
-            add_tag = True
-            
-        if add_tag:
-            for s_tag in tag.findall('./subject'):
-                subject_groups.append(s_tag.text)
-
-    return subject_groups
-
-def get_keyword_groups_from_xml(root, kwd_group_type = None):
-    """
-    Given an xml.etree.ElementTree.Element, get the
-    kwd-group
-    values, optionally filtered by kwd-group-type
-    """
-    keyword_groups = []
-    
-    for tag in root.findall('./front/article-meta/kwd-group'):
-        add_tag = None
-        
-        if kwd_group_type:
-            if tag.get("kwd-group-type") == kwd_group_type:
-                add_tag = True
-        else:
-            add_tag = True
-            
-        if add_tag:
-            for k_tag in tag.findall('./kwd'):
-                # Check for nested italic tag
-                child_count = 0
-                for child in k_tag:
-                    keyword_groups.append(child.text)
-                    child_count = child_count + 1
-                # If there are no nested tags use the base text
-                if child_count == 0:
-                    keyword_groups.append(k_tag.text)
-
-    return keyword_groups
-
-def get_funding_awards_from_xml(root):
-    """
-    Given an xml.etree.ElementTree.Element, get the
-    award-group funding-source etc.
-    from the funding-group
-    """
     funding_awards = []
 
-    for tag in root.findall('./front/article-meta/funding-group/award-group'):
+    for id, award_group in award_groups.iteritems():
         award = eLifeFundingAward()
-        
-        for id_tag in tag.findall('./funding-source/institution-wrap/institution-id'):
-            if id_tag.get("institution-id-type") == "FundRef":
-                award.institution_id = id_tag.text
-        
-        for institution_tag in tag.findall('./funding-source/institution-wrap/institution'):
-            award.institution_name = institution_tag.text
+
+        if award_group.get('id-type') == "FundRef":
+            award.institution_id = award_group.get('id')
             
-        for award_id_tag in tag.findall('./award-id'):
-            award.add_award_id(award_id_tag.text)
-        
+        award.institution_name = award_group.get('institution')
+
+        # TODO !!! Check for multiple award_id, if exists
+        if award_group.get('award-id'):
+            award.add_award_id(award_group.get('award-id'))
+
         funding_awards.append(award)
 
     return funding_awards
 
-def get_ref_list_from_xml(root):
+
+def build_ref_list(refs):
     """
     Given an xml.etree.ElementTree.Element, get the
     ref-list ref
     """
     ref_list = []
 
-    for ref_tag in root.findall('./back/ref-list/ref'):
+    for reference in refs:
         ref = eLifeRef()
         
         # Publcation Type
-        for citation_tag in ref_tag.findall('./element-citation'):
-            if citation_tag.get("publication-type"):
-                ref.publication_type = citation_tag.get("publication-type")
-                
+        if reference.get('publication_type'):
+            ref.publication_type = reference.get('publication_type')
+    
         # Article title
-        for tag in citation_tag.findall('./article-title'):
-            ref.article_title = tag.text
-                
-        # Source
-        for tag in citation_tag.findall('./source'):
-            ref.source = tag.text
+        if reference.get('article_title'):
+            ref.article_title = reference.get('article_title')
+            
+        # Article title
+        if reference.get('source'):
+            ref.source = reference.get('source')
             
         # Volume
-        for tag in citation_tag.findall('./volume'):
-            ref.volume = tag.text
-            
+        if reference.get('volume'):
+            ref.volume = reference.get('volume')
+
         # First page
-        for tag in citation_tag.findall('./fpage'):
-            ref.fpage = tag.text
-            
+        if reference.get('fpage'):
+            ref.fpage = reference.get('fpage')
+
         # Last page
-        for tag in citation_tag.findall('./lpage'):
-            ref.lpage = tag.text
+        if reference.get('lpage'):
+            ref.lpage = reference.get('lpage')
             
         # DOI
-        for pub_id_tag in citation_tag.findall('./pub-id'):
-            if pub_id_tag.get("pub-id-type") == "doi":
-                ref.doi = pub_id_tag.text
-            
-        # Year
-        for tag in citation_tag.findall('./year'):
-            ref.year = tag.text
+        # TODO!!!
 
+        # Year
+        if reference.get('year'):
+            ref.year = reference.get('year')
+            
         # Authors
-        for person_group_tag in citation_tag.findall('./person-group'):
-            if person_group_tag.get("person-group-type") == "author":
-                for name_tag in person_group_tag.findall('./name'):
-                    author = {}
-                    for surname_tag in name_tag.findall('./surname'): 
-                        author["surname"] = surname_tag.text
-                    for given_names_tag in name_tag.findall('./given-names'): 
-                        author["given_names"] = given_names_tag.text
-                    ref.add_author(author)
-        
+        if reference.get('authors'):
+            for author in reference.get('authors'):
+                # TODO - Need to parse surname and given-names
+                ref_author = {}
+                ref_author['surname'] = author
+                ref.add_author(ref_author)
+
         ref_list.append(ref)
 
     return ref_list
+
+
 
 def get_component_list_from_xml(root, raw = False):
     """
@@ -574,139 +257,133 @@ def get_component_list_from_xml(root, raw = False):
     return component_list
 
 
-def get_volume_from_xml(root, contrib_type = None):
-    """
-    Given an xml.etree.ElementTree.Element, get the
-    volume
-    if present and return it
-    """
-    volume = None
-    
-    for tag in root.findall('./front/article-meta/volume'):
-        volume = tag.text
+def remove_tag(tag_name, string):
 
-    return volume
-
-def get_is_poa_from_xml(root, contrib_type = None):
     """
-    Given an xml.etree.ElementTree.Element, get the
-    pub-date pub-type="collection"
-    if present then is_poa is false, if not present then is_poa is True
+    Remove unwanted tags from the string, keeping the contents it surrounds,
+    parsing it as HTML, then only keep the body paragraph contents
     """
-    # Default value
-    is_poa = True
+    if string is None:
+        return None
     
-    # When parsing the file, use the presence of a
-    #   pub-date pub-type="collection"   as is_poa is False, other wise is_poa is True
+    soup = BeautifulSoup(string)
 
-    for tag in root.findall('./front/article-meta/pub-date'):
-        pub_type = tag.get("pub-type")
-        if pub_type == "collection":
-            is_poa = False
+    tags = soup.find_all(tag_name)
+    for tag in tags:
+        tag.unwrap()
     
-    return is_poa
+    # If the abstract starts with a tag, then it will not be enclosed in a p tag
+    if hasattr(soup.body.p, "children"):
+        return "".join(map(unicode, soup.body.p.children)) or None
+    elif hasattr(soup.body, "children"):
+        # No p tag, use all the children
+        return "".join(map(unicode, soup.body.children)) or None
+    else:
+        return None
+
+def clean_abstract(abstract):
+    """
+    Remove unwanted tags from abstract string,
+    parsing it as HTML, then only keep the body paragraph contents
+    """
+
+    remove_tags = ['xref', 'ext-link']
+    for tag_name in remove_tags:
+        abstract = remove_tag(tag_name, abstract)
+    
+    return abstract
+
 
 def build_article_from_xml(article_xml_filename):
     """
-    Parse NLM XML with ElementTree, and populate an
+    Parse JATS XML with elifetools parser, and populate an
     eLifePOA article object
     Basic data crossref needs: article_id, doi, title, contributors with names set
     """
     
     error_count = 0
     
-    tree = ElementTree.parse(article_xml_filename)
-    root = tree.getroot()
-
-    # Get DOI and article_id
-    article_id = get_article_id_from_xml(root, "publisher-id")
-    doi = get_article_id_from_xml(root, "doi")
+    soup = parser.parse_document(article_xml_filename)
+    
+    # Get DOI
+    doi = parser.doi(soup)
     
     # Create the article object
     article = eLifePOA(doi, title=None)
     
+    # Get publisher_id and set object manuscript value
+    publisher_id = parser.publisher_id(soup)
+    article.manuscript = publisher_id
+    
     # Set the articleType
-    article_type = get_article_type_from_xml(root)
+    article_type = parser.article_type(soup)
     if article_type:
         article.articleType = article_type
     
     # title
-    article.title = get_title_from_xml(root)
+    article.title = parser.full_title(soup)
     #print article.title
         
     # abstract
-    article.abstract = get_abstract_from_xml(root)
+    article.abstract = clean_abstract(parser.full_abstract(soup))
     
     # contributors
-    contributors = get_contributors_from_xml(root, contrib_type = "author")
+    contrib_type = "author"
+    authors = parser.authors(soup, contrib_type)
+    contributors = build_contributors(authors, contrib_type)
     article.contributors = contributors
-    contributors_non_byline = get_contributors_from_xml(root, contrib_type = "author non-byline")
+    
+    contrib_type = "author non-byline"
+    authors = parser.authors(soup, contrib_type)
+    contributors_non_byline = build_contributors(authors, contrib_type)
     article.contributors = article.contributors + contributors_non_byline
     
     # license href
-    license_data = get_license_from_xml(root)
     license = eLifeLicense()
-    license.href = license_data['href']
+    license.href = parser.license_url(soup)
     article.license = license
     
     # article_category
-    article_categories = get_subject_groups_from_xml(root, subj_group_type = "heading")
-    article.article_categories = article_categories
+    article.article_categories = parser.category(soup)
     
     # keywords
-    author_keywords = get_keyword_groups_from_xml(root, kwd_group_type = "author-keywords")
-    article.author_keywords = author_keywords
+    article.author_keywords = parser.keywords(soup)
     
     # research organisms
-    research_organisms = get_keyword_groups_from_xml(root, kwd_group_type = "research-organism")
-    article.research_organisms = research_organisms
+    article.research_organisms = parser.research_organism(soup)
     
-    # funding awards
-    funding_awards = get_funding_awards_from_xml(root)
-    article.funding_awards = funding_awards
+    # funding awards 
+    award_groups = parser.full_award_groups(soup)
+    article.funding_awards = build_funding(award_groups)
     
-    # references or citations
-    ref_list = get_ref_list_from_xml(root)
-    article.ref_list = ref_list
+    # references or citations 
+    refs = parser.refs(soup)
+    article.ref_list = build_ref_list(refs)
     
-    # components with component DOI
-    component_list = get_component_list_from_xml(root)
-    article.component_list = component_list
-    
-    # history
-    history_dates = get_history_from_xml(root)
-    
+    # components with component DOI   - TODO!!!!!!!
+    #component_list = get_component_list_from_xml(root)
+    #article.component_list = component_list
+        
+    # History dates   
     date_types = ["received", "accepted"]
     for date_type in date_types:
-        try:
-            if history_dates[date_type]:
-                date_instance = eLifeDate(date_type, history_dates[date_type])
-                article.add_date(date_instance)
-        except KeyError:
-            # date did not exist
-            # Do not log an error because some articles do not have a history
-            # error_count = error_count + 1
-            pass
-            
-    # Parse the pub-date for VoR articles
-    pub_dates = get_pub_dates_from_xml(root)
-    pub_date_types = ["pub"]
-    for pub_type in pub_date_types:
-        try:
-            if pub_dates[pub_type]:
-                date_instance = eLifeDate(pub_type, pub_dates[pub_type])
-                article.add_date(date_instance)
-        
-        except:
-            # PoA will not have pub-date, quietly continue
-            pass
+        history_date = parser.history_date(soup, date_type)
+        if history_date:
+            date_instance = eLifeDate(date_type, history_date)
+            article.add_date(date_instance)
 
+    # Pub date
+    pub_date = parser.pub_date(soup)
+    if pub_date:
+        date_instance = eLifeDate("pub", pub_date)
+        article.add_date(date_instance)
+    
     # Set the volume if present
-    volume = get_volume_from_xml(root)
+    volume = parser.volume(soup)
     if volume:
         article.volume = volume
 
-    article.is_poa = get_is_poa_from_xml(root)
+    article.is_poa = parser.is_poa(soup)
 
     return article,error_count
 

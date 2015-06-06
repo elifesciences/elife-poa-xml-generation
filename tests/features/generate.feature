@@ -109,7 +109,7 @@ Feature: Generate POA XML
     | no < tag                                         | no &lt; tag  
     | <i>a</i> <                                       | <i>a</i> &lt;
     | <i><sup><</sup>></i>                             | <i><sup>&lt;</sup>&gt;</i>
-  
+    | <u><b><</b>></u>                                 | <u><b>&lt;</b>&gt;</u>
     
   Scenario: Test entity to unicode conversion, angle bracket replacements and XML tree building
     Given I have the raw string <string>
@@ -133,6 +133,7 @@ Feature: Generate POA XML
     | I LTLTiGTGTLTLTsupGTGTmLTLT/supGTGTLTLT/iGTGT        | p         | <?xml version="1.0" ?><p>I <italic><sup>m</sup></italic></p>  | <?xml version="1.0" ?><root><p>I <italic><sup>m</sup></italic></p></root>
     | 2&#x00FC; LTLTiGTGTisLTLT/iGTGT LTLT 3LTLTsupGTGT&#x03B1;LTLT/supGTGT GTGT 4    | p         | <?xml version="1.0" ?><p>2ü <italic>is</italic> &lt; 3<sup>α</sup> &gt; 4</p>  | <?xml version="1.0" ?><root><p>2ü <italic>is</italic> &lt; 3<sup>α</sup> &gt; 4</p></root>
     | LTLTiGTGTSalmonellaLTLT/iGTGT Typhi and LTLTiGTGTSalmonellaLTLT/iGTGT Paratyphi  | p | <?xml version="1.0" ?><p><italic>Salmonella</italic> Typhi and <italic>Salmonella</italic> Paratyphi</p> | <?xml version="1.0" ?><root><p><italic>Salmonella</italic> Typhi and <italic>Salmonella</italic> Paratyphi</p></root>
+    | renamed CpoB (LTLTuGTGTLTLTbGTGTCLTLT/bGTGTLTLT/uGTGToordinator of LTLTuGTGTLTLTbGTGTPLTLT/bGTGTLTLT/uGTGTG synthesis  | p | <?xml version="1.0" ?><p>renamed CpoB (<u><b>C</b></u>oordinator of <u><b>P</b></u>G synthesis</p> | <?xml version="1.0" ?><root><p>renamed CpoB (<u><b>C</b></u>oordinator of <u><b>P</b></u>G synthesis</p></root>
     
     
   Scenario: Parse group authors string

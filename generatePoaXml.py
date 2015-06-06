@@ -512,7 +512,9 @@ class ContributorAffiliation():
     institution = None
     city = None 
     country = None
-
+    
+    text = None
+    
 class eLifePOSContributor():
     """
     Currently we are not sure that we can get an auth_id for 
@@ -812,7 +814,11 @@ def escape_unmatched_angle_brackets(s):
                     '<b>','</b>',
                     '<bold>','</bold>',
                     '<sup>','</sup>',
-                    '<sub>','</sub>']
+                    '<sub>','</sub>',
+                    '<u>', '</u>',
+                    '<underline>', '</underline>',
+                    '<b>', '</b>',
+                    '<bold>', '</bold>']
     
     # Split string on tags
     tags = re.split('(<.*?>)', s)
@@ -847,6 +853,8 @@ def convert_to_xml_string(s):
     s = entity_to_unicode(s).encode('utf-8')
     s = decode_brackets(s)
     s = replace_tags(s)
+    s = replace_tags(s, 'u', 'underline')
+    s = replace_tags(s, 'b', 'bold')  
     s = escape_unmatched_angle_brackets(s)
     return s
 
