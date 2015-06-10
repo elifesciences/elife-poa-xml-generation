@@ -400,7 +400,7 @@ class crossrefXML(object):
             tag_converted_string = replace_tags(tag_converted_string, 'bold', 'b')
             tag_converted_string = escape_unmatched_angle_brackets(tag_converted_string)
             tagged_string = '<' + tag_name + '>' + tag_converted_string + '</' + tag_name + '>'
-            reparsed = minidom.parseString(tagged_string)
+            reparsed = minidom.parseString(tagged_string.encode('utf-8'))
 
             root_xml_element = append_minidom_xml_to_elementtree_xml(
                 parent, reparsed
