@@ -164,8 +164,9 @@ def build_ref_list(refs):
             for author in reference.get('authors'):
                 # TODO - Need to parse surname and given-names
                 ref_author = {}
-                ref_author['surname'] = author
-                ref.add_author(ref_author)
+                if 'surname' in author:
+                    ref_author['surname'] = author['surname']
+                    ref.add_author(ref_author)
 
         ref_list.append(ref)
 
