@@ -375,11 +375,17 @@ def copy_pdf_to_hw_staging_dir(file_title_map, output_dir, doi, current_zipfile)
 
 	if decapitate_pdf_with_error_check(decap_name_plus_path, decap_dir + "/"):
 		# pass the local file path, and teh path to a temp dir, to the decapiation script
-		move_file = open(decap_dir + "/" + decap_name, "rb").read()
-		out_handler = open(output_dir + "/" + new_name, "wb")
-		out_handler.write(move_file)
-		out_handler.close()
-		print "decapitaiton worked"
+		try:
+			move_file = open(decap_dir + "/" + decap_name, "rb").read()
+			out_handler = open(output_dir + "/" + new_name, "wb")
+			out_handler.write(move_file)
+			out_handler.close()
+			print "decapitaiton worked"
+		except:
+			# The decap may return true but the file does not exist for some reason
+			#  allow the transformation to continue in order to processes the supplementary files
+			alert_message = "decap returned true but the pdf file is missing " + new_name
+			logger.error(alert_message)
 	else:
 		# if the decapitation script has failed, we move the original pdf file
 		move_file = file
