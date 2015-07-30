@@ -40,7 +40,7 @@ def build_contributors(authors, contrib_type):
         contributor = None
         
         surname = author.get("surname")
-        given_name = author.get("given_names")
+        given_name = author.get("given-names")
         collab = author.get("collab")
 
         if surname or collab:
@@ -48,9 +48,9 @@ def build_contributors(authors, contrib_type):
         else:
             continue
         
-        contributor.group_author_key = author.get("group_author_key")
+        contributor.group_author_key = author.get("group-author-key")
         contributor.orcid = author.get("orcid")
-        if author.get("corresponding"):
+        if author.get("corresp"):
             contributor.corresp = True
         else:
             contributor.corresp = False
@@ -61,17 +61,12 @@ def build_contributors(authors, contrib_type):
         city = []
         country = []
         
-        if type(author.get("institution")) == list:
-            for index in range(0, len(author.get("institution"))):
-                department.append(author.get("department")[index])
-                institution.append(author.get("institution")[index])
-                city.append(author.get("city")[index])
-                country.append(author.get("country")[index])
-        else:
-            department.append(author.get("department"))
-            institution.append(author.get("institution"))
-            city.append(author.get("city"))
-            country.append(author.get("country"))
+        if author.get("affiliations"):
+            for aff in author.get("affiliations"):
+                    department.append(aff.get("dept"))
+                    institution.append(aff.get("institution"))
+                    city.append(aff.get("city"))
+                    country.append(aff.get("country"))
         
         # Turn the set of lists into ContributorAffiliation
         for index in range(0, len(institution)):
