@@ -148,7 +148,8 @@ def build_ref_list(refs):
             ref.lpage = reference.get('lpage')
             
         # DOI
-        # TODO!!!
+        if reference.get('reference_id'):
+            ref.doi = reference.get('reference_id')
 
         # Year
         if reference.get('year'):
