@@ -172,6 +172,8 @@ class crossrefXML(object):
         
         self.set_access_indicators(self.journal_article, poa_article)
         
+        self.set_archive_locations(self.journal_article, poa_article)
+        
         self.set_doi_data(self.journal_article, poa_article)
         
         self.set_citation_list(self.journal_article, poa_article)
@@ -345,6 +347,11 @@ class crossrefXML(object):
                 self.ai_program_ref = SubElement(self.ai_program, 'ai:license_ref')
                 self.ai_program_ref.set('applies_to', applies_to)
                 self.ai_program_ref.text = poa_article.license.href
+   
+    def set_archive_locations(self, parent, poa_article):
+        self.archive_locations = SubElement(parent, 'archive_locations')
+        self.archive  = SubElement(self.archive_locations, 'archive')
+        self.archive.set('name', 'CLOCKSS')
    
     def set_citation_list(self, parent, poa_article):
         """
