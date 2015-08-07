@@ -107,23 +107,29 @@ class crossrefXML(object):
         return pub_date
         
     def set_journal(self, parent, poa_articles):
-        self.journal = SubElement(parent, 'journal')
-        self.set_journal_metadata(self.journal)
         
-        self.journal_issue = SubElement(self.journal, 'journal_issue')
-        
-        #self.publication_date = self.set_date(self.journal_issue, poa_article, 'publication_date')
-        
-        # Get the issue date from the first article in the list when doing one article per issue
-        pub_date = self.get_pub_date(poa_articles[0])
-        self.set_publication_date(self.journal_issue, pub_date)
-
-        self.journal_volume = SubElement(self.journal_issue, 'journal_volume')
-        self.volume = SubElement(self.journal_volume, 'volume')
-        self.volume.text = self.elife_journal_volume
-        
-        # Add journal article
+        # Add journal for each article
         for poa_article in poa_articles:
+            self.journal = SubElement(parent, 'journal')
+            self.set_journal_metadata(self.journal)
+            
+            self.journal_issue = SubElement(self.journal, 'journal_issue')
+            
+            #self.publication_date = self.set_date(self.journal_issue, poa_article, 'publication_date')
+            
+            # Get the issue date from the first article in the list when doing one article per issue
+            pub_date = self.get_pub_date(poa_articles[0])
+            self.set_publication_date(self.journal_issue, pub_date)
+    
+            self.journal_volume = SubElement(self.journal_issue, 'journal_volume')
+            self.volume = SubElement(self.journal_volume, 'volume')
+            # Use volume from the article unless not present then use the default
+            if poa_article.volume:
+                self.volume.text = poa_article.volume
+            else:
+                self.volume.text = self.elife_journal_volume
+        
+            # Add journal article
             self.set_journal_article(self.journal, poa_article)
 
     def set_journal_metadata(self, parent):
