@@ -170,6 +170,8 @@ class crossrefXML(object):
         
         self.set_fundref(self.journal_article, poa_article)
         
+        self.set_access_indicators(self.journal_article, poa_article)
+        
         self.set_doi_data(self.journal_article, poa_article)
         
         self.set_citation_list(self.journal_article, poa_article)
@@ -326,7 +328,24 @@ class crossrefXML(object):
                         self.fr_award_number = SubElement(self.fr_fundgroup, 'fr:assertion')
                         self.fr_award_number.set("name", "award_number")
                         self.fr_award_number.text = award_id
-                        
+                           
+    def set_access_indicators(self, parent, poa_article):
+        """
+        Set the AccessIndicators
+        """
+        
+        applies_to = ['vor','am','tdm']
+        
+        if poa_article.license.href:
+            
+            self.ai_program = SubElement(parent, 'ai:program')
+            self.ai_program.set('name', 'AccessIndicators')
+            
+            for applies_to in applies_to:
+                self.ai_program_ref = SubElement(self.ai_program, 'ai:license_ref')
+                self.ai_program_ref.set('applies_to', applies_to)
+                self.ai_program_ref.text = poa_article.license.href
+   
     def set_citation_list(self, parent, poa_article):
         """
         Set the citation_list from the article object ref_list objects
