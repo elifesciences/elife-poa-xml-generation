@@ -169,6 +169,33 @@ def build_ref_list(refs):
     return ref_list
 
 
+def component_title(component):
+    """
+    Label, title and caption
+    Title is the label text plus the title text
+    Title may contain italic tag, etc.
+    """
+    
+    title = u''
+    
+    label_text = u''
+    title_text = u''
+    if component.get('label'):
+        label_text = component.get('label')
+        
+    if component.get('title'):
+        title_text = component.get('title')
+
+    title = unicode(label_text)
+    if label_text != '' and title_text != '':
+        title += ' '
+    title += unicode(title_text)
+    
+    if component.get('type') == 'abstract' and title == '':
+        title = 'Abstract'
+    
+    return title
+
 
 def build_components(components):
     """
@@ -179,55 +206,41 @@ def build_components(components):
     for comp in components:
         component = eLifeComponent()
         
+        # DOI and Resource URL
         if comp.get('doi'):
             component.doi = comp.get('doi')
-        
-        # Depending on the type of parent tag, extract different content
-        if comp.get('type') == 'table-wrap':
-            # TODO!!!
-            pass
-        elif comp.get('type') == 'supplementary-material':
-            # TODO!!!
-            pass   
-        elif comp.get('type') == 'fig':
-            # Figures
-            
-            # Title is the label text plus the title text
-            # Title may contain italic tag, etc.
-            label_text = u''
-            title_text = u''
-            
-            if comp.get('label'):
-                label_text = comp.get('label')
-                
-            if comp.get('title'):
-                title_text = comp.get('title')
+            # Based on lookup URL path logic
+            doi_resource = "http://elifesciences.org/lookup/doi/" + comp.get('doi')
+            component.doi_resource = doi_resource
 
-            component.title = unicode(label_text) + ' ' + unicode(title_text)
-                
+        if component_title(comp) != '':
+            component.title = component_title(comp)
+        
+        # Subtitle
+        if comp.get('type') in ['supplementary-material', 'fig']:
+
             if comp.get('full_caption'):
                 subtitle = comp.get('full_caption')
                 subtitle = clean_abstract(subtitle)
                 component.subtitle = subtitle
-            
-            # Mime type
-            # TODO!!
-            """
-            for graphic_tag in parent_tag.findall('./graphic'):
-                # There is a graphic tag, set as tiff
-                component.mime_type = 'image/tiff'
-            """
-            """
-            for media_tag in parent_tag.findall('./media'):
-                # There is a media tag i.e. video
-                # TODO!!!
-            """
+
+        # Mime type 
+        if comp.get('type') in ['abstract', 'table-wrap', 'sub-article']:
+            component.mime_type = 'text/plain'
+
+        # TODO!!
+        """
+        for graphic_tag in parent_tag.findall('./graphic'):
+            # There is a graphic tag, set as tiff
+            component.mime_type = 'image/tiff'
+        """
+        """
+        for media_tag in parent_tag.findall('./media'):
+            # There is a media tag i.e. video
+            # TODO!!!
+        """
         
-        # Resource URL
-        if comp.get('doi'):
-            # TO DO - Base it on prevailing URL path logic
-            doi_resource = "http://elifesciences.org/lookup/doi/" + comp.get('doi')
-            component.doi_resource = doi_resource
+
         
         # Append it to our list of components
         component_list.append(component)
