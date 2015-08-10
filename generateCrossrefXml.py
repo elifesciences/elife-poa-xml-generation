@@ -366,9 +366,13 @@ class crossrefXML(object):
                 self.citation = SubElement(self.citation_list, 'citation')
                 self.citation.set("key", str(ref_index))
                 
-                if ref.get_journal_title():
-                    self.journal_title = SubElement(self.citation, 'journal_title')
-                    self.journal_title.text = ref.get_journal_title()
+                if ref.source:
+                    if ref.publication_type == "journal":
+                        self.journal_title = SubElement(self.citation, 'journal_title')
+                        self.journal_title.text = ref.source
+                    else:
+                        self.volume_title = SubElement(self.citation, 'volume_title')
+                        self.volume_title.text = ref.source
                 
                 # Only set the first author surname
                 if len(ref.authors) > 0:

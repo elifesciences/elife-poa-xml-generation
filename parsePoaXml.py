@@ -124,8 +124,8 @@ def build_ref_list(refs):
         ref = eLifeRef()
         
         # Publcation Type
-        if reference.get('publication_type'):
-            ref.publication_type = reference.get('publication_type')
+        if reference.get('publication-type'):
+            ref.publication_type = reference.get('publication-type')
     
         # Article title
         if reference.get('article_title'):
