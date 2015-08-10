@@ -225,22 +225,15 @@ def build_components(components):
                 component.subtitle = subtitle
 
         # Mime type 
-        if comp.get('type') in ['abstract', 'table-wrap', 'sub-article']:
+        if comp.get('type') in ['abstract', 'table-wrap', 'sub-article',
+                                'chem-struct-wrap', 'boxed-text']:
             component.mime_type = 'text/plain'
-
-        # TODO!!
-        """
-        for graphic_tag in parent_tag.findall('./graphic'):
-            # There is a graphic tag, set as tiff
+        if comp.get('type') in ['fig']:
             component.mime_type = 'image/tiff'
-        """
-        """
-        for media_tag in parent_tag.findall('./media'):
-            # There is a media tag i.e. video
-            # TODO!!!
-        """
-        
-
+        elif comp.get('type') in ['media', 'supplementary-material']:
+            if comp.get('mimetype') and comp.get('mime-subtype'):
+                component.mime_type = (comp.get('mimetype') + '/'
+                                       + comp.get('mime-subtype'))
         
         # Append it to our list of components
         component_list.append(component)
