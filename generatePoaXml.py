@@ -48,7 +48,7 @@ class eLife2XML(object):
         self.root.set('article-type', poa_article.articleType)
         self.root.set('xmlns:mml', 'http://www.w3.org/1998/Math/MathML')
         self.root.set('xmlns:xlink', 'http://www.w3.org/1999/xlink')
-        self.root.set('dtd-version', '1.1d1')
+        self.root.set('dtd-version', '1.1d3')
 
         # set comment
         generated = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -486,7 +486,7 @@ class eLife2XML(object):
         print self.root
 
     def prettyXML(self):
-        publicId = '-//NLM//DTD JATS (Z39.96) Journal Archiving and Interchange DTD v1.1d1 20130915//EN'
+        publicId = '-//NLM//DTD JATS (Z39.96) Journal Archiving and Interchange DTD v1.1d3 20150301//EN'
         systemId = 'JATS-archivearticle1.dtd'
         encoding = 'utf-8'
         namespaceURI = None
