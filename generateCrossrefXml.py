@@ -47,6 +47,7 @@ class crossrefXML(object):
         self.root.set('xmlns:ai', 'http://www.crossref.org/AccessIndicators.xsd')
         self.root.set('xsi:schemaLocation', 'http://www.crossref.org/schema/4.3.5 http://www.crossref.org/schemas/crossref4.3.5.xsd')
         self.root.set('xmlns:mml', 'http://www.w3.org/1998/Math/MathML')
+        self.root.set('xmlns:jats', 'http://www.ncbi.nlm.nih.gov/JATS1')
 
         # Publication date
         if pub_date is None:
@@ -151,6 +152,9 @@ class crossrefXML(object):
 
         for contrib_type in self.contrib_types:
             self.set_contributors(self.journal_article, poa_article, contrib_type)
+        
+        self.set_abstract(self.journal_article, poa_article)
+        self.set_digest(self.journal_article, poa_article)
         
         # Journal publication date
         pub_date = self.get_pub_date(poa_article)
@@ -291,6 +295,45 @@ class crossrefXML(object):
     
             # Reset sequence value after the first sucessful loop
             sequence = "additional"
+
+    def set_abstract(self, parent, poa_article):
+        if poa_article.abstract:
+            abstract = '<p>' + poa_article.abstract + '</p>'
+            self.set_abstract_tag(parent, abstract, type="abstract")
+            
+    def set_digest(self, parent, poa_article):
+        if poa_article.digest:
+            self.set_abstract_tag(parent, poa_article.digest, type="executive-summary")
+
+    def set_abstract_tag(self, parent, abstract, type):
+
+        tag_name = 'jats:abstract'
+        namespaces = ' xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1" '
+
+        attributes = []
+        attributes_text = ''
+        if type == 'executive-summary':
+            attributes = ['abstract-type']
+            attributes_text = ' abstract-type="executive-summary" '
+
+        tag_converted_abstract = abstract
+        tag_converted_abstract = replace_tags(tag_converted_abstract, 'p', 'jats:p')
+        tag_converted_abstract = replace_tags(tag_converted_abstract, 'italic', 'jats:italic')
+        tag_converted_abstract = replace_tags(tag_converted_abstract, 'bold', 'jats:bold')
+        tag_converted_abstract = replace_tags(tag_converted_abstract, 'underline', 'jats:underline')
+        tag_converted_abstract = replace_tags(tag_converted_abstract, 'sub', 'jats:sub')
+        tag_converted_abstract = replace_tags(tag_converted_abstract, 'sup', 'jats:sup')
+        #tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
+        
+        tagged_string = '<' + tag_name + namespaces + attributes_text + '>'
+        tagged_string += tag_converted_abstract
+        tagged_string += '</' + tag_name + '>'
+        reparsed = minidom.parseString(xml_escape_ampersand(tagged_string).encode('utf-8'))
+        
+        recursive = False
+        root_xml_element = append_minidom_xml_to_elementtree_xml(
+            parent, reparsed, recursive, attributes
+        )
 
     def set_publication_date(self, parent, pub_date):
         # pub_date is a python time object

@@ -256,11 +256,12 @@ def remove_tag(tag_name, string):
     for tag in tags:
         tag.unwrap()
     
-    # If the abstract starts with a tag, then it will not be enclosed in a p tag
-    if hasattr(soup.body.p, "children"):
+    # If the abstract starts with a tag, and has only one p tag
+    #   then it will not be enclosed in a p tag
+    if hasattr(soup.body.p, "children") and len(soup.find_all('p')) == 1:
         return "".join(map(unicode, soup.body.p.children)) or None
-    elif hasattr(soup.body, "children"):
-        # No p tag, use all the children
+    if hasattr(soup.body, "children"):
+        # No p tag or more than one p tag, use all the children
         return "".join(map(unicode, soup.body.children)) or None
     else:
         return None
@@ -310,6 +311,9 @@ def build_article_from_xml(article_xml_filename):
         
     # abstract
     article.abstract = clean_abstract(parser.full_abstract(soup))
+    
+    # digest
+    article.digest = clean_abstract(parser.full_digest(soup))
     
     # contributors
     contrib_type = "author"
