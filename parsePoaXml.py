@@ -38,13 +38,20 @@ def build_contributors(authors, contrib_type):
     
     for author in authors:
         contributor = None
+        author_contrib_type = contrib_type
         
         surname = author.get("surname")
         given_name = author.get("given-names")
         collab = author.get("collab")
 
+        # Small hack for on-behalf-of type when building authors
+        #  use on-behalf-of as the contrib_type
+        if author.get("type") and author.get("type") == "on-behalf-of":
+            collab = author.get("on-behalf-of")
+            author_contrib_type = "on-behalf-of"
+
         if surname or collab:
-            contributor = eLifePOSContributor(contrib_type, surname, given_name, collab)
+            contributor = eLifePOSContributor(author_contrib_type, surname, given_name, collab)
         else:
             continue
         
@@ -320,8 +327,9 @@ def build_article_from_xml(article_xml_filename):
     
     # contributors
     contrib_type = "author"
-    authors = parser.authors(soup, contrib_type)
-    contributors = build_contributors(authors, contrib_type)
+    all_contributors = parser.contributors(soup)
+    author_contributors = filter(lambda con: con.get('type') in ['author','on-behalf-of'], all_contributors)
+    contributors = build_contributors(author_contributors, contrib_type)
     article.contributors = contributors
     
     contrib_type = "author non-byline"

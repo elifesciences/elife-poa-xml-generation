@@ -30,7 +30,7 @@ class crossrefXML(object):
         self.root = Element('doi_batch')
 
         # set the boiler plate values
-        self.contrib_types = ["author"]
+        self.contrib_types = ["author","on-behalf-of"]
         self.elife_journal_id = "eLife"
         self.elife_journal_title = "eLife"
         self.elife_journal_volume = "4"
@@ -150,8 +150,7 @@ class crossrefXML(object):
         # Set the title with italic tag support
         self.set_titles(self.journal_article, poa_article)
 
-        for contrib_type in self.contrib_types:
-            self.set_contributors(self.journal_article, poa_article, contrib_type)
+        self.set_contributors(self.journal_article, poa_article, self.contrib_types)
         
         self.set_abstract(self.journal_article, poa_article)
         self.set_digest(self.journal_article, poa_article)
@@ -251,7 +250,7 @@ class crossrefXML(object):
                 self.ai_program_ref.set('applies_to', applies_to)
                 self.ai_program_ref.text = license_href
 
-    def set_contributors(self, parent, poa_article, contrib_type = None):
+    def set_contributors(self, parent, poa_article, contrib_types = None):
         # If contrib_type is None, all contributors will be added regardless of their type
         self.contributors = SubElement(parent, "contributors")
 
@@ -259,23 +258,29 @@ class crossrefXML(object):
         # Use the natural list order of contributors when setting the first author
         sequence = "first"
         for contributor in poa_article.contributors:
-            if contrib_type:
+            if contrib_types:
                 # Filter by contrib_type if supplied
-                if contributor.contrib_type != contrib_type:
+                if contributor.contrib_type not in contrib_types:
                     continue
+            
+            if contributor.contrib_type == "on-behalf-of":
+                contributor_role = "author"
+            else:
+                contributor_role = contributor.contrib_type
+                
             # Skip contributors with no surname
             if contributor.surname == "" or contributor.surname is None:
                 # Most likely a group author
                 if contributor.collab:
                     self.organization = SubElement(self.contributors, "organization")
                     self.organization.text = contributor.collab
-                    self.organization.set("contributor_role", contributor.contrib_type)
+                    self.organization.set("contributor_role", contributor_role)
                     self.organization.set("sequence", sequence)
             
             else:
                 self.person_name = SubElement(self.contributors, "person_name")
     
-                self.person_name.set("contributor_role", contributor.contrib_type)
+                self.person_name.set("contributor_role", contributor_role)
                 
                 if contributor.corresp == True or contributor.equal_contrib == True:
                     self.person_name.set("sequence", sequence)
