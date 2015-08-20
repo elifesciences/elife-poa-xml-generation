@@ -465,6 +465,9 @@ class crossrefXML(object):
                     self.format = SubElement(self.component, 'format')
                     self.format.set("mime_type", self.crossref_mime_type(comp.mime_type))
                 
+            if comp.permissions:
+                self.set_component_permissions(self.component, comp.permissions)
+                    
             if comp.doi:
                 self.doi_data = SubElement(self.component, 'doi_data')
                 self.doi_tag = SubElement(self.doi_data, 'doi')
@@ -472,6 +475,24 @@ class crossrefXML(object):
                 if comp.doi_resource:
                     self.resource = SubElement(self.doi_data, 'resource')
                     self.resource.text = comp.doi_resource
+  
+    def set_component_permissions(self, parent, permissions):
+        # Specific license to the component
+        
+        # TODO !!!
+        #self.component_ai_program = SubElement(parent, 'ai:program')
+        
+        for permission in permissions:
+            text_parts = []
+            
+            if permission.get('copyright_statement'):
+                text_parts.append(permission.get('copyright_statement'))
+            if permission.get('license'):
+                text_parts.append(permission.get('license'))
+            
+            if len(text_parts) > 0:
+                # TODO !!! Add this text somewhere. Issue #53
+                text = " ".join(text_parts)
   
     def set_subtitle(self, parent, component):
         tag_name = 'subtitle'

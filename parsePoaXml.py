@@ -235,6 +235,9 @@ def build_components(components):
                 component.mime_type = (comp.get('mimetype') + '/'
                                        + comp.get('mime-subtype'))
         
+        # Permissions
+        component.permissions = comp.get('permissions')
+        
         # Append it to our list of components
         component_list.append(component)
 

@@ -656,6 +656,7 @@ class eLifeComponent():
         self.mime_type = None
         self.doi = None
         self.doi_resource = None
+        self.permissions = None
 
 class eLifePOA():
     """
