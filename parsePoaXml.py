@@ -256,15 +256,24 @@ def remove_tag(tag_name, string):
     """
     Remove unwanted tags from the string, keeping the contents it surrounds,
     parsing it as HTML, then only keep the body paragraph contents
+    tag_name if ending in * can match tags starting with a value,
+    e.g. mml:*   will remove any tag with name starting with mml:
     """
     if string is None:
         return None
     
     soup = BeautifulSoup(string)
 
-    tags = soup.find_all(tag_name)
+    tags = soup.find_all(True)
     for tag in tags:
-        tag.unwrap()
+        if tag_name.endswith('*'):
+            # Wildcard match capability
+            if tag.name.startswith(tag_name[0:-1]):
+                tag.unwrap()
+        else:
+            # Exact match
+            if tag.name == tag_name:
+                tag.unwrap()
     
     # If the abstract starts with a tag, and has only one p tag
     #   then it will not be enclosed in a p tag
@@ -282,7 +291,7 @@ def clean_abstract(abstract):
     parsing it as HTML, then only keep the body paragraph contents
     """
 
-    remove_tags = ['xref', 'ext-link']
+    remove_tags = ['xref', 'ext-link', 'inline-formula', 'mml:*']
     for tag_name in remove_tags:
         abstract = remove_tag(tag_name, abstract)
     
