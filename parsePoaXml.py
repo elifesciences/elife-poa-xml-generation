@@ -170,6 +170,9 @@ def build_ref_list(refs):
                 if 'surname' in author:
                     ref_author['surname'] = author['surname']
                     ref.add_author(ref_author)
+                elif 'collab' in author:
+                    ref_author['collab'] = author['collab']
+                    ref.add_author(ref_author)
 
         ref_list.append(ref)
 

@@ -424,9 +424,12 @@ class crossrefXML(object):
                 
                 # Only set the first author surname
                 if len(ref.authors) > 0:
-                    author_surname = ref.authors[0]["surname"]
-                    self.author = SubElement(self.citation, 'author')
-                    self.author.text = author_surname
+                    if ref.authors[0].get("surname"):
+                        self.author = SubElement(self.citation, 'author')
+                        self.author.text = ref.authors[0].get("surname")
+                    elif ref.authors[0].get("collab"):
+                        self.author = SubElement(self.citation, 'author')
+                        self.author.text = ref.authors[0].get("collab")
                     
                 if ref.volume:
                     self.volume = SubElement(self.citation, 'volume')
