@@ -339,7 +339,7 @@ def build_article_from_xml(article_xml_filename):
     
     # contributors
     contrib_type = "author"
-    all_contributors = parser.contributors(soup)
+    all_contributors = parser.contributors(soup, detail="full")
     author_contributors = filter(lambda con: con.get('type') in ['author','on-behalf-of'], all_contributors)
     contributors = build_contributors(author_contributors, contrib_type)
     article.contributors = contributors
