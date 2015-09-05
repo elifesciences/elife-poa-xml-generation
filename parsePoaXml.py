@@ -301,11 +301,13 @@ def clean_abstract(abstract):
     return abstract
 
 
-def build_article_from_xml(article_xml_filename):
+def build_article_from_xml(article_xml_filename, detail="brief"):
     """
     Parse JATS XML with elifetools parser, and populate an
     eLifePOA article object
     Basic data crossref needs: article_id, doi, title, contributors with names set
+    detail="brief" is normally enough,
+    detail="full" will populate all the contributor affiliations that are linked by xref tags
     """
     
     error_count = 0
@@ -339,13 +341,13 @@ def build_article_from_xml(article_xml_filename):
     
     # contributors
     contrib_type = "author"
-    all_contributors = parser.contributors(soup, detail="full")
+    all_contributors = parser.contributors(soup, detail)
     author_contributors = filter(lambda con: con.get('type') in ['author','on-behalf-of'], all_contributors)
     contributors = build_contributors(author_contributors, contrib_type)
     article.contributors = contributors
     
     contrib_type = "author non-byline"
-    authors = parser.authors(soup, contrib_type)
+    authors = parser.authors(soup, contrib_type, detail)
     contributors_non_byline = build_contributors(authors, contrib_type)
     article.contributors = article.contributors + contributors_non_byline
     

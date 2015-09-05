@@ -116,6 +116,7 @@ Feature: Parse article XML
 
   Scenario: Parse article XML file contributor affiliations
     Given I have the document <document>
+    And I have detail full
     When I build article from xml
     And I set the object to article <property> index <index>
     And I set the object to contributor affiliation index <aff_index>

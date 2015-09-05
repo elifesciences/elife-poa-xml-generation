@@ -10,9 +10,20 @@ def have_the_document(step, document):
     world.document = document
     world.file_location = set_file_location(document)
 
+
+@step(u'I have detail (\S+)')
+def have_detail(step, detail):
+    world.detail = detail
+    assert world.detail is not None, \
+        "Got detail %s" % world.detail
+
 @step(u'I build article from xml')
 def i_build_article_from_xml(step):
-    (world.article, world.error_count) = build_article_from_xml(world.file_location)
+    if hasattr(world, 'detail'):
+        detail = world.detail
+    else:
+        detail = 'brief'
+    (world.article, world.error_count) = build_article_from_xml(world.file_location, detail)
     assert world.article is not None, \
         "Got article %s" % world.article
 
