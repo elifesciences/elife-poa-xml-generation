@@ -42,17 +42,19 @@ def i_have_the_decoded_string_decoded_string(step, decoded_string):
     assert world.decoded_string == decoded_string, \
         "Got decoded_string %s" % world.decoded_string
 
-@step(u'I have settings')
-def i_have_settings(step):
-    world.settings = settings
-    assert world.settings is not None, \
-        "Got settings %s" % world.settings
-
 @step(u'I read settings (\S+)')
 def i_read_settings_property(step, property):
-    world.value = getattr(world.settings, property)
+    world.value = getattr(settings, property)
     assert world.value is not None, \
         "Got value %s" % world.value
+
+@step(u'I import (\S+)')
+def i_import(step, library):
+    import importlib
+    mod = importlib.import_module(library)
+    setattr(world, library, mod)
+    assert getattr(world, library) is not None, \
+        "Got value %s" % getattr(world, library)
 
 @step(u'I have the value (.*)')
 def i_have_the_value(step, value):
@@ -72,17 +74,15 @@ def i_have_the_json_value(step, value):
     
 @step(u'I set settings (\S+) to (.*)')
 def i_set_settings_property_to_value(step, property, value):
-    attr = None
-    setattr(world.settings, property, value)
-    attr = getattr(world.settings, property)
+    setattr(settings, property, value)
+    attr = getattr(settings, property)
     assert attr is not None, \
         "Got attr %s" % str(attr)
     
 @step(u'I set json settings (\S+) to (.*)')
 def i_set_json_settings_property_to_value(step, property, value):
-    attr = None
-    setattr(world.settings, property, json.loads(str(value)))
-    attr = getattr(world.settings, property)
+    setattr(settings, property, json.loads(str(value)))
+    attr = getattr(settings, property)
     assert attr is not None, \
         "Got attr %s" % str(attr)
     
@@ -90,22 +90,22 @@ def i_set_json_settings_property_to_value(step, property, value):
 def i_set_xls_files_to_the_default(step):
     # Set to the default so it does not need to be repeated
     property = "XLS_FILES"
-    setattr(world.settings, property, XLS_FILES)
-    attr = getattr(world.settings, property)
+    setattr(settings, property, XLS_FILES)
+    attr = getattr(settings, property)
     assert attr is not None, \
         "Got attr %s" % str(attr)
     
 @step(u'I reload settings')
 def i_reload_settings(step):
-    reload(world.settings)
-    assert world.settings is not None, \
-        "Got settings %s" % world.settings
+    reload(settings)
+    assert settings is not None, \
+        "Got settings %s" % settings
     
 @step(u'I reload XML generation libraries')
 def i_reload_xml_generation_libraries(step):
     reload(parseCSVFiles)
-    assert world.settings is not None, \
-        "Got settings %s" % world.settings
+    assert parseCSVFiles is not None, \
+        "Got parseCSVFiles %s" % parseCSVFiles
     
 @step(u'I have article_id (\S+)')
 def i_have_article_id(step, article_id):
