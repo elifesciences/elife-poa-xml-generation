@@ -340,16 +340,15 @@ def build_article_from_xml(article_xml_filename, detail="brief"):
     article.digest = clean_abstract(parser.full_digest(soup))
     
     # contributors
-    contrib_type = "author"
     all_contributors = parser.contributors(soup, detail)
     author_contributors = filter(lambda con: con.get('type') in ['author','on-behalf-of'], all_contributors)
+    contrib_type = "author"
     contributors = build_contributors(author_contributors, contrib_type)
-    article.contributors = contributors
-    
+
     contrib_type = "author non-byline"
     authors = parser.authors(soup, contrib_type, detail)
     contributors_non_byline = build_contributors(authors, contrib_type)
-    article.contributors = article.contributors + contributors_non_byline
+    article.contributors = contributors + contributors_non_byline
     
     # license href
     license = eLifeLicense()
@@ -366,16 +365,13 @@ def build_article_from_xml(article_xml_filename, detail="brief"):
     article.research_organisms = parser.research_organism(soup)
     
     # funding awards 
-    award_groups = parser.full_award_groups(soup)
-    article.funding_awards = build_funding(award_groups)
+    article.funding_awards = build_funding(parser.full_award_groups(soup))
     
     # references or citations 
-    refs = parser.refs(soup)
-    article.ref_list = build_ref_list(refs)
+    article.ref_list = build_ref_list(parser.refs(soup))
     
     # components with component DOI 
-    components = parser.components(soup)
-    article.component_list = build_components(components)
+    article.component_list = build_components(parser.components(soup))
         
     # History dates   
     date_types = ["received", "accepted"]
