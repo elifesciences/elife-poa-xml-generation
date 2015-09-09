@@ -2,4 +2,5 @@
 omit =
     */virtualenv/*
     */Envs/*
+    */venv/*
     terrain.py
