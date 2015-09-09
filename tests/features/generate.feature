@@ -158,15 +158,15 @@ Feature: Generate POA XML
     
   Examples:
     | article_id     | property       | index    | subproperty   | attribute
-    #| 00003          | title          |          |               | This, 'title, includes "quotation", marks & more ü
-    #| 00003          | contributors   | 0        | surname       | Anand 
+    | 00003          | title          |          |               | This, 'title, includes "quotation", marks & more ü
+    | 00003          | contributors   | 0        | surname       | Anand 
     | 02935          | contributors   | 0        | surname       | Ju
-    #| 02935          | contributors   | 32       | surname       | Malkin
-    #| 02935          | contributors   | 33       | collab        | ICGC Breast Cancer Group
-    #| 02935          | contributors   | 34       | collab        | ICGC Chronic Myeloid Disorders Group
-    #| 02935          | contributors   | 35       | collab        | ICGC Prostate Cancer Group
-    #| 02935          | contributors   | 36       | surname       | Foster
-    #| 02935          | is_poa         |          |               | True
+    | 02935          | contributors   | 32       | surname       | Malkin
+    | 02935          | contributors   | 33       | collab        | ICGC Breast Cancer Group
+    | 02935          | contributors   | 34       | collab        | ICGC Chronic Myeloid Disorders Group
+    | 02935          | contributors   | 35       | collab        | ICGC Prostate Cancer Group
+    | 02935          | contributors   | 36       | surname       | Foster
+    | 02935          | is_poa         |          |               | True
     
         
   Scenario: Build POA XML for article
