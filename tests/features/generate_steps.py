@@ -48,14 +48,6 @@ def i_read_settings_property(step, property):
     assert world.value is not None, \
         "Got value %s" % world.value
 
-@step(u'I import (\S+)')
-def i_import(step, library):
-    import importlib
-    mod = importlib.import_module(library)
-    setattr(world, library, mod)
-    assert getattr(world, library) is not None, \
-        "Got value %s" % getattr(world, library)
-
 @step(u'I have the value (.*)')
 def i_have_the_value(step, value):
     # Type convert the value as required
