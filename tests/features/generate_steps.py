@@ -224,7 +224,7 @@ def i_have_the_xml_string_xml_string(step, xml_string):
 @step(u'I build POA XML for article')
 def i_build_poa_xml_for_article(step):
     world.attribute = build_xml_for_article(int(world.article_id))
-    assert world.attribute is True, \
+    assert world.attribute is not None, \
         "Got attribute %s" % world.attribute
     
 @step(u'I build POA article for article')

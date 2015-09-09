@@ -319,12 +319,14 @@ def build_article_for_article(article_id):
 	if not set_keywords(article, article_id): error_count = error_count + 1
 
 	# Building from CSV data it must be a POA type, set it
-	article.is_poa = True
+	if article:
+		article.is_poa = True
 
 	print error_count
 
 	# default conflict text
-	article.conflict_default = "The authors declare that no competing interests exist."
+	if article:
+		article.conflict_default = "The authors declare that no competing interests exist."
 	
 	if error_count == 0:
 		return article, error_count

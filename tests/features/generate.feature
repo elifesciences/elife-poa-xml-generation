@@ -182,4 +182,4 @@ Feature: Generate POA XML
     | article_id     | attribute
     | 00003          | True
     | 02935          | True
-    
+    | 99999          | False
