@@ -351,7 +351,7 @@ class pubMedPoaXML(object):
             tag_converted_abstract = replace_tags(tag_converted_abstract, 'italic', 'i')
             tag_converted_abstract = replace_tags(tag_converted_abstract, 'bold', 'b')
             tag_converted_abstract = replace_tags(tag_converted_abstract, 'underline', 'u')
-            tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
+            #tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
             tagged_string = '<' + tag_name + '>' + tag_converted_abstract + '</' + tag_name + '>'
             reparsed = minidom.parseString(xml_escape_ampersand(tagged_string).encode('utf-8'))
 
@@ -461,14 +461,14 @@ if __name__ == '__main__':
     article_xmls = [#"generated_xml_output/elife_poa_e02935.xml"
                     #,"generated_xml_output/Feature.xml"
                     "generated_xml_output/elife02935.xml"
-                    ,"generated_xml_output/elife04024.xml"
-                    ,"generated_xml_output/elife04034.xml"
-                    ,"generated_xml_output/elife04037.xml"
-                    ,"generated_xml_output/elife04105.xml"
-                    ,"generated_xml_output/elife04180.xml"
-                    ,"generated_xml_output/elife04586.xml"
-                    ,"generated_xml_output/elife_poa_e00662.xml"
-                    ,"generated_xml_output/elife_poa_e02923.xml"
+                    #,"generated_xml_output/elife04024.xml"
+                    #,"generated_xml_output/elife04034.xml"
+                    #,"generated_xml_output/elife04037.xml"
+                    #,"generated_xml_output/elife04105.xml"
+                    #,"generated_xml_output/elife04180.xml"
+                    #,"generated_xml_output/elife04586.xml"
+                    #,"generated_xml_output/elife_poa_e00662.xml"
+                    #,"generated_xml_output/elife_poa_e02923.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
