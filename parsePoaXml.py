@@ -403,10 +403,11 @@ def build_articles_from_article_xmls(article_xmls):
     """
 
     poa_articles = []
+    detail = "full"
     
     for article_xml in article_xmls:
         print "working on ", article_xml
-        article,error_count = build_article_from_xml(article_xml)
+        article,error_count = build_article_from_xml(article_xml, detail)
         if error_count == 0:
             poa_articles.append(article)
             
@@ -424,7 +425,7 @@ if __name__ == '__main__':
     
     for article_xml in article_xlms:
         print "working on ", article_xml
-        article,error_count = build_article_from_xml("generated_xml_output" + os.sep + article_xml)
+        article,error_count = build_article_from_xml("generated_xml_output" + os.sep + article_xml, detail="full")
         
         if error_count == 0:
             poa_articles.append(article)
