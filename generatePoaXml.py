@@ -171,8 +171,12 @@ class eLife2XML(object):
         #
         self.set_abstract(self.article_meta, poa_article)
         #
+        
+        # Disabled author keywords from inclusion Oct 2, 2015
+        """
         if len(poa_article.author_keywords) > 0:
             self.set_kwd_group_author_keywords(self.article_meta, poa_article)
+        """
         #
         if len(poa_article.research_organisms) > 0:
             self.set_kwd_group_research_organism(self.article_meta, poa_article)
