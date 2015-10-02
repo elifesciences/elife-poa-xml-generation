@@ -216,11 +216,17 @@ class pubMedPoaXML(object):
                 self.collective_name.text = contributor.collab
             
             # Add each affiliation for multiple affiliation support
+            non_blank_aff_count = len(filter(lambda aff: aff.text != "", contributor.affiliations))             
             for aff in contributor.affiliations:
                 if aff.text != "":
-                    self.affiliation_info = SubElement(self.person_name, "AffiliationInfo")
-                    self.affiliation = SubElement(self.affiliation_info, "Affiliation")
-                    self.affiliation.text = aff.text
+                    if non_blank_aff_count == 1:
+                        self.affiliation = SubElement(self.person_name, "Affiliation")
+                        self.affiliation.text = aff.text
+                    elif non_blank_aff_count > 1:
+                        # Wrap each in AffiliationInfo tag
+                        self.affiliation_info = SubElement(self.person_name, "AffiliationInfo")
+                        self.affiliation = SubElement(self.affiliation_info, "Affiliation")
+                        self.affiliation.text = aff.text
                 
             if contributor.orcid:
                 self.orcid = SubElement(self.person_name, "Identifier")
@@ -461,14 +467,14 @@ if __name__ == '__main__':
     article_xmls = [#"generated_xml_output/elife_poa_e02935.xml"
                     #,"generated_xml_output/Feature.xml"
                     "generated_xml_output/elife02935.xml"
-                    #,"generated_xml_output/elife04024.xml"
-                    #,"generated_xml_output/elife04034.xml"
-                    #,"generated_xml_output/elife04037.xml"
-                    #,"generated_xml_output/elife04105.xml"
-                    #,"generated_xml_output/elife04180.xml"
-                    #,"generated_xml_output/elife04586.xml"
-                    #,"generated_xml_output/elife_poa_e00662.xml"
-                    #,"generated_xml_output/elife_poa_e02923.xml"
+                    ,"generated_xml_output/elife04024.xml"
+                    ,"generated_xml_output/elife04034.xml"
+                    ,"generated_xml_output/elife04037.xml"
+                    ,"generated_xml_output/elife04105.xml"
+                    ,"generated_xml_output/elife04180.xml"
+                    ,"generated_xml_output/elife04586.xml"
+                    ,"generated_xml_output/elife_poa_e00662.xml"
+                    ,"generated_xml_output/elife_poa_e02923.xml"
                     ]
     
     poa_articles = build_articles_from_article_xmls(article_xmls)
