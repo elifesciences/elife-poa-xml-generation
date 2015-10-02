@@ -215,10 +215,18 @@ class pubMedPoaXML(object):
                 self.collective_name = SubElement(self.person_name, "CollectiveName")
                 self.collective_name.text = contributor.collab
             
-            # Only add one affiliation per author for Pubmed
-            for aff in contributor.affiliations[:1]:
-                self.affiliation = SubElement(self.person_name, "Affiliation")
-                self.affiliation.text = aff.text
+            # Add each affiliation for multiple affiliation support
+            non_blank_aff_count = len(filter(lambda aff: aff.text != "", contributor.affiliations))             
+            for aff in contributor.affiliations:
+                if aff.text != "":
+                    if non_blank_aff_count == 1:
+                        self.affiliation = SubElement(self.person_name, "Affiliation")
+                        self.affiliation.text = aff.text
+                    elif non_blank_aff_count > 1:
+                        # Wrap each in AffiliationInfo tag
+                        self.affiliation_info = SubElement(self.person_name, "AffiliationInfo")
+                        self.affiliation = SubElement(self.affiliation_info, "Affiliation")
+                        self.affiliation.text = aff.text
                 
             if contributor.orcid:
                 self.orcid = SubElement(self.person_name, "Identifier")
@@ -349,7 +357,7 @@ class pubMedPoaXML(object):
             tag_converted_abstract = replace_tags(tag_converted_abstract, 'italic', 'i')
             tag_converted_abstract = replace_tags(tag_converted_abstract, 'bold', 'b')
             tag_converted_abstract = replace_tags(tag_converted_abstract, 'underline', 'u')
-            tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
+            #tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
             tagged_string = '<' + tag_name + '>' + tag_converted_abstract + '</' + tag_name + '>'
             reparsed = minidom.parseString(xml_escape_ampersand(tagged_string).encode('utf-8'))
 
