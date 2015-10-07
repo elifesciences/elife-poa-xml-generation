@@ -637,6 +637,7 @@ class eLifeRef():
         self.volume = None
         self.fpage = None
         self.lpage = None
+        self.elocation_id = None
         self.doi = None
         self.year = None
         # For books

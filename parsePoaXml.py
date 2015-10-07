@@ -161,7 +161,12 @@ def build_ref_list(refs):
         # Year
         if reference.get('year'):
             ref.year = reference.get('year')
-            
+
+        # elocation-id
+        if reference.get('elocation-id'):
+            print "set elocation-id"
+            ref.elocation_id = reference.get('elocation-id')
+
         # Authors
         if reference.get('authors'):
             for author in reference.get('authors'):
