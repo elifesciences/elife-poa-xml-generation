@@ -164,7 +164,6 @@ def build_ref_list(refs):
 
         # elocation-id
         if reference.get('elocation-id'):
-            print "set elocation-id"
             ref.elocation_id = reference.get('elocation-id')
 
         # Authors

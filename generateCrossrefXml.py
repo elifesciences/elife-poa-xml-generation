@@ -448,11 +448,9 @@ class crossrefXML(object):
                     self.doi.text = ref.doi
                     
                 if ref.elocation_id:
-                    # TODO!!
-                    pass
-                    #self.item_number = SubElement(self.citation, 'item_number')
-                    #self.item_number.set("item_number_type", "article_number")
-                    #self.item_number.text = ref.elocation_id
+                    # Until an alternate tag is available, elocation-id goes into the first_page tag
+                    self.first_page = SubElement(self.citation, 'first_page')
+                    self.first_page.text = ref.elocation_id
 
     def set_component_list(self, parent, poa_article):
         """
