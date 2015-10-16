@@ -575,8 +575,8 @@ class crossrefXML(object):
         rough_string = ElementTree.tostring(self.root, encoding)
         reparsed = minidom.parseString(rough_string)
 
-        return reparsed.toprettyxml(indent="\t", encoding = encoding)
-        #return reparsed.toxml(encoding = encoding)
+        #return reparsed.toprettyxml(indent="\t", encoding = encoding)
+        return reparsed.toxml(encoding = encoding)
 
 def build_crossref_xml_for_articles(poa_articles):
     """
