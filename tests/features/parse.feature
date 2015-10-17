@@ -116,6 +116,7 @@ Feature: Parse article XML
 
   Scenario: Parse article XML file contributor affiliations
     Given I have the document <document>
+    And I have detail full
     When I build article from xml
     And I set the object to article <property> index <index>
     And I set the object to contributor affiliation index <aff_index>
@@ -179,4 +180,42 @@ Feature: Parse article XML
     | elife02935.xml        | pub        | month          | 10
     | elife02935.xml        | pub        | year           | 2014
     
+    
+  Scenario: Parse article XML file ref list
+    Given I have the document <document>
+    When I build article from xml
+    And I set the object to article <property> index <index>
+    And I have the attribute <attribute>
+    Then I have object attribute value <value>
 
+  Examples:
+    | document              | property   | index  | attribute         | value
+    | elife00013.xml        | ref_list   | 0      | source            | Chemical communication
+    | elife00013.xml        | ref_list   | 0      | year              | 1992
+    | elife00013.xml        | ref_list   | 0      | publication_type  | book
+    
+    | elife-02362-v2.xml    | ref_list   | 72     | article_title     | HIV-1 vpu blocks recycling and biosynthetic transport of the intrinsic immunity factor CD317/Tetherin to overcome the virion release restriction
+    | elife-02362-v2.xml    | ref_list   | 72     | year              | 2011
+    | elife-02362-v2.xml    | ref_list   | 72     | source            | Mbio
+    | elife-02362-v2.xml    | ref_list   | 72     | volume            | 2
+    | elife-02362-v2.xml    | ref_list   | 72     | doi               | 10.1128/mBio.00036-11
+    | elife-02362-v2.xml    | ref_list   | 72     | publication_type  | journal
+    | elife-02362-v2.xml    | ref_list   | 72     | elocation_id      | e00036-11
+    
+  Scenario: Parse article XML file ref list authors
+    Given I have the document <document>
+    When I build article from xml
+    And I set the object to article <property> index <index>
+    And I set the object to ref authors index <a_index>
+    And I have the attribute <attribute>
+    Then I have dict attribute value <value>
+
+  Examples:
+    | document              | property   | index  | a_index | attribute         | value
+    | elife00013.xml        | ref_list   | 0      | 0       | surname           | Agosta
+    | elife00013.xml        | ref_list   | 1      | 0       | surname           | Ahmed
+    | elife00013.xml        | ref_list   | 1      | 1       | surname           | Yokota
+    | elife00013.xml        | ref_list   | 1      | 2       | surname           | Fujiwara
+    
+    | elife02935.xml        | ref_list   | 17     | 0       | collab            | 1000 Genomes Project Consortium
+    | elife02935.xml        | ref_list   | 17     | 1       | surname           | Abecasis

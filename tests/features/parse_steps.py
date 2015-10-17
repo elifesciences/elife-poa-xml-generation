@@ -10,9 +10,20 @@ def have_the_document(step, document):
     world.document = document
     world.file_location = set_file_location(document)
 
+
+@step(u'I have detail (\S+)')
+def have_detail(step, detail):
+    world.detail = detail
+    assert world.detail is not None, \
+        "Got detail %s" % world.detail
+
 @step(u'I build article from xml')
 def i_build_article_from_xml(step):
-    (world.article, world.error_count) = build_article_from_xml(world.file_location)
+    if hasattr(world, 'detail'):
+        detail = world.detail
+    else:
+        detail = 'brief'
+    (world.article, world.error_count) = build_article_from_xml(world.file_location, detail)
     assert world.article is not None, \
         "Got article %s" % world.article
 
@@ -105,6 +116,21 @@ def i_have_object_attribute_value(step, value):
     assert value == object_value, \
         "Got object value %s" % object_value
 
+@step(u'I have dict attribute value (.*)')
+def i_have_dict_attribute_value_value(step, value):
+    if value == "None":
+        value = None
+    if value == "False":
+        value = False
+    if value == "True":
+        value = True
+
+    dict_value = world.object.get(world.attribute)
+
+    assert value == dict_value, \
+        "Got dict value %s" % dict_value
+        
+
 @step(u'I have date object attribute value (\S+)')
 def i_have_date_object_attribute_value_value(step, value):
     if value == "None":
@@ -125,6 +151,20 @@ def i_have_date_object_attribute_value_value(step, value):
     
     assert value == object_value, \
         "Got object value %s" % object_value
+
+
+@step(u'I set the object to article ref_list index (.*)')
+def i_set_the_object_to_ref_list(step, index):
+    world.object = world.article.ref_list[int(index)]
+    assert world.object is not None, \
+        "Got article ref_list object %s" % world.object
+
+@step(u'I set the object to ref authors index (.*)')
+def i_set_object_to_ref_authors_index(step, a_index):
+    world.object = world.object.authors[int(a_index)]
+    assert world.object is not None, \
+        "Got ref object %s" % world.object
+
 
 
 def set_file_location(doc):

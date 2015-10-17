@@ -4,8 +4,7 @@ Feature: Generate POA XML
   I want to use the XML generation libraries
 
   Scenario: Check settings exist and their value
-    Given I have settings
-    When I read settings <property>
+    Given I read settings <property>
     Then I have the value <value>
     
   Examples:
@@ -15,9 +14,8 @@ Feature: Generate POA XML
     | GREATER_THAN_ESCAPE_SEQUENCE                | GTGT
 
   Scenario: Override settings values
-    Given I have settings
-    When I set settings <property> to <value>
-    And I read settings <property>
+    Given I set settings <property> to <value>
+    When I read settings <property>
     Then I have the value <value>
     
   Examples:
@@ -26,9 +24,8 @@ Feature: Generate POA XML
     | XLS_PATH                                    | test_data/
 
   Scenario: Override json settings values
-    Given I have settings
-    When I set json settings <property> to <value>
-    And I read settings <property>
+    Given I set json settings <property> to <value>
+    When I read settings <property>
     Then I have the json value <value>
     
   Examples:
@@ -47,9 +44,8 @@ Feature: Generate POA XML
     | Edit&#x00F3;rial&#x00F3; Department&#x00F3; | Editórialó Departmentó
     
   Scenario: Angle bracket escape sequence conversion
-    Given I have settings
+    Given I reload settings
     And I have the raw string <string>
-    And I reload settings
     When I decode the string with decode brackets
     Then I have the decoded string <decoded_string>
     
@@ -63,9 +59,7 @@ Feature: Generate POA XML
     | YLTLTsupGTGT1LTLT/supGTGTSLTLTsupGTGT2LTLT/supGTGTPLTLTsupGTGT3LTLT/supGTGTTLTLTsupGTGT4LTLT/supGTGTSLTLTsupGTGT5LTLT/supGTGTPLTLTsupGTGT6LTLT/supGTGTSLTLTsupGTGT7LTLT/supGTGT repeats                         | Y<sup>1</sup>S<sup>2</sup>P<sup>3</sup>T<sup>4</sup>S<sup>5</sup>P<sup>6</sup>S<sup>7</sup> repeats
     
   Scenario: Parse CSV files
-    Given I have settings
-    And I reload settings
-    And I set settings XLS_PATH to test_data/
+    Given I set settings XLS_PATH to test_data/
     And I set XLS_FILES to the default
     And I reload XML generation libraries
     And I have article_id <article_id>
@@ -152,9 +146,7 @@ Feature: Generate POA XML
     
     
   Scenario: Build eLifePOA article object for article
-    Given I have settings
-    And I reload settings
-    And I set settings XLS_PATH to test_data/
+    Given I set settings XLS_PATH to test_data/
     And I set XLS_FILES to the default
     And I reload XML generation libraries
     And I have article_id <article_id>
@@ -178,9 +170,7 @@ Feature: Generate POA XML
     
         
   Scenario: Build POA XML for article
-    Given I have settings
-    And I reload settings
-    And I set settings XLS_PATH to test_data/
+    Given I set settings XLS_PATH to test_data/
     And I set settings TARGET_OUTPUT_DIR to test_output/
     And I set XLS_FILES to the default
     And I reload XML generation libraries
@@ -192,4 +182,4 @@ Feature: Generate POA XML
     | article_id     | attribute
     | 00003          | True
     | 02935          | True
-    
+    | 99999          | False

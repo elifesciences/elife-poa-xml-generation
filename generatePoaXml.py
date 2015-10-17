@@ -597,6 +597,72 @@ class eLifeLicense():
             self.p1 = "This is an open-access article, free of all copyright, and may be freely reproduced, distributed, transmitted, modified, built upon, or otherwise used by anyone for any lawful purpose. The work is made available under the "
             self.p2 = " public domain dedication."
 
+class eLifeFundingAward():
+    """
+    An award group as part of a funding group
+    """
+    def __init__(self):
+        self.award_ids = []
+        self.institution_name = None
+        self.institution_id = None
+
+    def add_award_id(self, award_id):
+        self.award_ids.append(award_id)
+
+    def get_funder_identifier(self):
+        # Funder identifier is the unique id found in the institution_id DOI
+        try:
+            return self.institution_id.split('/')[-1]
+        except:
+            return None
+
+    def get_funder_name(self):
+        # Alias for institution_name parsed from the XML
+        return self.institution_name
+        
+    def get_award_number(self):
+        # Alias for award_id parsed from the XML
+        return self.award_id
+
+class eLifeRef():
+    """
+    A ref or citation in the article to support crossref VOR deposits initially
+    """
+    def __init__(self):
+        self.publication_type = None
+        self.authors = []
+        # For journals
+        self.article_title = None
+        self.source = None
+        self.volume = None
+        self.fpage = None
+        self.lpage = None
+        self.elocation_id = None
+        self.doi = None
+        self.year = None
+        # For books
+        self.volume_title = None
+
+    def add_author(self, author):
+        # Author is a dict of values
+        self.authors.append(author)
+        
+    def get_journal_title(self):
+        # Alias for source
+        return self.source
+
+class eLifeComponent():
+    """
+    An article component with a component DOI, primarily for crossref VOR deposits
+    """
+    def __init__(self):
+        self.title = None
+        self.subtitle = None
+        self.mime_type = None
+        self.doi = None
+        self.doi_resource = None
+        self.permissions = None
+
 class eLifePOA():
     """
     We include some boiler plate in the init, namely articleType
@@ -618,6 +684,9 @@ class eLifePOA():
         self.conflict_default = None
         self.ethics = []
         self.author_keywords = []
+        self.funding_awards = []
+        self.ref_list = []
+        self.component_list = []
         # For PubMed function a hook to specify if article was ever through PoA pipeline
         self.was_ever_poa = None
         self.is_poa = None
@@ -748,6 +817,8 @@ def escape_unmatched_angle_brackets(s):
     """
     allowed_tags = ['<i>','</i>',
                     '<italic>','</italic>',
+                    '<b>','</b>',
+                    '<bold>','</bold>',
                     '<sup>','</sup>',
                     '<sub>','</sub>',
                     '<u>', '</u>',
@@ -793,12 +864,13 @@ def convert_to_xml_string(s):
     s = escape_unmatched_angle_brackets(s)
     return s
 
-def append_minidom_xml_to_elementtree_xml(parent, xml, recursive = False):
+def append_minidom_xml_to_elementtree_xml(parent, xml, recursive = False, attributes = None):
     """
     Recursively,
     Given an ElementTree.Element as parent, and a minidom instance as xml,
     append the tags and content from xml to parent
     Used primarily for adding a snippet of XML with <italic> tags
+    attributes: a list of attribute names to copy
     """
 
     # Get the root tag name
@@ -806,6 +878,10 @@ def append_minidom_xml_to_elementtree_xml(parent, xml, recursive = False):
         tag_name = xml.documentElement.tagName
         node = xml.getElementsByTagName(tag_name)[0]
         new_elem = SubElement(parent, tag_name)
+        if attributes:
+            for attribute in attributes:
+                if xml.documentElement.getAttribute(attribute):
+                    new_elem.set(attribute, xml.documentElement.getAttribute(attribute))
     else:
         node = xml
         tag_name = node.tagName
@@ -823,7 +899,7 @@ def append_minidom_xml_to_elementtree_xml(parent, xml, recursive = False):
                 
         elif child_node.childNodes is not None:
             new_elem_sub = SubElement(new_elem, child_node.tagName)
-            new_elem_sub = append_minidom_xml_to_elementtree_xml(new_elem_sub, child_node, True)
+            new_elem_sub = append_minidom_xml_to_elementtree_xml(new_elem_sub, child_node, True, attributes)
 
         i = i + 1
 
