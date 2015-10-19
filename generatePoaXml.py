@@ -691,6 +691,7 @@ class eLifePOA():
         self.was_ever_poa = None
         self.is_poa = None
         self.volume = None
+        self.elocation_id = None
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)

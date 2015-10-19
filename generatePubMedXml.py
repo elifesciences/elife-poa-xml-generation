@@ -179,6 +179,11 @@ class pubMedPoaXML(object):
         self.e_location_id = SubElement(parent, "ELocationID")
         self.e_location_id.set("EIdType", "doi")
         self.e_location_id.text = poa_article.doi
+        
+        if poa_article.elocation_id:
+            self.e_location_id = SubElement(parent, "ELocationID")
+            self.e_location_id.set("EIdType", "pii")
+            self.e_location_id.text = poa_article.elocation_id
 
     def set_language(self, parent, poa_article):
         self.language = SubElement(parent, "Language")

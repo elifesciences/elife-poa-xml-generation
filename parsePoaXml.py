@@ -343,6 +343,9 @@ def build_article_from_xml(article_xml_filename, detail="brief"):
     # digest
     article.digest = clean_abstract(parser.full_digest(soup))
     
+    # elocation-id
+    article.elocation_id = parser.elocation_id(soup)
+    
     # contributors
     all_contributors = parser.contributors(soup, detail)
     author_contributors = filter(lambda con: con.get('type') in ['author','on-behalf-of'], all_contributors)
