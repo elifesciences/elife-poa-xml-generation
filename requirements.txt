@@ -1,7 +1,7 @@
 GitPython==0.3.2.1
 xlrd==0.9.3
 requests==2.5.3
-elementtree
+elementtree==1.2.6.post20050316
 PyPDF2==1.20
 beautifulsoup4==4.3.2
 elifetools==0.1.3
