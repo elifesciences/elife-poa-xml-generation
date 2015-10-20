@@ -1,6 +1,8 @@
 
 [![Build Status](https://travis-ci.org/elifesciences/elife-poa-xml-generation.svg?branch=master)](https://travis-ci.org/elifesciences/elife-poa-xml-generation)
 
+[![Coverage](https://coveralls.io/repos/elife-poa-xml-generation/badge.svg)](https://coveralls.io/r/elifesciences/elife-poa-xml-generation)
+
 # Background
 
 This is a project to create XML files that conform to the output we expect for delivery to HighWire for the publish on accept project.
