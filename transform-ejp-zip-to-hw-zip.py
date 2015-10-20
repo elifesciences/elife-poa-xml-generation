@@ -1,6 +1,6 @@
 import zipfile
 import glob
-from elementtree import ElementTree as ET
+from xml.etree import ElementTree as ET
 import logging
 import settings as settings
 import arrow

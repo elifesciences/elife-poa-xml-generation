@@ -11,10 +11,10 @@ Feature: Use python imports and requirements
   Examples:
     | package_name
     | git
-    | elementtree
     | generatePoaXml
     | xml_generation
     | parseCSVFiles
     | settings
     | lxml
     | requests
+    | arrow
