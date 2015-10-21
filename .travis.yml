@@ -1,0 +1,14 @@
+language: python
+python:
+  - "2.7"
+sudo: false
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+# command to run tests
+before_script:
+  - cp example-settings.py settings.py
+  - cd tests
+script: lettuce
+after_success: coveralls
