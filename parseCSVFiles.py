@@ -463,7 +463,7 @@ def decode_cp1252(str):
 	try:
 		# See if it is not safe to encode to ascii first
 		junk = str.encode('ascii')
-	except UnicodeDecodeError:
+	except UnicodeEncodeError:
 		# Wrap the decode in another exception to make sure this never fails
 		try:
 			str = str.decode('cp1252')
