@@ -191,8 +191,8 @@ def set_author_info(article, article_id):
 
 			author_type = "author"
 
-			first_name = get_author_first_name(article_id, author_id)
-			last_name = get_author_last_name(article_id, author_id)
+			first_name = decode_cp1252(get_author_first_name(article_id, author_id))
+			last_name = decode_cp1252(get_author_last_name(article_id, author_id))
 			middle_name = get_author_middle_name(article_id, author_id)
 			#initials = middle_name_initials(middle_name)
 			if middle_name.strip() != "":

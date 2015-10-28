@@ -452,6 +452,25 @@ def unserialise_ethics(ethic):
 	unserial_ethic = unserial_ethic.replace("GTGT", ">")
 	return unserial_ethic
 
+def decode_cp1252(str):
+	"""
+	CSV files look to be in CP-1252 encoding (Western Europe)
+	Decoding to ASCII is normally fine, except when it gets an O umlaut, for example
+	In this case, values must be decoded from cp1252 in order to be added as unicode
+	to the final XML output.
+	This function helps do that in selected places, like on author surnames
+	"""
+	try:
+		# See if it is not safe to encode to ascii first
+		junk = str.encode('ascii')
+	except UnicodeDecodeError:
+		# Wrap the decode in another exception to make sure this never fails
+		try:
+			str = str.decode('cp1252')
+		except:
+			pass
+	return str
+
 def parse_ethics(ethic):
 	"""
 	Given angle bracket escaped XML string, parse
