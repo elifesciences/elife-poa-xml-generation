@@ -53,7 +53,7 @@ def set_title(article, article_id):
 def set_abstract(article, article_id):
 	logger.info("in set_abstract")
 	try:
-		abstract = get_abstract(article_id)
+		abstract = decode_cp1252(get_abstract(article_id))
 		article.abstract = convert_to_xml_string(abstract)
 		article.manuscript = article_id
 		return True
@@ -201,11 +201,11 @@ def set_author_info(article, article_id):
 			author = eLifePOSContributor(author_type, last_name, first_name)
 			affiliation = ContributorAffiliation()
 
-			department = get_author_department(article_id, author_id)
+			department = decode_cp1252(get_author_department(article_id, author_id))
 			if department.strip() != "":
 				affiliation.department = department
-			affiliation.institution = get_author_institution(article_id, author_id)
-			city = get_author_city(article_id, author_id)
+			affiliation.institution = decode_cp1252(get_author_institution(article_id, author_id))
+			city = decode_cp1252(get_author_city(article_id, author_id))
 			if city.strip() != "":
 				affiliation.city = city
 			affiliation.country = get_author_country(article_id, author_id)
