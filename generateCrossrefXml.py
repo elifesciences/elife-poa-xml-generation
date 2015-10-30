@@ -54,7 +54,11 @@ class crossrefXML(object):
             self.pub_date = time.gmtime()
             
         # Generate batch id
-        self.elife_doi_batch_id = "elife-" + time.strftime("%Y-%m-%d-%H%M%S", self.pub_date) + "-CrossRef"
+        batch_doi = ''
+        if len(poa_articles) == 1:
+            # If only one article is supplied, then add the doi to the batch file name
+            batch_doi = str(poa_articles[0].manuscript).zfill(5) + '-'
+        self.elife_doi_batch_id = "elife-crossref-" + batch_doi + time.strftime("%Y%m%d%H%M%S", self.pub_date)
 
         # set comment
         generated = time.strftime("%Y-%m-%d %H:%M:%S")
