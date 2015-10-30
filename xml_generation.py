@@ -53,7 +53,7 @@ def set_title(article, article_id):
 def set_abstract(article, article_id):
 	logger.info("in set_abstract")
 	try:
-		abstract = get_abstract(article_id)
+		abstract = decode_cp1252(get_abstract(article_id))
 		article.abstract = convert_to_xml_string(abstract)
 		article.manuscript = article_id
 		return True
