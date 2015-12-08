@@ -33,7 +33,6 @@ class crossrefXML(object):
         self.contrib_types = ["author","on-behalf-of"]
         self.elife_journal_id = "eLife"
         self.elife_journal_title = "eLife"
-        self.elife_journal_volume = "4"
         self.elife_email_address = 'production@elifesciences.org'
         self.elife_epub_issn = "2050-084X"
         self.elife_publisher_name = "eLife Sciences Publications, Ltd"
@@ -132,7 +131,7 @@ class crossrefXML(object):
             if poa_article.volume:
                 self.volume.text = poa_article.volume
             else:
-                self.volume.text = self.elife_journal_volume
+                self.volume.text = elife_journal_volume(pub_date)
         
             # Add journal article
             self.set_journal_article(self.journal, poa_article)
