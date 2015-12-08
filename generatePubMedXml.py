@@ -123,16 +123,6 @@ class pubMedPoaXML(object):
         self.issn = SubElement(self.journal, 'Issn')
         self.issn.text = self.elife_epub_issn
         
-        self.volume = SubElement(self.journal, "Volume")
-        # Use volume from the article unless not present then use the default
-        if poa_article.volume:
-            self.volume.text = poa_article.volume
-        else:
-            self.volume.text = self.elife_journal_volume
-
-        self.issue = SubElement(self.journal, "Issue")
-        self.issue.text = self.elife_journal_issue
-        
         #self.journal_pubdate = SubElement(self.journal, "PubDate")
         pub_type = self.get_pub_type(poa_article)
         if pub_type == "epublish":
@@ -144,6 +134,18 @@ class pubMedPoaXML(object):
             except:
                 # Default use the run time date
                 a_date = self.pub_date
+        
+        self.volume = SubElement(self.journal, "Volume")
+        # Use volume from the article unless not present then use the default
+        if poa_article.volume:
+            self.volume.text = poa_article.volume
+        else:
+            self.volume.text = elife_journal_volume(a_date)
+
+        self.issue = SubElement(self.journal, "Issue")
+        self.issue.text = self.elife_journal_issue
+        
+        # Add the pub date now
         self.set_pub_date(self.journal, a_date, pub_type)
 
     def set_replaces(self, parent, poa_article):

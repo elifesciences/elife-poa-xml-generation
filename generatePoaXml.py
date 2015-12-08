@@ -750,6 +750,17 @@ class ElifeDocumentType(minidom.DocumentType):
             writer.write("]")
         writer.write(">"+newl)
 
+def elife_journal_volume(pub_date):
+    """
+    volume value is based on the pub date year
+    pub_date is a python time object
+    """
+    try:
+        volume = str(pub_date.tm_year - 2011)
+    except:
+        volume = None
+    return volume
+
 def repl(m):
     # Convert hex to int to unicode character
     chr_code = int(m.group(1), 16)
