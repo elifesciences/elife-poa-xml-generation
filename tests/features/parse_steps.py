@@ -86,6 +86,13 @@ def i_set_the_object_to_article_research_organisms_index(step, index):
     assert world.object is not None, \
         "Got research_organisms object %s" % world.object
     
+@step(u'I set the object to article funding_awards index (.*)')
+def i_set_the_object_to_article_funding_awards_index(step, index):
+    print world.article.funding_awards[int(index)]
+    world.object = world.article.funding_awards[int(index)]
+    assert world.object is not None, \
+        "Got funding_awards object %s" % world.object
+    
 @step(u'I set the object to article date type (\S+)')
 def i_set_the_object_to_article_date_type(step, type):
     world.object = world.article.get_date(type)

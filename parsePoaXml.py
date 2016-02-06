@@ -101,23 +101,26 @@ def build_funding(award_groups):
     """
     Given a funding data, format it
     """
-    
+    if not award_groups:
+        return []
+        
     funding_awards = []
 
-    for id, award_group in award_groups.iteritems():
-        award = eLifeFundingAward()
-
-        if award_group.get('id-type') == "FundRef":
-            award.institution_id = award_group.get('id')
-            
-        award.institution_name = award_group.get('institution')
-
-        # TODO !!! Check for multiple award_id, if exists
-        if award_group.get('award-id'):
-            award.add_award_id(award_group.get('award-id'))
-
-        funding_awards.append(award)
-
+    for award_group in award_groups:
+        for id, award_group in award_group.iteritems():
+            award = eLifeFundingAward()
+    
+            if award_group.get('id-type') == "FundRef":
+                award.institution_id = award_group.get('id')
+                
+            award.institution_name = award_group.get('institution')
+    
+            # TODO !!! Check for multiple award_id, if exists
+            if award_group.get('award-id'):
+                award.add_award_id(award_group.get('award-id'))
+    
+            funding_awards.append(award)
+    
     return funding_awards
 
 
