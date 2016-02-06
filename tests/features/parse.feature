@@ -115,6 +115,7 @@ Feature: Parse article XML
     | elife02935.xml        | contributor        | 52      | surname        | Campbell
     | elife02935.xml        | contributor        | 53      | contrib_type   | author non-byline
     | elife02935.xml        | contributor        | 53      | surname        | Provenzano
+    | elife02935.xml        | funding_awards      | 0       | institution_name    | Wellcome Trust
 
   Scenario: Parse article XML file contributor affiliations
     Given I have the document <document>
