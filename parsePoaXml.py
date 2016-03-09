@@ -261,6 +261,27 @@ def build_components(components):
     return component_list
 
 
+
+def build_related_articles(related_articles):
+    """
+    Given parsed data build a list of related article objects
+    """
+    article_list = []
+    
+    for related_article in related_articles:
+        article = eLifeRelatedArticle()
+        if related_article.get('xlink_href'):
+            article.xlink_href = related_article.get('xlink_href')
+        if related_article.get('related_article_type'):
+            article.related_article_type = related_article.get('related_article_type')
+        if related_article.get('ext_link_type'):
+            article.ext_link_type = related_article.get('ext_link_type')
+
+        # Append it to our list
+        article_list.append(article)
+
+    return article_list
+
 def remove_tag(tag_name, string):
 
     """
@@ -326,6 +347,9 @@ def build_article_from_xml(article_xml_filename, detail="brief"):
     
     # Create the article object
     article = eLifePOA(doi, title=None)
+    
+    # Related articles
+    article.related_articles = build_related_articles(parser.related_article(soup))
     
     # Get publisher_id and set object manuscript value
     publisher_id = parser.publisher_id(soup)

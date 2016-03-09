@@ -663,6 +663,15 @@ class eLifeComponent():
         self.doi_resource = None
         self.permissions = None
 
+class eLifeRelatedArticle():
+    """
+    Related article tag data as an object
+    """
+    def __init__(self):
+        self.xlink_href = None
+        self.related_article_type = None
+        self.ext_link_type = None
+
 class eLifePOA():
     """
     We include some boiler plate in the init, namely articleType
@@ -692,6 +701,7 @@ class eLifePOA():
         self.is_poa = None
         self.volume = None
         self.elocation_id = None
+        self.related_articles = []
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)

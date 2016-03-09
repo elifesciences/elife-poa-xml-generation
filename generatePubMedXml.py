@@ -304,10 +304,11 @@ class pubMedPoaXML(object):
             self.publication_type = SubElement(parent, "PublicationType")
             if poa_article.articleType == "editorial":
                 self.publication_type.text = "EDITORIAL"
+            elif poa_article.articleType == "correction":
+                self.publication_type.text = "PUBLISHED ERRATUM"
             elif (poa_article.articleType == "research-article" 
                or poa_article.articleType == "discussion" 
-               or poa_article.articleType == "article-commentary" 
-               or poa_article.articleType == "correction"):
+               or poa_article.articleType == "article-commentary"):
                 self.publication_type.text = "JOURNAL ARTICLE"
 
     def set_article_id_list(self, parent, poa_article):
@@ -379,6 +380,16 @@ class pubMedPoaXML(object):
         # Keywords and others go in Object tags
         self.object_list = SubElement(parent, "ObjectList")
         
+        # Add related article data for correction articles
+        if poa_article.articleType == "correction":
+            for related_article in poa_article.related_articles:
+                if related_article.related_article_type == "corrected-article":
+                    object = self.set_object(self.object_list, "Erratum",
+                                             "type", str(related_article.ext_link_type))
+                    doi_param = SubElement(object, "Param")
+                    doi_param.set("Name", "id")
+                    doi_param.text = str(related_article.xlink_href)
+
         # Add research organisms
         for research_organism in poa_article.research_organisms:
             if research_organism.lower() != 'other':
@@ -430,6 +441,7 @@ class pubMedPoaXML(object):
         self.param= SubElement(self.object, "Param")
         self.param.set("Name", param_name)
         self.param.text = param
+        return self.object
 
     def printXML(self):
         print self.root
