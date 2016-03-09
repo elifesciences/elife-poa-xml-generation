@@ -386,7 +386,7 @@ class pubMedPoaXML(object):
                     object = self.set_object(self.object_list, "Erratum",
                                              "type", str(related_article.ext_link_type))
                     doi_param = SubElement(object, "Param")
-                    doi_param.set("Type", "id")
+                    doi_param.set("Name", "id")
                     doi_param.text = str(related_article.xlink_href)
 
         # Add research organisms
