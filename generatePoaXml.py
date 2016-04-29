@@ -702,6 +702,7 @@ class eLifePOA():
         self.volume = None
         self.elocation_id = None
         self.related_articles = []
+        self.version = None
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
