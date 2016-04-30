@@ -154,7 +154,7 @@ class pubMedPoaXML(object):
         """
             
         if ((poa_article.is_poa is False and poa_article.was_ever_poa is True)
-            or (poa_article.is_poa is True and self.get_has_date(poa_article, "pub") is True)):
+            or (poa_article.version and poa_article.version > 1)):
             self.replaces = SubElement(parent, 'Replaces')
             self.replaces.set("IdType", "doi")
             self.replaces.text = poa_article.doi
@@ -512,6 +512,8 @@ if __name__ == '__main__':
             pub_type = "pub"
             date_instance = eLifeDate(pub_type, pub_date)
             article.add_date(date_instance)
+        if article.doi == '10.7554/eLife.02923':
+            article.version = 2
     
     build_pubmed_xml_for_articles(poa_articles)
 
