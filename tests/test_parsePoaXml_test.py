@@ -10,29 +10,10 @@ import generatePoaXml
 # Import test settings last in order to override the regular settings
 import poa_test_settings as settings
 
-def override_settings():
-    # For now need to override settings to use test data
-
-    generatePoaXml.settings = settings
-
-def create_test_directories():
-    try:
-        os.mkdir(settings.TEST_TEMP_DIR)
-    except OSError:
-        pass
-
-    try:
-        os.mkdir(settings.TARGET_OUTPUT_DIR)
-    except OSError:
-        pass
-
 
 class TestParsePoaXml(unittest.TestCase):
 
     def setUp(self):
-        override_settings()
-        create_test_directories()
-
         self.passes = []
         self.passes.append('elife-02935-v2.xml')
         self.passes.append('elife-04637-v2.xml')
