@@ -212,7 +212,8 @@ def set_author_info(article, article_id):
 
 			contrib_type = get_author_contrib_type(article_id, author_id)
 			dual_corresponding = get_author_dual_corresponding(article_id, author_id)
-			if contrib_type == "Corresponding Author" or dual_corresponding == 1:
+			if (contrib_type == "Corresponding Author" or
+					(dual_corresponding.strip() != '' and int(dual_corresponding.strip()) == 1)):
 				email = get_author_email(article_id, author_id)
 				affiliation.email = get_author_email(article_id, author_id)
 				author.corresp = True
