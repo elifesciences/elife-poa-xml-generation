@@ -38,6 +38,15 @@ class TestXmlGeneration(unittest.TestCase):
         override_settings()
         create_test_directories()
 
+        self.passes = []
+        self.passes.append((3, 'elife_poa_e00003.xml'))
+        self.passes.append((2935, 'elife_poa_e02935.xml'))
+        self.passes.append((2725, 'elife_poa_e02725.xml'))
+        self.passes.append((12, 'elife_poa_e00012.xml'))
+
+        self.fails = []
+        self.fails.append((99999, ''))
+
     def read_uncommented_xml(self, xml_file_name):
         fp = open(xml_file_name, 'rb')
         xml_content = fp.read()
@@ -47,22 +56,24 @@ class TestXmlGeneration(unittest.TestCase):
         return xml_content
 
     def test_generate(self):
-        article_id = 3
-        xml = build_xml_for_article(article_id)
-        self.assertTrue(xml)
+        for (article_id, xml_file_name) in self.passes:
+            xml = build_xml_for_article(article_id)
+            self.assertTrue(xml)
+        for (article_id, xml_file_name) in self.fails:
+            xml = build_xml_for_article(article_id)
+            self.assertFalse(xml)
 
     def test_generate_and_compare(self):
-        article_id = 3
-        xml_file_name = 'elife_poa_e00003.xml'
-        xml = build_xml_for_article(article_id)
-        self.assertTrue(xml)
+        for (article_id, xml_file_name) in self.passes:
+            xml = build_xml_for_article(article_id)
+            self.assertTrue(xml)
 
-        # To compare XML generated to XML sample,
-        #  remove the comments tags that hold the timestamp and git commit hash value
-        generated_xml = self.read_uncommented_xml(settings.TARGET_OUTPUT_DIR +
-                                                  os.sep + xml_file_name)
-        compare_to_xml = self.read_uncommented_xml(settings.XLS_PATH + xml_file_name)
-        self.assertEqual(generated_xml, compare_to_xml)
+            # To compare XML generated to XML sample,
+            #  remove the comments tags that hold the timestamp and git commit hash value
+            generated_xml = self.read_uncommented_xml(settings.TARGET_OUTPUT_DIR +
+                                                      os.sep + xml_file_name)
+            compare_to_xml = self.read_uncommented_xml(settings.XLS_PATH + xml_file_name)
+            self.assertEqual(generated_xml, compare_to_xml)
 
 if __name__ == '__main__':
     unittest.main()
