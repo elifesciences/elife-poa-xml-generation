@@ -95,21 +95,6 @@ class pubMedPoaXML(object):
             pub_type = "aheadofprint"
         return pub_type
 
-    def get_has_date(self, poa_article, date_type):
-        """
-        Given an article object, determine whether the
-        date of type date_type's date object exists
-        Useful in generating Replaces tag for POA articles
-        """
-        
-        has_date = None
-        try:
-            poa_article.get_date(date_type).date
-            has_date = True
-        except:
-            has_date = False
-            
-        return has_date
 
     def set_journal(self, parent, poa_article):
         self.journal = SubElement(parent, "Journal")
@@ -479,6 +464,7 @@ def build_pubmed_xml_for_articles(poa_articles):
     f.write(prettyXML)
     f.close()
     
+    return prettyXML
     #print prettyXML
 
 if __name__ == '__main__':
@@ -515,7 +501,7 @@ if __name__ == '__main__':
         if article.doi == '10.7554/eLife.02923':
             article.version = 2
     
-    build_pubmed_xml_for_articles(poa_articles)
+    xml = build_pubmed_xml_for_articles(poa_articles)
 
 
 
