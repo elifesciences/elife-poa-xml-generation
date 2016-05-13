@@ -12,5 +12,7 @@ sample_pdf_decapitation_output/*
 sample_pdf_from_ejp/*
 staging_decapitate_pdf_dir/*
 tmp/*
+!tmp/.keepme
 tests/*.log
 tests/test_output/*
+tests/tmp/generated_xml_output/*
