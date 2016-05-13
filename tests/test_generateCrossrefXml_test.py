@@ -23,6 +23,12 @@ class TestGenerateCrossrefXml(unittest.TestCase):
         self.passes.append(('elife-04637-v2.xml', 'elife-crossref-04637-20160513134549.xml'))
 
     def clean_crossref_xml_for_comparison(self, xml_content):
+        # For now running a test on a PoA article ignore the
+        # <publication_date media_type="online"> which is set to the date it is generated
+        if '<doi_batch_id>elife-crossref-00003' in xml_content:
+            xml_content = re.sub(ur'<publication_date media_type="online">.*-->',
+                                 '</publication_date>', xml_content)
+
         xml_content = re.sub(ur'<!--.*-->', '', xml_content)
         xml_content = re.sub(ur'<doi_batch_id>.*</doi_batch_id>', '', xml_content)
         xml_content = re.sub(ur'<timestamp>.*</timestamp>', '', xml_content)
