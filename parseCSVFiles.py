@@ -426,6 +426,11 @@ def get_author_conflict(article_id, author_id):
                                      COLUMN_HEADINGS["author_conflict"])
     return attribute
 
+def get_author_orcid(article_id, author_id):
+    attribute = get_author_attribute(article_id, author_id,
+                                     COLUMN_HEADINGS["orcid"])
+    return attribute
+
 def get_group_authors(article_id):
     # Wrap in an exception because some empty rows throws IndexError
     try:

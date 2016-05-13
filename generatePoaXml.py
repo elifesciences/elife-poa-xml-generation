@@ -356,9 +356,9 @@ class eLife2XML(object):
                 self.role.text = "Reviewing editor"
 
             if contributor.orcid:
-                self.orcid = SubElement(self.contrib, "uri")
-                self.orcid.set("content-type", "orcid")
-                self.orcid.set("xlink:href", contributor.orcid)
+                self.orcid = SubElement(self.contrib, "contrib-id")
+                self.orcid.set("contrib-id-type", "orcid")
+                self.orcid.text = "http://orcid.org/" + contributor.orcid
 
             # Contributor conflict xref tag logic
             if contributor.conflict:

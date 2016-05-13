@@ -222,6 +222,10 @@ def set_author_info(article, article_id):
             if conflict.strip() != "":
                 author.set_conflict(conflict)
 
+            orcid = get_author_orcid(article_id, author_id)
+            if orcid.strip() != "":
+                author.orcid = orcid
+
             author.auth_id = `int(author_id)`
             author.set_affiliation(affiliation)
 

@@ -56,7 +56,8 @@ XLS_COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"author_conflict" : "poa_a_cmp",
 					"organisms" : "poa_ro_researchorganism",
 					"keywords" : "poa_kw_keyword",
-					"group_author" : "poa_ga"
+					"group_author" : "poa_ga",
+					"orcid" : "ORCID"
 				}
 
 # xml writing settings
