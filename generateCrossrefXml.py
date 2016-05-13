@@ -596,6 +596,7 @@ def build_crossref_xml_for_articles(poa_articles):
     f.write(prettyXML)
     f.close()
     
+    return prettyXML
     #print prettyXML
 
 if __name__ == '__main__':
@@ -624,7 +625,7 @@ if __name__ == '__main__':
             date_instance = eLifeDate(pub_type, pub_date)
             article.add_date(date_instance)
     
-    build_crossref_xml_for_articles(poa_articles)
+    xml = build_crossref_xml_for_articles(poa_articles)
 
 
 
