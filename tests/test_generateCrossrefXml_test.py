@@ -26,8 +26,8 @@ class TestGenerateCrossrefXml(unittest.TestCase):
         # For now running a test on a PoA article ignore the
         # <publication_date media_type="online"> which is set to the date it is generated
         if '<doi_batch_id>elife-crossref-02725' in xml_content:
-            xml_content = re.sub(ur'<publication_date media_type="online">.*-->',
-                                 '</publication_date>', xml_content)
+            xml_content = re.sub(ur'<publication_date media_type="online">.*</publication_date>',
+                                 '', xml_content)
 
         xml_content = re.sub(ur'<!--.*-->', '', xml_content)
         xml_content = re.sub(ur'<doi_batch_id>.*</doi_batch_id>', '', xml_content)
