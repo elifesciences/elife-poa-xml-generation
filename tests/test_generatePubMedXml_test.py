@@ -21,6 +21,9 @@ class TestGeneratePubMedXml(unittest.TestCase):
         self.passes.append(('elife-15743-v1.xml',1, 'elife-2016-05-13-143615-PubMed.xml'))
 
     def clean_pubmed_xml_for_comparison(self, xml_content):
+        if '<ELocationID EIdType="doi">10.7554/eLife.00003</ELocationID>' in xml_content:
+            xml_content = re.sub(ur'<PubDate PubStatus="aheadofprint">.*</PubDate>',
+                                 '', xml_content)
         xml_content = re.sub(ur'<!--.*-->', '', xml_content)
         return xml_content
 
