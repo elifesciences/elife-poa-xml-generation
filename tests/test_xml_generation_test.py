@@ -44,6 +44,9 @@ class TestXmlGeneration(unittest.TestCase):
         self.passes.append((2725, 'elife_poa_e02725.xml'))
         self.passes.append((12, 'elife_poa_e00012.xml'))
         self.passes.append((7, 'elife_poa_e00007.xml'))
+        self.passes.append((12717, 'elife_poa_e12717.xml'))
+        self.passes.append((14874, 'elife_poa_e14874.xml'))
+        self.passes.append((14997, 'elife_poa_e14997.xml'))
 
         self.fails = []
         self.fails.append((99999, ''))

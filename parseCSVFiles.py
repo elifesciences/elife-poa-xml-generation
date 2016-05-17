@@ -440,6 +440,11 @@ def get_group_authors(article_id):
         attribute = None
     return attribute
 
+def get_datasets(article_id):
+    attribute = get_article_attributes(article_id, "datasets",
+                                       COLUMN_HEADINGS["datasets"])[0]
+    return attribute
+
 ## conversion functions
 def get_elife_doi(article_id):
     """
