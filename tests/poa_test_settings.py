@@ -20,7 +20,8 @@ XLS_FILES = {
     "abstract" : "poa_abstract.csv",
     "title": "poa_title.csv",
     "keywords": "poa_keywords.csv",
-    "group_authors": "poa_group_authors.csv"
+    "group_authors": "poa_group_authors.csv",
+    "datasets": "poa_datasets.csv"
             }
 
 OVERFLOW_XLS_FILES = ["abstract", "title"]
@@ -60,7 +61,9 @@ XLS_COLUMN_HEADINGS = {
     "author_conflict" : "poa_a_cmp",
     "organisms" : "poa_ro_researchorganism",
     "keywords" : "poa_kw_keyword",
-    "group_author" : "poa_ga"
+    "group_author" : "poa_ga",
+    "orcid" : "ORCID",
+    "datasets" : "poa_m_dataset_note"
 }
 
 # xml writing settings

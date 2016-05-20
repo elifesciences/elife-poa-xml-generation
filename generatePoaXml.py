@@ -59,6 +59,9 @@ class eLife2XML(object):
             # conf1 is reserved for the default conflict value, so increment now
             self.conflict_count += 1
 
+        # sec section counter
+        self.sec_count = 0
+
         self.build(self.root, poa_article)
 
     def build(self, root, poa_article):
@@ -77,6 +80,19 @@ class eLife2XML(object):
             self.set_fn_group_competing_interest(self.back, poa_article)
         if len(poa_article.ethics) > 0:
             self.set_fn_group_ethics_information(self.back, poa_article)
+        if len(poa_article.datasets) > 0:
+            self.sec = self.set_section(self.back, "supplementary-material")
+            self.sec_title = SubElement(self.sec, "title")
+            self.sec_title.text = "Additional Files"
+            self.sec = self.set_section(self.sec, "datasets")
+            self.set_article_datasets(self.sec, poa_article)
+
+    def set_section(self, parent, sec_type):
+        self.sec_count = self.sec_count + 1
+        self.sec = SubElement(parent, "sec")
+        self.sec.set("id", "s" + str(self.sec_count))
+        self.sec.set("sec-type", sec_type)
+        return self.sec
 
     def set_fn_group_competing_interest(self, parent, poa_article):
         self.competing_interest = SubElement(parent, "fn-group")
@@ -177,6 +193,88 @@ class eLife2XML(object):
         #
         if len(poa_article.research_organisms) > 0:
             self.set_kwd_group_research_organism(self.article_meta, poa_article)
+
+    def set_article_datasets(self, parent, poa_article):
+        self.dataro_num = 0
+        self.set_article_datasets_header(parent)
+        if len(poa_article.get_datasets("datasets")) > 0:
+            self.set_major_datasets(parent, poa_article)
+        if len(poa_article.get_datasets("prev_published_datasets")) > 0:
+            self.set_previously_published_datasets(parent, poa_article)
+
+    def set_article_datasets_header(self, parent):
+        self.sec_title = SubElement(parent, "title")
+        self.sec_title.text = "Major datasets"
+        self.p = SubElement(parent, "p")
+
+    def set_major_datasets(self, parent, poa_article):
+        self.p = SubElement(parent, "p")
+        self.p.text = "The following datasets were generated:"
+        self.p = SubElement(parent, "p")
+        # Datasets
+        for dataset in poa_article.get_datasets("datasets"):
+            self.dataro_num = self.dataro_num + 1
+            self.set_dataset(self.p, dataset, self.dataro_num)
+        return parent
+
+    def set_previously_published_datasets(self, parent, poa_article):
+        self.p = SubElement(parent, "p")
+        self.p.text = "The following previously published datasets were used:"
+        self.p = SubElement(parent, "p")
+        # Datasets
+        for dataset in poa_article.get_datasets("prev_published_datasets"):
+            self.dataro_num = self.dataro_num + 1
+            self.set_dataset(self.p, dataset, self.dataro_num)
+        return parent
+
+    def set_dataset(self, parent, dataset, dataro_num):
+        self.related_object = SubElement(parent, "related-object")
+        self.related_object.set('id', 'dataro' + str(dataro_num))
+        self.related_object.set('content-type', 'generated-dataset')
+
+        if dataset.source_id:
+            self.related_object.set('source-id-type', 'uri')
+            self.related_object.set('source-id', dataset.source_id)
+
+        if len(dataset.authors) > 0:
+            for author in dataset.authors:
+                self.collab = SubElement(self.related_object, "collab")
+                self.collab.text = author
+                self.collab.tail = ", "
+
+        dataset_tags = []
+
+        if dataset.year:
+            self.year = Element("year")
+            self.year.text = dataset.year
+            dataset_tags.append(self.year)
+
+        if dataset.title:
+            self.source = Element("source")
+            self.source.text = dataset.title
+            dataset_tags.append(self.source)
+
+        if dataset.source_id:
+            self.ext_link = Element("ext-link")
+            self.ext_link.text = dataset.source_id
+            self.ext_link.set("ext-link-type", "uri")
+            self.ext_link.set("xlink:href", dataset.source_id)
+            dataset_tags.append(self.ext_link)
+
+        if dataset.license_info:
+            self.comment = Element("comment")
+            self.comment.text = dataset.license_info
+            dataset_tags.append(self.comment)
+
+        # Add tags with <x>,</x> in between them
+        for i, tag in enumerate(dataset_tags):
+            self.related_object.append(tag)
+            if i < len(dataset_tags) - 1:
+                self.x = Element("x")
+                self.x.text = ","
+                self.x.tail = " "
+                self.related_object.append(self.x)
+
 
     def set_title_group(self, parent, poa_article):
         """
@@ -673,6 +771,21 @@ class eLifeRelatedArticle():
         self.related_article_type = None
         self.ext_link_type = None
 
+class eLifeDataset():
+    """
+    Article component representing a dataset
+    """
+    def __init__(self):
+        self.dataset_type = None
+        self.authors = []
+        self.source_id = None
+        self.year = None
+        self.title = None
+        self.license_info = None
+
+    def add_author(self, author):
+        self.authors.append(author)
+
 class eLifePOA():
     """
     We include some boiler plate in the init, namely articleType
@@ -704,6 +817,7 @@ class eLifePOA():
         self.elocation_id = None
         self.related_articles = []
         self.version = None
+        self.datasets = []
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -742,6 +856,14 @@ class eLifePOA():
     def add_author_keyword(self, author_keyword):
         self.author_keywords.append(author_keyword)
 
+    def add_dataset(self, dataset):
+        self.datasets.append(dataset)
+
+    def get_datasets(self, dataset_type=None):
+        if dataset_type:
+            return filter(lambda d: str(d.dataset_type) == dataset_type, self.datasets)
+        else:
+            return self.datasets
 
 class ElifeDocumentType(minidom.DocumentType):
     """
@@ -822,7 +944,7 @@ def decode_brackets(s):
     s = s.replace(settings.GREATER_THAN_ESCAPE_SEQUENCE, '>')
     return s
 
-def replace_tags(s, from_tag = 'i', to_tag='italic'):
+def replace_tags(s, from_tag='i', to_tag='italic'):
     """
     Replace tags such as <i> to <italic>
     <sup> and <sub> are allowed and do not need to be replaced
