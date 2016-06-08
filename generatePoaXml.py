@@ -59,6 +59,9 @@ class eLife2XML(object):
             # conf1 is reserved for the default conflict value, so increment now
             self.conflict_count += 1
 
+        # corresponding author count, incremented when printing corresp xref
+        self.corresp_count = 0
+
         self.build(self.root, poa_article)
 
     def build(self, root, poa_article):
@@ -155,6 +158,10 @@ class eLife2XML(object):
             self.set_contrib_group(self.article_meta, poa_article, contrib_type)
         #
         self.set_pub_date(self.article_meta, poa_article, "epub")
+        #
+        if len(filter(lambda contributor: contributor.corresp is True, poa_article.contributors)) > 0:
+            self.set_author_notes(self.article_meta, poa_article)
+            
         #
         if poa_article.manuscript:
             self.elocation_id = SubElement(self.article_meta, "elocation-id")
@@ -360,15 +367,6 @@ class eLife2XML(object):
                 self.orcid.set("contrib-id-type", "orcid")
                 self.orcid.text = "http://orcid.org/" + contributor.orcid
 
-            # Contributor conflict xref tag logic
-            if contributor.conflict:
-                rid = "conf" + str(self.conflict_count + 1)
-                self.conflict_count += 1
-            elif poa_article.conflict_default:
-                rid = "conf1"
-            else:
-                rid = None
-
             for affiliation in contributor.affiliations:
                 self.aff = SubElement(self.contrib, "aff")
 
@@ -403,9 +401,23 @@ class eLife2XML(object):
                     self.fax = SubElement(self.aff, "fax")
                     self.fax.text = affiliation.fax
 
-                if affiliation.email:
-                    self.email = SubElement(self.aff, "email")
-                    self.email.text = affiliation.email
+            # Corresponding author xref tag logic
+            if contributor.corresp is True:
+                self.corresp_count += 1
+                rid = "cor" + str(self.corresp_count)
+                self.xref = SubElement(self.contrib, "xref")
+                self.xref.set("ref-type", "corresp")
+                self.xref.set("rid", rid)
+                self.xref.text = "*"
+
+            # Contributor conflict xref tag logic
+            if contributor.conflict:
+                rid = "conf" + str(self.conflict_count + 1)
+                self.conflict_count += 1
+            elif poa_article.conflict_default:
+                rid = "conf1"
+            else:
+                rid = None
 
             # Contrib conflict xref
             if contrib_type != "editor":
@@ -474,6 +486,34 @@ class eLife2XML(object):
             month.text = str(date.date.tm_mon).zfill(2)
             year = SubElement(self.date, "year")
             year.text = str(date.date.tm_year)
+
+    def set_author_notes(self, parent, poa_article):
+        self.author_notes = SubElement(parent, "author-notes")
+        corresp_count = 0
+        for contributor in poa_article.contributors:
+            if contributor.corresp is True:
+                corresp_count += 1
+                self.set_corresp(self.author_notes, contributor, corresp_count)
+
+    def set_corresp(self, parent, contributor, corresp_count):
+        # For setting corresponding author tags in author-notes section
+
+        # Look for the first email address in the contributors affiliations for now
+        email = None
+        for affiliation in contributor.affiliations:
+            if affiliation.email:
+                email = affiliation.email
+                break
+        initials = "" + contributor.given_name[0] + contributor.surname[0]
+        if email:
+            self.corresp  = SubElement(parent, "corresp")
+            self.corresp.set("id", "cor" + str(corresp_count))
+            self.label  = SubElement(self.corresp, "label")
+            self.label.text = "*"
+            self.label.tail = "For correspondence: "
+            self.email = SubElement(self.corresp, "email")
+            self.email.text = email
+            self.email.tail = " (" + initials + ");"
 
     def set_history(self, parent, poa_article):
         self.history = SubElement(parent, "history")
