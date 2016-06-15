@@ -62,6 +62,13 @@ class eLife2XML(object):
         # sec section counter
         self.sec_count = 0
 
+        # corresponding author count, incremented when printing corresp xref
+        self.corresp_count = 0
+
+        # author aff count, and dict of author affiliations by index
+        self.author_aff_count = 0
+        self.author_affs = {}
+
         self.build(self.root, poa_article)
 
     def build(self, root, poa_article):
@@ -171,6 +178,10 @@ class eLife2XML(object):
             self.set_contrib_group(self.article_meta, poa_article, contrib_type)
         #
         self.set_pub_date(self.article_meta, poa_article, "epub")
+        #
+        if len(filter(lambda contributor: contributor.corresp is True, poa_article.contributors)) > 0:
+            self.set_author_notes(self.article_meta, poa_article)
+            
         #
         if poa_article.manuscript:
             self.elocation_id = SubElement(self.article_meta, "elocation-id")
@@ -417,6 +428,35 @@ class eLife2XML(object):
 
         parent.append(root_xml_element)
 
+    def get_aff_id(self, affiliation):
+        """
+        For each unique author affiliation, assign it a unique id value
+        and keep track of all the affs in a dict
+        This can be assembled by processing each author aff in succession
+        Return the new or existing aff_id dict index
+        """
+        aff_id = None
+
+        for key, value in self.author_affs.iteritems():
+            if self.compare_aff(affiliation, value):
+                aff_id = key
+        if not aff_id:
+            self.author_aff_count += 1
+            aff_id = self.author_aff_count
+            self.author_affs[aff_id] = affiliation
+
+        return aff_id
+
+    def compare_aff(self, aff1, aff2):
+        # Compare two affiliations by comparing the object attributes
+        attrs = ['city', 'country', 'department', 'institution']
+        for attr in attrs:
+            if (getattr(aff1, attr) and
+                getattr(aff2, attr) and
+                getattr(aff1, attr) != getattr(aff2, attr)):
+                return False
+        return True
+
     def set_contrib_group(self, parent, poa_article, contrib_type=None):
         # If contrib_type is None, all contributors will be added regardless of their type
         self.contrib_group = SubElement(parent, "contrib-group")
@@ -458,6 +498,26 @@ class eLife2XML(object):
                 self.orcid.set("contrib-id-type", "orcid")
                 self.orcid.text = "http://orcid.org/" + contributor.orcid
 
+            for affiliation in contributor.affiliations:
+                if contrib_type != "editor":
+                    aff_id = self.get_aff_id(affiliation)
+                    rid = "aff" + str(aff_id)
+                    self.xref = SubElement(self.contrib, "xref")
+                    self.xref.set("ref-type", "aff")
+                    self.xref.set("rid", rid)
+                else:
+                    # For editors add an inline aff tag
+                    self.set_aff(self.contrib, affiliation, contrib_type, aff_id=None)
+
+            # Corresponding author xref tag logic
+            if contributor.corresp is True:
+                self.corresp_count += 1
+                rid = "cor" + str(self.corresp_count)
+                self.xref = SubElement(self.contrib, "xref")
+                self.xref.set("ref-type", "corresp")
+                self.xref.set("rid", rid)
+                self.xref.text = "*"
+
             # Contributor conflict xref tag logic
             if contributor.conflict:
                 rid = "conf" + str(self.conflict_count + 1)
@@ -467,50 +527,55 @@ class eLife2XML(object):
             else:
                 rid = None
 
-            for affiliation in contributor.affiliations:
-                self.aff = SubElement(self.contrib, "aff")
-
-                if contrib_type != "editor":
-                    if affiliation.department:
-                        self.department = SubElement(self.aff, "institution")
-                        self.department.set("content-type", "dept")
-                        self.department.text = affiliation.department
-                        self.department.tail = ", "
-
-                if affiliation.institution:
-                    self.institution = SubElement(self.aff, "institution")
-                    self.institution.text = affiliation.institution
-                    self.institution.tail = ", "
-
-                if affiliation.city:
-                    self.addline = SubElement(self.aff, "addr-line")
-                    self.city = SubElement(self.addline, "named-content")
-                    self.city.set("content-type", "city")
-                    self.city.text = affiliation.city
-                    self.addline.tail = ", "
-
-                if affiliation.country:
-                    self.country = SubElement(self.aff, "country")
-                    self.country.text = affiliation.country
-
-                if affiliation.phone:
-                    self.phone = SubElement(self.aff, "phone")
-                    self.phone.text = affiliation.phone
-
-                if affiliation.fax:
-                    self.fax = SubElement(self.aff, "fax")
-                    self.fax.text = affiliation.fax
-
-                if affiliation.email:
-                    self.email = SubElement(self.aff, "email")
-                    self.email.text = affiliation.email
-
             # Contrib conflict xref
             if contrib_type != "editor":
                 if rid:
                     self.xref = SubElement(self.contrib, "xref")
                     self.xref.set("ref-type", "fn")
                     self.xref.set("rid", rid)
+
+        # Add the aff tags
+        if contrib_type != "editor":
+            for key, value in self.author_affs.iteritems():
+                aff_id = "aff" + str(key)
+                self.set_aff(self.contrib_group, value, contrib_type, aff_id)
+
+    def set_aff(self, parent, affiliation, contrib_type, aff_id=None):
+        self.aff = SubElement(parent, "aff")
+
+        if aff_id:
+            self.aff.set("id", aff_id)
+
+        if contrib_type != "editor":
+            if affiliation.department:
+                self.department = SubElement(self.aff, "institution")
+                self.department.set("content-type", "dept")
+                self.department.text = affiliation.department
+                self.department.tail = ", "
+
+        if affiliation.institution:
+            self.institution = SubElement(self.aff, "institution")
+            self.institution.text = affiliation.institution
+            self.institution.tail = ", "
+
+        if affiliation.city:
+            self.addline = SubElement(self.aff, "addr-line")
+            self.city = SubElement(self.addline, "named-content")
+            self.city.set("content-type", "city")
+            self.city.text = affiliation.city
+            self.addline.tail = ", "
+
+        if affiliation.country:
+            self.country = SubElement(self.aff, "country")
+            self.country.text = affiliation.country
+
+        if affiliation.phone:
+            self.phone = SubElement(self.aff, "phone")
+            self.phone.text = affiliation.phone
+
+        if affiliation.fax:
+            self.fax = SubElement(self.aff, "fax")
+            self.fax.text = affiliation.fax
 
     def set_article_categories(self, parent, poa_article):
         # article-categories
@@ -572,6 +637,34 @@ class eLife2XML(object):
             month.text = str(date.date.tm_mon).zfill(2)
             year = SubElement(self.date, "year")
             year.text = str(date.date.tm_year)
+
+    def set_author_notes(self, parent, poa_article):
+        self.author_notes = SubElement(parent, "author-notes")
+        corresp_count = 0
+        for contributor in poa_article.contributors:
+            if contributor.corresp is True:
+                corresp_count += 1
+                self.set_corresp(self.author_notes, contributor, corresp_count)
+
+    def set_corresp(self, parent, contributor, corresp_count):
+        # For setting corresponding author tags in author-notes section
+
+        # Look for the first email address in the contributors affiliations for now
+        email = None
+        for affiliation in contributor.affiliations:
+            if affiliation.email:
+                email = affiliation.email
+                break
+        initials = "" + contributor.given_name[0] + contributor.surname[0]
+        if email:
+            self.corresp  = SubElement(parent, "corresp")
+            self.corresp.set("id", "cor" + str(corresp_count))
+            self.label  = SubElement(self.corresp, "label")
+            self.label.text = "*"
+            self.label.tail = "For correspondence: "
+            self.email = SubElement(self.corresp, "email")
+            self.email.text = email
+            self.email.tail = " (" + initials + ");"
 
     def set_history(self, parent, poa_article):
         self.history = SubElement(parent, "history")
