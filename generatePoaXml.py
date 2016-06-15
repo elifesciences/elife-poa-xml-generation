@@ -62,6 +62,10 @@ class eLife2XML(object):
         # corresponding author count, incremented when printing corresp xref
         self.corresp_count = 0
 
+        # author aff count, and dict of author affiliations by index
+        self.author_aff_count = 0
+        self.author_affs = {}
+
         self.build(self.root, poa_article)
 
     def build(self, root, poa_article):
@@ -326,6 +330,35 @@ class eLife2XML(object):
 
         parent.append(root_xml_element)
 
+    def get_aff_id(self, affiliation):
+        """
+        For each unique author affiliation, assign it a unique id value
+        and keep track of all the affs in a dict
+        This can be assembled by processing each author aff in succession
+        Return the new or existing aff_id dict index
+        """
+        aff_id = None
+
+        for key, value in self.author_affs.iteritems():
+            if self.compare_aff(affiliation, value):
+                aff_id = key
+        if not aff_id:
+            self.author_aff_count += 1
+            aff_id = self.author_aff_count
+            self.author_affs[aff_id] = affiliation
+
+        return aff_id
+
+    def compare_aff(self, aff1, aff2):
+        # Compare two affiliations by comparing the object attributes
+        attrs = ['city', 'country', 'department', 'email', 'fax', 'institution', 'phone']
+        for attr in attrs:
+            if (getattr(aff1, attr) and
+                getattr(aff2, attr) and
+                getattr(aff1, attr) != getattr(aff2, attr)):
+                return False
+        return True
+
     def set_contrib_group(self, parent, poa_article, contrib_type=None):
         # If contrib_type is None, all contributors will be added regardless of their type
         self.contrib_group = SubElement(parent, "contrib-group")
@@ -368,38 +401,15 @@ class eLife2XML(object):
                 self.orcid.text = "http://orcid.org/" + contributor.orcid
 
             for affiliation in contributor.affiliations:
-                self.aff = SubElement(self.contrib, "aff")
-
                 if contrib_type != "editor":
-                    if affiliation.department:
-                        self.department = SubElement(self.aff, "institution")
-                        self.department.set("content-type", "dept")
-                        self.department.text = affiliation.department
-                        self.department.tail = ", "
-
-                if affiliation.institution:
-                    self.institution = SubElement(self.aff, "institution")
-                    self.institution.text = affiliation.institution
-                    self.institution.tail = ", "
-
-                if affiliation.city:
-                    self.addline = SubElement(self.aff, "addr-line")
-                    self.city = SubElement(self.addline, "named-content")
-                    self.city.set("content-type", "city")
-                    self.city.text = affiliation.city
-                    self.addline.tail = ", "
-
-                if affiliation.country:
-                    self.country = SubElement(self.aff, "country")
-                    self.country.text = affiliation.country
-
-                if affiliation.phone:
-                    self.phone = SubElement(self.aff, "phone")
-                    self.phone.text = affiliation.phone
-
-                if affiliation.fax:
-                    self.fax = SubElement(self.aff, "fax")
-                    self.fax.text = affiliation.fax
+                    aff_id = self.get_aff_id(affiliation)
+                    rid = "aff" + str(aff_id)
+                    self.xref = SubElement(self.contrib, "xref")
+                    self.xref.set("ref-type", "aff")
+                    self.xref.set("rid", rid)
+                else:
+                    # For editors add an inline aff tag
+                    self.set_aff(self.contrib, affiliation, contrib_type, aff_id=None)
 
             # Corresponding author xref tag logic
             if contributor.corresp is True:
@@ -425,6 +435,49 @@ class eLife2XML(object):
                     self.xref = SubElement(self.contrib, "xref")
                     self.xref.set("ref-type", "fn")
                     self.xref.set("rid", rid)
+
+        # Add the aff tags
+        if contrib_type != "editor":
+            for key, value in self.author_affs.iteritems():
+                aff_id = "aff" + str(key)
+                self.set_aff(self.contrib_group, value, contrib_type, aff_id)
+
+    def set_aff(self, parent, affiliation, contrib_type, aff_id=None):
+        self.aff = SubElement(parent, "aff")
+
+        if aff_id:
+            self.aff.set("id", aff_id)
+
+        if contrib_type != "editor":
+            if affiliation.department:
+                self.department = SubElement(self.aff, "institution")
+                self.department.set("content-type", "dept")
+                self.department.text = affiliation.department
+                self.department.tail = ", "
+
+        if affiliation.institution:
+            self.institution = SubElement(self.aff, "institution")
+            self.institution.text = affiliation.institution
+            self.institution.tail = ", "
+
+        if affiliation.city:
+            self.addline = SubElement(self.aff, "addr-line")
+            self.city = SubElement(self.addline, "named-content")
+            self.city.set("content-type", "city")
+            self.city.text = affiliation.city
+            self.addline.tail = ", "
+
+        if affiliation.country:
+            self.country = SubElement(self.aff, "country")
+            self.country.text = affiliation.country
+
+        if affiliation.phone:
+            self.phone = SubElement(self.aff, "phone")
+            self.phone.text = affiliation.phone
+
+        if affiliation.fax:
+            self.fax = SubElement(self.aff, "fax")
+            self.fax.text = affiliation.fax
 
     def set_article_categories(self, parent, poa_article):
         # article-categories
