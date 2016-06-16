@@ -48,6 +48,12 @@ class TestXmlGeneration(unittest.TestCase):
         self.passes.append((14874, 'elife_poa_e14874.xml'))
         self.passes.append((14997, 'elife_poa_e14997.xml'))
 
+        self.pub_date = []
+        self.pub_date.append((3, time.strptime("20121113",  "%Y%m%d")))
+
+        self.volume = []
+        self.volume.append((3, 1))
+
         self.fails = []
         self.fails.append((99999, ''))
 
@@ -67,9 +73,23 @@ class TestXmlGeneration(unittest.TestCase):
             xml = build_xml_for_article(article_id)
             self.assertFalse(xml)
 
+    def set_pub_date(self, article, article_id):
+        for (pub_date_article_id, pub_date) in self.pub_date:
+            if pub_date_article_id == article_id:
+                date_pub = eLifeDate("pub", pub_date)
+                article.add_date(date_pub)
+
+    def set_volume(self, article, article_id):
+        for (volume_article_id, volume) in self.volume:
+            if volume_article_id == article_id:
+                article.volume = volume
+
     def test_generate_and_compare(self):
         for (article_id, xml_file_name) in self.passes:
-            xml = build_xml_for_article(article_id)
+            article, error_count = build_article_for_article(article_id)
+            self.set_pub_date(article, article_id)
+            self.set_volume(article, article_id)
+            xml = output_xml_for_article(article, article_id)
             self.assertTrue(xml)
 
             # To compare XML generated to XML sample,

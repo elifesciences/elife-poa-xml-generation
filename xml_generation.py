@@ -357,25 +357,27 @@ def build_article_for_article(article_id):
         return None, error_count
 
 def build_xml_for_article(article_id):
-
     article, error_count = build_article_for_article(article_id)
-
     if article:
-        try:
-            article_xml = eLife2XML(article)
-            logger.info("generated xml for " + str(article_id))
-            write_xml(article_id, article_xml, dir=settings.TARGET_OUTPUT_DIR)
-            logger.info("xml written for " + str(article_id))
-            print "written " + str(article_id)
-            return True
-        except:
-            logger.error("could not generate or write xml for " + str(article_id))
-            return False
+        return output_xml_for_article(article, article_id)
     else:
         logger.warning("the following article did not have enough components and " +
                        "xml was not generated " + str(article_id))
         logger.warning("warning count was " + str(error_count))
         return False
+
+def output_xml_for_article(article, article_id):
+    try:
+        article_xml = eLife2XML(article)
+        logger.info("generated xml for " + str(article_id))
+        write_xml(article_id, article_xml, dir=settings.TARGET_OUTPUT_DIR)
+        logger.info("xml written for " + str(article_id))
+        print "written " + str(article_id)
+        return True
+    except:
+        logger.error("could not generate or write xml for " + str(article_id))
+        return False
+
 
 @memoize
 def index_manuscripts_on_article_id():

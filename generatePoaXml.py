@@ -177,11 +177,12 @@ class eLife2XML(object):
         for contrib_type in self.contrib_types:
             self.set_contrib_group(self.article_meta, poa_article, contrib_type)
         #
-        self.set_pub_date(self.article_meta, poa_article, "epub")
-        #
         if len(filter(lambda contributor: contributor.corresp is True, poa_article.contributors)) > 0:
             self.set_author_notes(self.article_meta, poa_article)
-            
+        #
+        self.set_pub_date(self.article_meta, poa_article, "pub")
+        #
+        self.set_volume(self.article_meta, poa_article)
         #
         if poa_article.manuscript:
             self.elocation_id = SubElement(self.article_meta, "elocation-id")
@@ -617,14 +618,20 @@ class eLife2XML(object):
             kwd = SubElement(self.kwd_group, "kwd")
             kwd.text = author_keyword
 
+    def set_volume(self, parent, poa_article):
+        if poa_article.volume:
+            self.volume = SubElement(parent, "volume")
+            self.volume.text = str(poa_article.volume)
+
     def set_pub_date(self, parent, poa_article, pub_type):
         # pub-date pub-type = pub_type
         date = poa_article.get_date(pub_type)
         if date:
-            self.pub_date = SubElement(parent, "pub-date")
-            self.pub_date.set("pub-type", pub_type)
-            year = SubElement(self.pub_date, "year")
-            year.text = str(date.date.tm_year)
+            if pub_type == "pub":
+                self.pub_date = SubElement(parent, "pub-date")
+                self.pub_date.set("date-type", pub_type)
+                self.pub_date.set("publication-format", "electronic")
+                self.set_dmy(self.pub_date, date)
 
     def set_date(self, parent, poa_article, date_type):
         # date date-type = date_type
@@ -632,12 +639,15 @@ class eLife2XML(object):
         if date:
             self.date = SubElement(parent, "date")
             self.date.set("date-type", date_type)
-            day = SubElement(self.date, "day")
-            day.text = str(date.date.tm_mday).zfill(2)
-            month = SubElement(self.date, "month")
-            month.text = str(date.date.tm_mon).zfill(2)
-            year = SubElement(self.date, "year")
-            year.text = str(date.date.tm_year)
+            self.set_dmy(self.date, date)
+            
+    def set_dmy(self, parent, date):
+        day = SubElement(parent, "day")
+        day.text = str(date.date.tm_mday).zfill(2)
+        month = SubElement(parent, "month")
+        month.text = str(date.date.tm_mon).zfill(2)
+        year = SubElement(parent, "year")
+        year.text = str(date.date.tm_year)
 
     def set_author_notes(self, parent, poa_article):
         self.author_notes = SubElement(parent, "author-notes")
@@ -1202,7 +1212,7 @@ if __name__ == '__main__':
 
     # dates
     t = time.strptime("2013-10-03", "%Y-%m-%d")
-    date_epub = eLifeDate("epub", t)
+    date_epub = eLifeDate("pub", t)
     date_accepted = eLifeDate("accepted", t)
     date_received = eLifeDate("received", t)
     # copyright date as the license date
