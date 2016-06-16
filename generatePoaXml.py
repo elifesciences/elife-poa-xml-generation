@@ -182,6 +182,8 @@ class eLife2XML(object):
         #
         self.set_pub_date(self.article_meta, poa_article, "pub")
         #
+        self.set_volume(self.article_meta, poa_article)
+        #
         if poa_article.manuscript:
             self.elocation_id = SubElement(self.article_meta, "elocation-id")
             self.elocation_id.text = "e" + str(int(poa_article.manuscript)).zfill(5)
@@ -615,6 +617,11 @@ class eLife2XML(object):
         for author_keyword in poa_article.author_keywords:
             kwd = SubElement(self.kwd_group, "kwd")
             kwd.text = author_keyword
+
+    def set_volume(self, parent, poa_article):
+        if poa_article.volume:
+            self.volume = SubElement(parent, "volume")
+            self.volume.text = str(poa_article.volume)
 
     def set_pub_date(self, parent, poa_article, pub_type):
         # pub-date pub-type = pub_type

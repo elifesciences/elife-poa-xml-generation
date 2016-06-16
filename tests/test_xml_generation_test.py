@@ -80,7 +80,9 @@ class TestXmlGeneration(unittest.TestCase):
                 article.add_date(date_pub)
 
     def set_volume(self, article, article_id):
-        pass
+        for (volume_article_id, volume) in self.volume:
+            if volume_article_id == article_id:
+                article.volume = volume
 
     def test_generate_and_compare(self):
         for (article_id, xml_file_name) in self.passes:
