@@ -83,10 +83,13 @@ class eLife2XML(object):
 
     def set_backmatter(self, parent, poa_article):
         self.back = SubElement(parent, 'back')
+        self.sec = self.set_section(self.back, "additional-information")
+        self.sec_title = SubElement(self.sec, "title")
+        self.sec_title.text = "Additional information"
         if poa_article.has_contributor_conflict() or poa_article.conflict_default:
-            self.set_fn_group_competing_interest(self.back, poa_article)
+            self.set_fn_group_competing_interest(self.sec, poa_article)
         if len(poa_article.ethics) > 0:
-            self.set_fn_group_ethics_information(self.back, poa_article)
+            self.set_fn_group_ethics_information(self.sec, poa_article)
         if len(poa_article.datasets) > 0:
             self.sec = self.set_section(self.back, "supplementary-material")
             self.sec_title = SubElement(self.sec, "title")
