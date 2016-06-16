@@ -505,6 +505,7 @@ class eLife2XML(object):
                     self.xref = SubElement(self.contrib, "xref")
                     self.xref.set("ref-type", "aff")
                     self.xref.set("rid", rid)
+                    self.xref.text = str(aff_id)
                 else:
                     # For editors add an inline aff tag
                     self.set_aff(self.contrib, affiliation, contrib_type, aff_id=None)
