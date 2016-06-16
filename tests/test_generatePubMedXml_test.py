@@ -17,6 +17,7 @@ class TestGeneratePubMedXml(unittest.TestCase):
         self.passes = []
         self.passes.append(('elife-02935-v2.xml', 2, 'elife-2016-05-13-140109-PubMed.xml'))
         self.passes.append(('elife_poa_e00003.xml', 1, 'elife-2016-05-13-142048-PubMed.xml'))
+        self.passes.append(('elife_poa_e12717.xml', 1, 'elife-2016-06-16-021504-PubMed.xml'))
         self.passes.append(('elife-08206-v3.xml', 3, 'elife-2016-05-13-142852-PubMed.xml'))
         self.passes.append(('elife-15743-v1.xml',1, 'elife-2016-05-13-143615-PubMed.xml'))
 
