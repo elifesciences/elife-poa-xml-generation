@@ -583,7 +583,7 @@ def parse_datasets(datasets_content):
 
             for node in d_nodes.childNodes:
 
-                if node.nodeName == 'authors_text_list':
+                if node.nodeName == 'authors_text_list' and len(node.childNodes) > 0:
                     text_node = node.childNodes[0]
                     for author_name in text_node.nodeValue.split(','):
                         dataset.add_author(author_name.lstrip())
@@ -600,7 +600,7 @@ def parse_datasets(datasets_content):
                     text_node = node.childNodes[0]
                     dataset.license_info = entity_to_unicode(text_node.nodeValue)
 
-                if node.nodeName == 'year':
+                if node.nodeName == 'year' and len(node.childNodes) > 0:
                     text_node = node.childNodes[0]
                     dataset.year = entity_to_unicode(text_node.nodeValue)
 

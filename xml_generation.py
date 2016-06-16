@@ -155,7 +155,7 @@ def set_datasets(article, article_id):
                 article.add_dataset(dataset)
         return True
     except:
-        # logger.error("could not set datasets")
+        logger.error("could not set datasets")
         return False
 
 def set_categories(article, article_id):
