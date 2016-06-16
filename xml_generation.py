@@ -143,6 +143,21 @@ def set_ethics(article, article_id):
         # logger.error("could not set ethics")
         return False
 
+
+def set_datasets(article, article_id):
+    logger.info("in set_datasets")
+    try:
+        datasets = get_datasets(article_id)
+        logger.info(datasets)
+        if datasets:
+            dataset_objects = parse_datasets(datasets)
+            for dataset in dataset_objects:
+                article.add_dataset(dataset)
+        return True
+    except:
+        logger.error("could not set datasets")
+        return False
+
 def set_categories(article, article_id):
     logger.info("in set_categories")
     try:
@@ -319,6 +334,7 @@ def build_article_for_article(article_id):
     if not set_license(article, article_id): error_count = error_count + 1
     if not set_dates(article, article_id): error_count = error_count + 1
     if not set_ethics(article, article_id): error_count = error_count + 1
+    if not set_datasets(article, article_id): error_count = error_count + 1
     if not set_categories(article, article_id): error_count = error_count + 1
     if not set_organsims(article, article_id): error_count = error_count + 1
     if not set_author_info(article, article_id): error_count = error_count + 1

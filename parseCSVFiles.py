@@ -440,6 +440,14 @@ def get_group_authors(article_id):
         attribute = None
     return attribute
 
+def get_datasets(article_id):
+    try:
+        attribute = get_article_attributes(article_id, "datasets",
+                                           COLUMN_HEADINGS["datasets"])[0]
+    except IndexError:
+        attribute = None
+    return attribute
+
 ## conversion functions
 def get_elife_doi(article_id):
     """
@@ -487,10 +495,10 @@ def middle_name_initials(middle_name):
         return None
     return initials
 
-def unserialise_ethics(ethic):
-    unserial_ethic = ethic.replace("LTLT", "<")
-    unserial_ethic = unserial_ethic.replace("GTGT", ">")
-    return unserial_ethic
+def unserialise_angle_brackets(escaped_string):
+    unserial_xml = escaped_string.replace(settings.LESS_THAN_ESCAPE_SEQUENCE, "<")
+    unserial_xml = unserial_xml.replace(settings.GREATER_THAN_ESCAPE_SEQUENCE, ">")
+    return unserial_xml
 
 def decode_cp1252(str):
     """
@@ -523,7 +531,7 @@ def parse_ethics(ethic):
 
     # Decode escaped angle brackets
     logger.info("ethic is " + str(ethic))
-    ethic_xml = unserialise_ethics(ethic)
+    ethic_xml = unserialise_angle_brackets(ethic)
     logger.info("ethic is " + str(ethic_xml))
 
     # Parse XML
@@ -548,6 +556,57 @@ def parse_ethics(ethic):
                 ethics.append(entity_to_unicode(ethic_text))
 
     return ethics
+
+def parse_datasets(datasets_content):
+    """
+    Datasets content is XML with escaped angle brackets
+    """
+    datasets = []
+
+    # Decode escaped angle brackets
+    logger.info("datasets is " + str(datasets_content))
+    datasets_xml = unserialise_angle_brackets(datasets_content)
+    logger.info("datasets is " + str(datasets_xml))
+
+    # Parse XML
+    encoding = 'utf-8'
+    reparsed = minidom.parseString(datasets_xml)
+
+    # Extract comments
+    for dataset_type in 'datasets', 'prev_published_datasets':
+        datasets_nodes = reparsed.getElementsByTagName(dataset_type)[0]
+
+        for d_nodes in datasets_nodes.getElementsByTagName("dataset"):
+            dataset = eLifeDataset()
+
+            dataset.dataset_type = dataset_type
+
+            for node in d_nodes.childNodes:
+
+                if node.nodeName == 'authors_text_list' and len(node.childNodes) > 0:
+                    text_node = node.childNodes[0]
+                    for author_name in text_node.nodeValue.split(','):
+                        dataset.add_author(author_name.lstrip())
+
+                if node.nodeName == 'title':
+                    text_node = node.childNodes[0]
+                    dataset.title = entity_to_unicode(text_node.nodeValue)
+
+                if node.nodeName == 'id':
+                    text_node = node.childNodes[0]
+                    dataset.source_id = entity_to_unicode(text_node.nodeValue)
+
+                if node.nodeName == 'license_info':
+                    text_node = node.childNodes[0]
+                    dataset.license_info = entity_to_unicode(text_node.nodeValue)
+
+                if node.nodeName == 'year' and len(node.childNodes) > 0:
+                    text_node = node.childNodes[0]
+                    dataset.year = entity_to_unicode(text_node.nodeValue)
+
+            datasets.append(dataset)
+
+    return datasets
 
 def parse_group_authors(group_authors):
     """
