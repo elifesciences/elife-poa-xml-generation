@@ -153,6 +153,10 @@ class pubMedPoaXML(object):
         tag_converted_title = replace_tags(tag_converted_title, 'italic', 'i')
         tag_converted_title = replace_tags(tag_converted_title, 'bold', 'b')
         tag_converted_title = replace_tags(tag_converted_title, 'underline', 'u')
+        # Specific issue to remove b tag wrapping the entire title, if present
+        if tag_converted_title.startswith('<b>') and tag_converted_title.endswith('</b>'):
+            tag_converted_title = tag_converted_title.lstrip('<b>')
+            tag_converted_title = tag_converted_title.rstrip('</b>')
         tag_converted_title = escape_unmatched_angle_brackets(tag_converted_title)
         tagged_string = '<' + tag_name + '>' + tag_converted_title + '</' + tag_name + '>'
         reparsed = minidom.parseString(xml_escape_ampersand(tagged_string).encode('utf-8'))
