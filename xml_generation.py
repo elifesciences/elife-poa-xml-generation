@@ -323,23 +323,22 @@ def build_article_for_article(article_id):
     Refactored for easier testing, but primarily used by build_xml_for_article
     """
     error_count = 0
+    error_messages = []
 
     # Only happy with string article_id - cast it now to be safe!
     article_id = str(article_id)
 
     article = instantiate_article(article_id)
-    if not set_title(article, article_id): error_count = error_count + 1
-    if not set_abstract(article, article_id): error_count = error_count + 1
-    if not set_articleType(article, article_id): error_count = error_count + 1
-    if not set_license(article, article_id): error_count = error_count + 1
-    if not set_dates(article, article_id): error_count = error_count + 1
-    if not set_ethics(article, article_id): error_count = error_count + 1
-    if not set_datasets(article, article_id): error_count = error_count + 1
-    if not set_categories(article, article_id): error_count = error_count + 1
-    if not set_organsims(article, article_id): error_count = error_count + 1
-    if not set_author_info(article, article_id): error_count = error_count + 1
-    if not set_editor_info(article, article_id): error_count = error_count + 1
-    if not set_keywords(article, article_id): error_count = error_count + 1
+
+    # Run each of the below functions to build the article object components
+    article_set_functions = [set_title, set_abstract, set_articleType, set_license,
+                            set_dates, set_ethics, set_datasets, set_categories,
+                            set_organsims, set_author_info, set_editor_info, set_keywords]
+    for set_function in article_set_functions:
+        if not set_function(article, article_id):
+            error_count = error_count + 1
+            error_messages.append("article_id " + str(article_id)
+                                  + " error in " + set_function.__name__)
 
     # Building from CSV data it must be a POA type, set it
     if article:
@@ -352,18 +351,20 @@ def build_article_for_article(article_id):
         article.conflict_default = "The authors declare that no competing interests exist."
 
     if error_count == 0:
-        return article, error_count
+        return article, error_count, error_messages
     else:
-        return None, error_count
+        return None, error_count, error_messages
 
 def build_xml_for_article(article_id):
-    article, error_count = build_article_for_article(article_id)
+    article, error_count, error_messages = build_article_for_article(article_id)
     if article:
         return output_xml_for_article(article, article_id)
     else:
         logger.warning("the following article did not have enough components and " +
                        "xml was not generated " + str(article_id))
         logger.warning("warning count was " + str(error_count))
+        if len(error_messages) > 0:
+            logger.warning(", ".join(error_messages))
         return False
 
 def output_xml_for_article(article, article_id):
