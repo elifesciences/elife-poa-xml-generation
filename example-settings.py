@@ -17,7 +17,8 @@ XLS_FILES = 	{"authors" : "poa_author.csv",
 				 "abstract": "poa_abstract.csv",
 				 "title": "poa_title.csv",
 				 "keywords": "poa_keywords.csv",
-				 "group_authors": "poa_group_authors.csv"
+				 "group_authors": "poa_group_authors.csv",
+				 "datasets": "poa_datasets.csv"
                  }
 
 # Special files that allow quotation marks in their final column: column 3
@@ -56,7 +57,9 @@ XLS_COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"author_conflict" : "poa_a_cmp",
 					"organisms" : "poa_ro_researchorganism",
 					"keywords" : "poa_kw_keyword",
-					"group_author" : "poa_ga"
+					"group_author" : "poa_ga",
+					"orcid" : "ORCID",
+					"datasets" : "poa_m_dataset_note"
 				}
 
 # xml writing settings

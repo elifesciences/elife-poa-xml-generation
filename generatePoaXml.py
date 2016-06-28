@@ -1,7 +1,4 @@
-import xml
-from xml.dom.minidom import Document
-from collections import namedtuple
-from xml.etree.ElementTree import Element, SubElement, Comment, tostring
+from xml.etree.ElementTree import Element, SubElement, Comment
 from xml.etree import ElementTree
 from xml.dom import minidom
 import time
@@ -17,13 +14,13 @@ pass the compount object to a class that writes the XML in the expected format.
 
 self.orcid.set("xlink:href", contributor.orcid) returns an error
 
-in aff, determine why some elements take an enclosing addr-line, and others don't 
+in aff, determine why some elements take an enclosing addr-line, and others don't
 
 in aff, if email is associated with aff, how do we deal with two atuhors from the same place,
 but with different emails?
 
-Think about moving the function that adds the doctype out of the funciton that 
-does pretty printing. 
+Think about moving the function that adds the doctype out of the funciton that
+does pretty printing.
 """
 
 class eLife2XML(object):
@@ -32,7 +29,7 @@ class eLife2XML(object):
         """
         set the root node
         get the article type from the object passed in to the class
-        set default values for items that are boilder plate for this XML 
+        set default values for items that are boilder plate for this XML
         """
         self.root = Element('article')
 
@@ -62,6 +59,16 @@ class eLife2XML(object):
             # conf1 is reserved for the default conflict value, so increment now
             self.conflict_count += 1
 
+        # sec section counter
+        self.sec_count = 0
+
+        # corresponding author count, incremented when printing corresp xref
+        self.corresp_count = 0
+
+        # author aff count, and dict of author affiliations by index
+        self.author_aff_count = 0
+        self.author_affs = {}
+
         self.build(self.root, poa_article)
 
     def build(self, root, poa_article):
@@ -72,27 +79,43 @@ class eLife2XML(object):
     def set_frontmatter(self, parent, poa_article):
         self.front = SubElement(parent, 'front')
         self.set_journal_meta(self.front)
-        self.set_article_meta(self.front, poa_article)        
+        self.set_article_meta(self.front, poa_article)
 
     def set_backmatter(self, parent, poa_article):
         self.back = SubElement(parent, 'back')
+        self.sec = self.set_section(self.back, "additional-information")
+        self.sec_title = SubElement(self.sec, "title")
+        self.sec_title.text = "Additional information"
         if poa_article.has_contributor_conflict() or poa_article.conflict_default:
-            self.set_fn_group_competing_interest(self.back, poa_article)
+            self.set_fn_group_competing_interest(self.sec, poa_article)
         if len(poa_article.ethics) > 0:
-            self.set_fn_group_ethics_information(self.back, poa_article)
-     
+            self.set_fn_group_ethics_information(self.sec, poa_article)
+        if len(poa_article.datasets) > 0:
+            self.sec = self.set_section(self.back, "supplementary-material")
+            self.sec_title = SubElement(self.sec, "title")
+            self.sec_title.text = "Additional Files"
+            self.sec = self.set_section(self.sec, "datasets")
+            self.set_article_datasets(self.sec, poa_article)
+
+    def set_section(self, parent, sec_type):
+        self.sec_count = self.sec_count + 1
+        self.sec = SubElement(parent, "sec")
+        self.sec.set("id", "s" + str(self.sec_count))
+        self.sec.set("sec-type", sec_type)
+        return self.sec
+
     def set_fn_group_competing_interest(self, parent, poa_article):
         self.competing_interest = SubElement(parent, "fn-group")
         self.competing_interest.set("content-type", "competing-interest")
         title = SubElement(self.competing_interest, "title")
         title.text = "Competing interest"
-        
+
         # Check if we are supplied a conflict default statement and set count accordingly
         if poa_article.conflict_default:
             conflict_count = 1
         else:
             conflict_count = 0
-            
+
         for contributor in poa_article.contributors:
             if contributor.conflict:
                 id = "conf" + str(conflict_count + 1)
@@ -124,7 +147,7 @@ class eLife2XML(object):
         self.competing_interest.set("content-type", "ethics-information")
         title = SubElement(self.competing_interest, "title")
         title.text = "Ethics"
-        
+
         for ethic in poa_article.ethics:
             fn = SubElement(self.competing_interest, "fn")
             fn.set("fn-type", "other")
@@ -144,23 +167,28 @@ class eLife2XML(object):
         # article-id pub-id-type="doi"
         if poa_article.doi:
             pub_id_type = "doi"
-            self.article_id = SubElement(self.article_meta, "article-id") 
+            self.article_id = SubElement(self.article_meta, "article-id")
             self.article_id.text = poa_article.doi
-            self.article_id.set("pub-id-type", pub_id_type) 
-        
+            self.article_id.set("pub-id-type", pub_id_type)
+
         # article-categories
         self.set_article_categories(self.article_meta, poa_article)
         #
         self.set_title_group(self.article_meta, poa_article)
-        
+
         #
         for contrib_type in self.contrib_types:
             self.set_contrib_group(self.article_meta, poa_article, contrib_type)
         #
-        self.set_pub_date(self.article_meta, poa_article, "epub")
+        if len(filter(lambda contributor: contributor.corresp is True, poa_article.contributors)) > 0:
+            self.set_author_notes(self.article_meta, poa_article)
+        #
+        self.set_pub_date(self.article_meta, poa_article, "pub")
+        #
+        self.set_volume(self.article_meta, poa_article)
         #
         if poa_article.manuscript:
-            self.elocation_id  = SubElement(self.article_meta, "elocation-id")
+            self.elocation_id = SubElement(self.article_meta, "elocation-id")
             self.elocation_id.text = "e" + str(int(poa_article.manuscript)).zfill(5)
         #
         if poa_article.dates:
@@ -171,7 +199,7 @@ class eLife2XML(object):
         #
         self.set_abstract(self.article_meta, poa_article)
         #
-        
+
         # Disabled author keywords from inclusion Oct 2, 2015
         """
         if len(poa_article.author_keywords) > 0:
@@ -180,6 +208,88 @@ class eLife2XML(object):
         #
         if len(poa_article.research_organisms) > 0:
             self.set_kwd_group_research_organism(self.article_meta, poa_article)
+
+    def set_article_datasets(self, parent, poa_article):
+        self.dataro_num = 0
+        self.set_article_datasets_header(parent)
+        if len(poa_article.get_datasets("datasets")) > 0:
+            self.set_major_datasets(parent, poa_article)
+        if len(poa_article.get_datasets("prev_published_datasets")) > 0:
+            self.set_previously_published_datasets(parent, poa_article)
+
+    def set_article_datasets_header(self, parent):
+        self.sec_title = SubElement(parent, "title")
+        self.sec_title.text = "Major datasets"
+        self.p = SubElement(parent, "p")
+
+    def set_major_datasets(self, parent, poa_article):
+        self.p = SubElement(parent, "p")
+        self.p.text = "The following datasets were generated:"
+        self.p = SubElement(parent, "p")
+        # Datasets
+        for dataset in poa_article.get_datasets("datasets"):
+            self.dataro_num = self.dataro_num + 1
+            self.set_dataset(self.p, dataset, self.dataro_num)
+        return parent
+
+    def set_previously_published_datasets(self, parent, poa_article):
+        self.p = SubElement(parent, "p")
+        self.p.text = "The following previously published datasets were used:"
+        self.p = SubElement(parent, "p")
+        # Datasets
+        for dataset in poa_article.get_datasets("prev_published_datasets"):
+            self.dataro_num = self.dataro_num + 1
+            self.set_dataset(self.p, dataset, self.dataro_num)
+        return parent
+
+    def set_dataset(self, parent, dataset, dataro_num):
+        self.related_object = SubElement(parent, "related-object")
+        self.related_object.set('id', 'dataro' + str(dataro_num))
+        self.related_object.set('content-type', 'generated-dataset')
+
+        if dataset.source_id:
+            self.related_object.set('source-id-type', 'uri')
+            self.related_object.set('source-id', dataset.source_id)
+
+        if len(dataset.authors) > 0:
+            for author in dataset.authors:
+                self.collab = SubElement(self.related_object, "collab")
+                self.collab.text = author
+                self.collab.tail = ", "
+
+        dataset_tags = []
+
+        if dataset.year:
+            self.year = Element("year")
+            self.year.text = dataset.year
+            dataset_tags.append(self.year)
+
+        if dataset.title:
+            self.source = Element("source")
+            self.source.text = dataset.title
+            dataset_tags.append(self.source)
+
+        if dataset.source_id:
+            self.ext_link = Element("ext-link")
+            self.ext_link.text = dataset.source_id
+            self.ext_link.set("ext-link-type", "uri")
+            self.ext_link.set("xlink:href", dataset.source_id)
+            dataset_tags.append(self.ext_link)
+
+        if dataset.license_info:
+            self.comment = Element("comment")
+            self.comment.text = dataset.license_info
+            dataset_tags.append(self.comment)
+
+        # Add tags with <x>,</x> in between them
+        for i, tag in enumerate(dataset_tags):
+            self.related_object.append(tag)
+            if i < len(dataset_tags) - 1:
+                self.x = Element("x")
+                self.x.text = ","
+                self.x.tail = " "
+                self.related_object.append(self.x)
+
 
     def set_title_group(self, parent, poa_article):
         """
@@ -190,7 +300,7 @@ class eLife2XML(object):
         root_xml_element = Element(root_tag_name)
         # Escape any unescaped ampersands
         title = xml_escape_ampersand(poa_article.title)
-        
+
         # XML
         tagged_string = '<' + tag_name + '>' + title + '</' + tag_name + '>'
         reparsed = minidom.parseString(tagged_string)
@@ -203,15 +313,15 @@ class eLife2XML(object):
 
     def set_journal_title_group(self, parent):
         """
-        take boiler plate values from the init of the class 
+        take boiler plate values from the init of the class
         """
-        
+
         # journal-title-group
         self.journal_title_group = SubElement(parent, "journal-title-group")
 
         # journal-title
         self.journal_title = SubElement(self.journal_title_group, "journal-title")
-        self.journal_title.text = self.elife_journal_title 
+        self.journal_title.text = self.elife_journal_title
 
     def set_journal_meta(self, parent):
         """
@@ -225,8 +335,8 @@ class eLife2XML(object):
             if journal_id_type == "nlm-ta":
                 self.journal_id.text = self.elife_journal_id.lower()
             else:
-                self.journal_id.text = self.elife_journal_id 
-            self.journal_id.set("journal-id-type", journal_id_type) 
+                self.journal_id.text = self.elife_journal_id
+            self.journal_id.set("journal-id-type", journal_id_type)
 
         #
         self.set_journal_title_group(self.journal_meta)
@@ -245,10 +355,10 @@ class eLife2XML(object):
         self.license = SubElement(parent, "license")
 
         self.license.set("xlink:href", poa_article.license.href)
-        
+
         self.license_p = SubElement(self.license, "license-p")
         self.license_p.text = poa_article.license.p1
-        
+
         ext_link = SubElement(self.license_p, "ext-link")
         ext_link.set("ext-link-type", "uri")
         ext_link.set("xlink:href", poa_article.license.href)
@@ -261,7 +371,7 @@ class eLife2XML(object):
         for c in poa_article.contributors:
             if c.contrib_type != "editor":
                 non_editor.append(c)
-        
+
         if len(non_editor) > 2:
             contributor = non_editor[0]
             copyright_holder = contributor.surname + " et al"
@@ -274,7 +384,7 @@ class eLife2XML(object):
             copyright_holder = contributor.surname
         else:
             copyright_holder = ""
-            
+
         # copyright-statement
         copyright_year = ""
         date = poa_article.get_date("license")
@@ -283,19 +393,19 @@ class eLife2XML(object):
             date = poa_article.get_date("accepted")
         if date:
             copyright_year = date.date.tm_year
-            
+
         copyright_statement = u'\u00a9 ' + str(copyright_year) + ", " + copyright_holder
         self.copyright_statement = SubElement(parent, "copyright-statement")
         self.copyright_statement.text = copyright_statement
-        
+
         # copyright-year
         self.copyright_year = SubElement(parent, "copyright-year")
         self.copyright_year.text = str(copyright_year)
-        
+
         # copyright-holder
         self.copyright_holder = SubElement(parent, "copyright-holder")
         self.copyright_holder.text = copyright_holder
-    
+
     def set_permissions(self, parent, poa_article):
         self.permissions = SubElement(parent, "permissions")
         if poa_article.license.copyright is True:
@@ -311,7 +421,7 @@ class eLife2XML(object):
         root_xml_element = Element(root_tag_name)
         # Escape any unescaped ampersands
         abstract = xml_escape_ampersand(poa_article.abstract)
-        
+
         # XML
         tagged_string = '<' + tag_name + '>' + abstract + '</' + tag_name + '>'
         reparsed = minidom.parseString(tagged_string)
@@ -322,7 +432,36 @@ class eLife2XML(object):
 
         parent.append(root_xml_element)
 
-    def set_contrib_group(self, parent, poa_article, contrib_type = None):
+    def get_aff_id(self, affiliation):
+        """
+        For each unique author affiliation, assign it a unique id value
+        and keep track of all the affs in a dict
+        This can be assembled by processing each author aff in succession
+        Return the new or existing aff_id dict index
+        """
+        aff_id = None
+
+        for key, value in self.author_affs.iteritems():
+            if self.compare_aff(affiliation, value):
+                aff_id = key
+        if not aff_id:
+            self.author_aff_count += 1
+            aff_id = self.author_aff_count
+            self.author_affs[aff_id] = affiliation
+
+        return aff_id
+
+    def compare_aff(self, aff1, aff2):
+        # Compare two affiliations by comparing the object attributes
+        attrs = ['city', 'country', 'department', 'institution']
+        for attr in attrs:
+            if (getattr(aff1, attr) and
+                getattr(aff2, attr) and
+                getattr(aff1, attr) != getattr(aff2, attr)):
+                return False
+        return True
+
+    def set_contrib_group(self, parent, poa_article, contrib_type=None):
         # If contrib_type is None, all contributors will be added regardless of their type
         self.contrib_group = SubElement(parent, "contrib-group")
         if contrib_type == "editor":
@@ -333,7 +472,7 @@ class eLife2XML(object):
                 # Filter by contrib_type if supplied
                 if contributor.contrib_type != contrib_type:
                     continue
-                
+
             self.contrib = SubElement(self.contrib_group, "contrib")
 
             self.contrib.set("contrib-type", contributor.contrib_type)
@@ -343,7 +482,7 @@ class eLife2XML(object):
                 self.contrib.set("equal_contrib", "yes")
             if contributor.auth_id:
                 self.contrib.set("id", "author-" + str(contributor.auth_id))
-                
+
             if contributor.collab:
                 self.collab = SubElement(self.contrib, "collab")
                 self.collab.text = contributor.collab
@@ -359,9 +498,30 @@ class eLife2XML(object):
                 self.role.text = "Reviewing editor"
 
             if contributor.orcid:
-                self.orcid = SubElement(self.contrib, "uri")
-                self.orcid.set("content-type", "orcid")
-                self.orcid.set("xlink:href", contributor.orcid)
+                self.orcid = SubElement(self.contrib, "contrib-id")
+                self.orcid.set("contrib-id-type", "orcid")
+                self.orcid.text = "http://orcid.org/" + contributor.orcid
+
+            for affiliation in contributor.affiliations:
+                if contrib_type != "editor":
+                    aff_id = self.get_aff_id(affiliation)
+                    rid = "aff" + str(aff_id)
+                    self.xref = SubElement(self.contrib, "xref")
+                    self.xref.set("ref-type", "aff")
+                    self.xref.set("rid", rid)
+                    self.xref.text = str(aff_id)
+                else:
+                    # For editors add an inline aff tag
+                    self.set_aff(self.contrib, affiliation, contrib_type, aff_id=None)
+
+            # Corresponding author xref tag logic
+            if contributor.corresp is True:
+                self.corresp_count += 1
+                rid = "cor" + str(self.corresp_count)
+                self.xref = SubElement(self.contrib, "xref")
+                self.xref.set("ref-type", "corresp")
+                self.xref.set("rid", rid)
+                self.xref.text = "*"
 
             # Contributor conflict xref tag logic
             if contributor.conflict:
@@ -372,44 +532,6 @@ class eLife2XML(object):
             else:
                 rid = None
 
-            for affiliation in contributor.affiliations:
-                self.aff = SubElement(self.contrib, "aff")
-
-                if contrib_type != "editor":
-                    if affiliation.department:
-                        self.department = SubElement(self.aff, "institution")
-                        self.department.set("content-type", "dept")
-                        self.department.text = affiliation.department
-                        self.department.tail = ", "
-
-                if affiliation.institution:
-                    self.institution = SubElement(self.aff, "institution")
-                    self.institution.text = affiliation.institution
-                    self.institution.tail = ", "
-
-                if affiliation.city:
-                    self.addline = SubElement(self.aff, "addr-line")
-                    self.city = SubElement(self.addline, "named-content")
-                    self.city.set("content-type", "city")
-                    self.city.text = affiliation.city
-                    self.addline.tail = ", "
-
-                if affiliation.country:
-                    self.country = SubElement(self.aff, "country")
-                    self.country.text = affiliation.country
-
-                if affiliation.phone:
-                    self.phone = SubElement(self.aff, "phone")
-                    self.phone.text = affiliation.phone
-
-                if affiliation.fax:
-                    self.fax = SubElement(self.aff, "fax")
-                    self.fax.text = affiliation.fax                    
-
-                if affiliation.email:
-                    self.email = SubElement(self.aff, "email")
-                    self.email.text = affiliation.email
-
             # Contrib conflict xref
             if contrib_type != "editor":
                 if rid:
@@ -417,18 +539,61 @@ class eLife2XML(object):
                     self.xref.set("ref-type", "fn")
                     self.xref.set("rid", rid)
 
+        # Add the aff tags
+        if contrib_type != "editor":
+            for key, value in self.author_affs.iteritems():
+                aff_id = "aff" + str(key)
+                self.set_aff(self.contrib_group, value, contrib_type, aff_id)
+
+    def set_aff(self, parent, affiliation, contrib_type, aff_id=None):
+        self.aff = SubElement(parent, "aff")
+
+        if aff_id:
+            self.aff.set("id", aff_id)
+
+        if contrib_type != "editor":
+            if affiliation.department:
+                self.department = SubElement(self.aff, "institution")
+                self.department.set("content-type", "dept")
+                self.department.text = affiliation.department
+                self.department.tail = ", "
+
+        if affiliation.institution:
+            self.institution = SubElement(self.aff, "institution")
+            self.institution.text = affiliation.institution
+            self.institution.tail = ", "
+
+        if affiliation.city:
+            self.addline = SubElement(self.aff, "addr-line")
+            self.city = SubElement(self.addline, "named-content")
+            self.city.set("content-type", "city")
+            self.city.text = affiliation.city
+            self.addline.tail = ", "
+
+        if affiliation.country:
+            self.country = SubElement(self.aff, "country")
+            self.country.text = affiliation.country
+
+        if affiliation.phone:
+            self.phone = SubElement(self.aff, "phone")
+            self.phone.text = affiliation.phone
+
+        if affiliation.fax:
+            self.fax = SubElement(self.aff, "fax")
+            self.fax.text = affiliation.fax
+
     def set_article_categories(self, parent, poa_article):
         # article-categories
         if poa_article.get_display_channel() or len(poa_article.article_categories) > 0:
             self.article_categories = SubElement(parent, "article-categories")
-            
+
             if poa_article.get_display_channel():
                 # subj-group subj-group-type="display-channel"
                 subj_group = SubElement(self.article_categories, "subj-group")
                 subj_group.set("subj-group-type", "display-channel")
                 subject = SubElement(subj_group, "subject")
                 subject.text = poa_article.get_display_channel()
-            
+
             for article_category in poa_article.article_categories:
                 # subj-group subj-group-type="heading"
                 subj_group = SubElement(self.article_categories, "subj-group")
@@ -445,7 +610,7 @@ class eLife2XML(object):
         for research_organism in poa_article.research_organisms:
             kwd = SubElement(self.kwd_group, "kwd")
             kwd.text = research_organism
-            
+
     def set_kwd_group_author_keywords(self, parent, poa_article):
         # kwd-group kwd-group-type="author-keywords"
         self.kwd_group = SubElement(parent, "kwd-group")
@@ -456,31 +621,68 @@ class eLife2XML(object):
             kwd = SubElement(self.kwd_group, "kwd")
             kwd.text = author_keyword
 
+    def set_volume(self, parent, poa_article):
+        if poa_article.volume:
+            self.volume = SubElement(parent, "volume")
+            self.volume.text = str(poa_article.volume)
+
     def set_pub_date(self, parent, poa_article, pub_type):
         # pub-date pub-type = pub_type
         date = poa_article.get_date(pub_type)
         if date:
-            self.pub_date = SubElement(parent, "pub-date")
-            self.pub_date.set("pub-type", pub_type)
-            year = SubElement(self.pub_date, "year")
-            year.text = str(date.date.tm_year)
+            if pub_type == "pub":
+                self.pub_date = SubElement(parent, "pub-date")
+                self.pub_date.set("date-type", pub_type)
+                self.pub_date.set("publication-format", "electronic")
+                self.set_dmy(self.pub_date, date)
 
     def set_date(self, parent, poa_article, date_type):
         # date date-type = date_type
         date = poa_article.get_date(date_type)
         if date:
-           self.date = SubElement(parent, "date")
-           self.date.set("date-type", date_type)
-           day = SubElement(self.date, "day")
-           day.text = str(date.date.tm_mday).zfill(2)
-           month = SubElement(self.date, "month")
-           month.text = str(date.date.tm_mon).zfill(2)
-           year = SubElement(self.date, "year")
-           year.text = str(date.date.tm_year)
+            self.date = SubElement(parent, "date")
+            self.date.set("date-type", date_type)
+            self.set_dmy(self.date, date)
+            
+    def set_dmy(self, parent, date):
+        day = SubElement(parent, "day")
+        day.text = str(date.date.tm_mday).zfill(2)
+        month = SubElement(parent, "month")
+        month.text = str(date.date.tm_mon).zfill(2)
+        year = SubElement(parent, "year")
+        year.text = str(date.date.tm_year)
+
+    def set_author_notes(self, parent, poa_article):
+        self.author_notes = SubElement(parent, "author-notes")
+        corresp_count = 0
+        for contributor in poa_article.contributors:
+            if contributor.corresp is True:
+                corresp_count += 1
+                self.set_corresp(self.author_notes, contributor, corresp_count)
+
+    def set_corresp(self, parent, contributor, corresp_count):
+        # For setting corresponding author tags in author-notes section
+
+        # Look for the first email address in the contributors affiliations for now
+        email = None
+        for affiliation in contributor.affiliations:
+            if affiliation.email:
+                email = affiliation.email
+                break
+        initials = "" + contributor.given_name[0] + contributor.surname[0]
+        if email:
+            self.corresp  = SubElement(parent, "corresp")
+            self.corresp.set("id", "cor" + str(corresp_count))
+            self.label  = SubElement(self.corresp, "label")
+            self.label.text = "*"
+            self.label.tail = "For correspondence: "
+            self.email = SubElement(self.corresp, "email")
+            self.email.text = email
+            self.email.tail = " (" + initials + ");"
 
     def set_history(self, parent, poa_article):
         self.history = SubElement(parent, "history")
-        
+
         for date_type in self.date_types:
             date = poa_article.get_date(date_type)
             if date:
@@ -495,7 +697,7 @@ class eLife2XML(object):
         encoding = 'utf-8'
         namespaceURI = None
         qualifiedName = "article"
-    
+
         doctype = ElifeDocumentType(qualifiedName)
         doctype._identified_mixin_init(publicId, systemId)
 
@@ -505,24 +707,24 @@ class eLife2XML(object):
             reparsed.insertBefore(doctype, reparsed.documentElement)
         #return reparsed.toprettyxml(indent="\t", encoding = encoding)
         # Switch to toxml() instead of toprettyxml() to solve extra whitespace issues
-        return reparsed.toxml(encoding = encoding)
+        return reparsed.toxml(encoding=encoding)
 
 class ContributorAffiliation():
     phone = None
     fax = None
-    email = None 
+    email = None
 
     department = None
     institution = None
-    city = None 
+    city = None
     country = None
-    
+
     text = None
-    
+
 class eLifePOSContributor():
     """
-    Currently we are not sure that we can get an auth_id for 
-    all contributors, so this attribute remains an optional attribute. 
+    Currently we are not sure that we can get an auth_id for
+    all contributors, so this attribute remains an optional attribute.
     """
 
     corresp = False
@@ -534,7 +736,7 @@ class eLifePOSContributor():
     conflict = None
     group_author_key = None
 
-    def __init__(self, contrib_type, surname, given_name, collab = None):
+    def __init__(self, contrib_type, surname, given_name, collab=None):
         self.contrib_type = contrib_type
         self.surname = surname
         self.given_name = given_name
@@ -543,7 +745,7 @@ class eLifePOSContributor():
 
     def set_affiliation(self, affiliation):
         self.affiliations.append(affiliation)
-        
+
     def set_conflict(self, conflict):
         self.conflict = conflict
 
@@ -551,7 +753,7 @@ class eLifeDate():
     """
     A struct_time date and a date_type
     """
-    
+
     def __init__(self, date_type, date):
         self.date_type = date_type
         # Date as a time.struct_time
@@ -563,7 +765,7 @@ class eLifeLicense():
     """
     License with some eLife preset values by license_id
     """
-    
+
     license_id = None
     license_type = None
     copyright = False
@@ -571,11 +773,11 @@ class eLifeLicense():
     name = None
     p1 = None
     p2 = None
-    
-    def __init__(self, license_id = None):
+
+    def __init__(self, license_id=None):
         if license_id:
             self.init_by_license_id(license_id)
-        
+
     def init_by_license_id(self, license_id):
         """
         For license_id value, set the license properties
@@ -587,14 +789,18 @@ class eLifeLicense():
             self.href = "http://creativecommons.org/licenses/by/4.0/"
             self.name = "Creative Commons Attribution License"
             self.p1 = "This article is distributed under the terms of the "
-            self.p2 = " permitting unrestricted use and redistribution provided that the original author and source are credited."
+            self.p2 = (" permitting unrestricted use and redistribution provided that the " +
+                       "original author and source are credited.")
         elif int(license_id) == 2:
             self.license_id = license_id
             self.license_type = "open-access"
             self.copyright = False
             self.href = "http://creativecommons.org/publicdomain/zero/1.0/"
             self.name = "Creative Commons CC0"
-            self.p1 = "This is an open-access article, free of all copyright, and may be freely reproduced, distributed, transmitted, modified, built upon, or otherwise used by anyone for any lawful purpose. The work is made available under the "
+            self.p1 = ("This is an open-access article, free of all copyright, and may be " +
+                       "freely reproduced, distributed, transmitted, modified, built upon, or " +
+                       "otherwise used by anyone for any lawful purpose. The work is made " +
+                       "available under the ")
             self.p2 = " public domain dedication."
 
 class eLifeFundingAward():
@@ -619,7 +825,7 @@ class eLifeFundingAward():
     def get_funder_name(self):
         # Alias for institution_name parsed from the XML
         return self.institution_name
-        
+
     def get_award_number(self):
         # Alias for award_id parsed from the XML
         return self.award_id
@@ -646,7 +852,7 @@ class eLifeRef():
     def add_author(self, author):
         # Author is a dict of values
         self.authors.append(author)
-        
+
     def get_journal_title(self):
         # Alias for source
         return self.source
@@ -672,18 +878,33 @@ class eLifeRelatedArticle():
         self.related_article_type = None
         self.ext_link_type = None
 
+class eLifeDataset():
+    """
+    Article component representing a dataset
+    """
+    def __init__(self):
+        self.dataset_type = None
+        self.authors = []
+        self.source_id = None
+        self.year = None
+        self.title = None
+        self.license_info = None
+
+    def add_author(self, author):
+        self.authors.append(author)
+
 class eLifePOA():
     """
     We include some boiler plate in the init, namely articleType
     """
-    contributors = [] 
+    contributors = []
 
     def __init__(self, doi, title):
         self.articleType = "research-article"
         self.display_channel = None
-        self.doi = doi 
-        self.contributors = [] 
-        self.title = title 
+        self.doi = doi
+        self.contributors = []
+        self.title = title
         self.abstract = ""
         self.research_organisms = []
         self.manuscript = None
@@ -703,6 +924,7 @@ class eLifePOA():
         self.elocation_id = None
         self.related_articles = []
         self.version = None
+        self.datasets = []
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -714,33 +936,41 @@ class eLifePOA():
         if not self.dates:
             self.dates = {}
         self.dates[date.date_type] = date
-        
+
     def get_date(self, date_type):
         try:
             return self.dates[date_type]
         except (KeyError, TypeError):
             return None
-        
+
     def get_display_channel(self):
         # display-channel string partly relates to the articleType
         return self.display_channel
-    
+
     def add_article_category(self, article_category):
         self.article_categories.append(article_category)
-        
+
     def has_contributor_conflict(self):
         # Return True if any contributors have a conflict
         for contributor in self.contributors:
             if contributor.conflict:
                 return True
         return False
-    
+
     def add_ethic(self, ethic):
         self.ethics.append(ethic)
-        
+
     def add_author_keyword(self, author_keyword):
         self.author_keywords.append(author_keyword)
 
+    def add_dataset(self, dataset):
+        self.datasets.append(dataset)
+
+    def get_datasets(self, dataset_type=None):
+        if dataset_type:
+            return filter(lambda d: str(d.dataset_type) == dataset_type, self.datasets)
+        else:
+            return self.datasets
 
 class ElifeDocumentType(minidom.DocumentType):
     """
@@ -779,20 +1009,20 @@ def repl(m):
 
 def get_last_commit_to_master():
     """
-    returns the last commit on the master branch. It would be more ideal to get the commit 
+    returns the last commit on the master branch. It would be more ideal to get the commit
     from the branch we are currently on, but as this is a check mostly to help
-    with production issues, returning the commit from master will be sufficient. 
+    with production issues, returning the commit from master will be sufficient.
     """
     repo = Repo(".")
     last_commit = None
     try:
-        last_commit = repo.commits()[0] 
+        last_commit = repo.commits()[0]
     except AttributeError:
         # Optimised for version 0.3.2.RC1
         last_commit = repo.head.commit
-    return str(last_commit) 
-    # commit =  repo.heads[0].commit 
-    # return str(commit) 
+    return str(last_commit)
+    # commit =  repo.heads[0].commit
+    # return str(commit)
 
 def entity_to_unicode(s):
     """
@@ -821,7 +1051,7 @@ def decode_brackets(s):
     s = s.replace(settings.GREATER_THAN_ESCAPE_SEQUENCE, '>')
     return s
 
-def replace_tags(s, from_tag = 'i', to_tag = 'italic'):
+def replace_tags(s, from_tag='i', to_tag='italic'):
     """
     Replace tags such as <i> to <italic>
     <sup> and <sub> are allowed and do not need to be replaced
@@ -838,27 +1068,27 @@ def escape_unmatched_angle_brackets(s):
     Note: Very, very basic, and do not try regex \1 style replacements
       on unicode ever again! Instead this uses string replace
     """
-    allowed_tags = ['<i>','</i>',
-                    '<italic>','</italic>',
-                    '<b>','</b>',
-                    '<bold>','</bold>',
-                    '<sup>','</sup>',
-                    '<sub>','</sub>',
+    allowed_tags = ['<i>', '</i>',
+                    '<italic>', '</italic>',
+                    '<b>', '</b>',
+                    '<bold>', '</bold>',
+                    '<sup>', '</sup>',
+                    '<sub>', '</sub>',
                     '<u>', '</u>',
                     '<underline>', '</underline>',
                     '<b>', '</b>',
                     '<bold>', '</bold>']
-    
+
     # Split string on tags
     tags = re.split('(<.*?>)', s)
     #print tags
 
     for i in range(len(tags)):
         val = tags[i]
-        
+
         # Use angle bracket character counts to find unmatched tags
         #  as well as our allowed_tags list to ignore good tags
-        
+
         if val.count('<') == val.count('>') and val not in allowed_tags:
             val = val.replace('<', '&lt;')
             val = val.replace('>', '&gt;')
@@ -872,7 +1102,7 @@ def escape_unmatched_angle_brackets(s):
         tags[i] = val
 
     return ''.join(tags)
-    
+
 def convert_to_xml_string(s):
     """
     For input strings with escaped tags and special characters
@@ -883,11 +1113,11 @@ def convert_to_xml_string(s):
     s = decode_brackets(s)
     s = replace_tags(s)
     s = replace_tags(s, 'u', 'underline')
-    s = replace_tags(s, 'b', 'bold')  
+    s = replace_tags(s, 'b', 'bold')
     s = escape_unmatched_angle_brackets(s)
     return s
 
-def append_minidom_xml_to_elementtree_xml(parent, xml, recursive = False, attributes = None):
+def append_minidom_xml_to_elementtree_xml(parent, xml, recursive=False, attributes=None):
     """
     Recursively,
     Given an ElementTree.Element as parent, and a minidom instance as xml,
@@ -919,10 +1149,11 @@ def append_minidom_xml_to_elementtree_xml(parent, xml, recursive = False, attrib
                 new_elem_sub.tail = child_node.nodeValue
             else:
                 new_elem_sub.tail = child_node.nodeValue
-                
+
         elif child_node.childNodes is not None:
             new_elem_sub = SubElement(new_elem, child_node.tagName)
-            new_elem_sub = append_minidom_xml_to_elementtree_xml(new_elem_sub, child_node, True, attributes)
+            new_elem_sub = append_minidom_xml_to_elementtree_xml(new_elem_sub, child_node,
+                                                                 True, attributes)
 
         i = i + 1
 
@@ -930,13 +1161,13 @@ def append_minidom_xml_to_elementtree_xml(parent, xml, recursive = False, attrib
     #encoding = 'utf-8'
     #rough_string = ElementTree.tostring(parent, encoding)
     #print rough_string
-    
+
     return parent
-    
+
 
 if __name__ == '__main__':
 
-    # test affiliations 
+    # test affiliations
     aff1 = ContributorAffiliation()
     aff1.department = entity_to_unicode("Edit&#x00F3;ri&#x00E1;l&#x2212;Dep&#x00E1;rtment")
     aff1.institution = "eLife"
@@ -959,7 +1190,7 @@ if __name__ == '__main__':
     aff3.email = "i.mulvany@elifesciences.org"
 
 
-    # test authors 
+    # test authors
     auth1 = eLifePOSContributor("author", "Harrison", "Melissa")
     auth1.auth_id = "029323as"
     auth1.corresp = True
@@ -972,7 +1203,7 @@ if __name__ == '__main__':
     auth2.auth_id = "ANOTHER_ID_2"
     auth2.corresp = True
     auth2.set_affiliation(aff3)
-    
+
     # test editor
     ed1 = eLifePOSContributor("editor", "Harrison", "Melissa")
     ed1.auth_id = "029323as"
@@ -984,7 +1215,7 @@ if __name__ == '__main__':
 
     # dates
     t = time.strptime("2013-10-03", "%Y-%m-%d")
-    date_epub = eLifeDate("epub", t)
+    date_epub = eLifeDate("pub", t)
     date_accepted = eLifeDate("accepted", t)
     date_received = eLifeDate("received", t)
     # copyright date as the license date
@@ -992,7 +1223,7 @@ if __name__ == '__main__':
     date_license = eLifeDate("license", t_license)
     license = eLifeLicense(1)
 
-    # test article 
+    # test article
     doi = "10.7554/eLife.00929"
     manuscript = 929
     title = "The Test Title"
@@ -1002,7 +1233,7 @@ if __name__ == '__main__':
     newArticle.abstract = abstract
     newArticle.display_channel = display_channel
     newArticle.conflict_default = "The authors declare that no competing interests exist."
-    
+
     newArticle.add_ethic("Human subjects: The eLife IRB approved our study")
     newArticle.add_ethic("Animal experimentation: This study was performed in strict accordance with the recommendations in the Guide for the Care and Use of Laboratory Animals of the National Institutes of Health. All of the animals were handled according to approved institutional animal care and use committee (IACUC) protocols (#08-133) of the University of Arizona. The protocol was approved by the Committee on the Ethics of Animal Experiments of the University of Minnesota (Permit Number: 27-2956).")
 
@@ -1014,17 +1245,17 @@ if __name__ == '__main__':
     newArticle.add_contributor(auth2)
     newArticle.add_contributor(auth3)
     newArticle.add_contributor(ed1)
-    
+
     newArticle.add_date(date_epub)
     newArticle.add_date(date_accepted)
     newArticle.add_date(date_received)
     newArticle.add_date(date_license)
-    
+
     newArticle.license = license
-    
+
     newArticle.add_article_category("Cell biology")
 
-    # test the XML generator 
+    # test the XML generator
     eXML = eLife2XML(newArticle)
     prettyXML = eXML.prettyXML()
     print prettyXML

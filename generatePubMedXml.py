@@ -1,11 +1,8 @@
-import xml
-from xml.dom.minidom import Document
-from collections import namedtuple
-from xml.etree.ElementTree import Element, SubElement, Comment, tostring
+from xml.etree.ElementTree import Element, SubElement, Comment
 from xml.etree import ElementTree
 from xml.dom import minidom
+import datetime
 import time
-import calendar
 import re
 import os
 from git import *
@@ -22,11 +19,11 @@ class pubMedPoaXML(object):
     """
     Generate PubMed XML for the PoA article, which is pubstatus = "aheadofprint"
     """
-    def __init__(self, poa_articles, pub_date = None):
+    def __init__(self, poa_articles, pub_date=None):
         """
         set the root node
         get the article type from the object passed in to the class
-        set default values for items that are boilder plate for this XML 
+        set default values for items that are boilder plate for this XML
         """
         self.root = Element('ArticleSet')
 
@@ -47,7 +44,8 @@ class pubMedPoaXML(object):
             self.pub_date = time.gmtime()
 
         # Generate batch id
-        self.elife_doi_batch_id = "elife-" + time.strftime("%Y-%m-%d-%H%M%S", self.pub_date) + "-PubMed"
+        self.elife_doi_batch_id = ("elife-" + time.strftime("%Y-%m-%d-%H%M%S", self.pub_date)
+                                   + "-PubMed")
 
         # set comment
         generated = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -58,12 +56,12 @@ class pubMedPoaXML(object):
         self.build(self.root, poa_articles)
 
     def build(self, root, poa_articles):
-        
+
         for poa_article in poa_articles:
             # Initialise these as None for each loop
             self.contributors = None
             self.groups = None
-            
+
             self.article = SubElement(root, "Article")
             self.set_journal(self.article, poa_article)
             self.set_replaces(self.article, poa_article)
@@ -85,7 +83,7 @@ class pubMedPoaXML(object):
         Given an article object, determine whether the pub_type is for
         PoA article or VoR article
         """
-        
+
         pub_type = None
         if poa_article.is_poa is False:
             # VoR
@@ -95,46 +93,32 @@ class pubMedPoaXML(object):
             pub_type = "aheadofprint"
         return pub_type
 
-    def get_has_date(self, poa_article, date_type):
-        """
-        Given an article object, determine whether the
-        date of type date_type's date object exists
-        Useful in generating Replaces tag for POA articles
-        """
-        
-        has_date = None
-        try:
-            poa_article.get_date(date_type).date
-            has_date = True
-        except:
-            has_date = False
-            
-        return has_date
 
     def set_journal(self, parent, poa_article):
         self.journal = SubElement(parent, "Journal")
-        
+
         self.publisher_name = SubElement(self.journal, "PublisherName")
         self.publisher_name.text = self.elife_publisher_name
 
         self.journal_title = SubElement(self.journal, 'JournalTitle')
         self.journal_title.text = self.elife_journal_title
-        
+
         self.issn = SubElement(self.journal, 'Issn')
         self.issn.text = self.elife_epub_issn
-        
+
         #self.journal_pubdate = SubElement(self.journal, "PubDate")
         pub_type = self.get_pub_type(poa_article)
         if pub_type == "epublish":
             a_date = poa_article.get_date("pub").date
         else:
-            # POA type, use the pub date if it is set, for when processing version 2, version 3, etc.
+            # POA type, use the pub date if it is set, for when processing
+            # version 2, version 3, etc.
             try:
                 a_date = poa_article.get_date("pub").date
             except:
                 # Default use the run time date
                 a_date = self.pub_date
-        
+
         self.volume = SubElement(self.journal, "Volume")
         # Use volume from the article unless not present then use the default
         if poa_article.volume:
@@ -144,7 +128,7 @@ class pubMedPoaXML(object):
 
         self.issue = SubElement(self.journal, "Issue")
         self.issue.text = self.elife_journal_issue
-        
+
         # Add the pub date now
         self.set_pub_date(self.journal, a_date, pub_type)
 
@@ -152,7 +136,7 @@ class pubMedPoaXML(object):
         """
         Set the Replaces tag, if applicable
         """
-            
+
         if ((poa_article.is_poa is False and poa_article.was_ever_poa is True)
             or (poa_article.version and poa_article.version > 1)):
             self.replaces = SubElement(parent, 'Replaces')
@@ -180,12 +164,12 @@ class pubMedPoaXML(object):
         root_xml_element = append_minidom_xml_to_elementtree_xml(
             parent, reparsed
         )
-        
+
     def set_e_location_id(self, parent, poa_article):
         self.e_location_id = SubElement(parent, "ELocationID")
         self.e_location_id.set("EIdType", "doi")
         self.e_location_id.text = poa_article.doi
-        
+
         if poa_article.elocation_id:
             self.e_location_id = SubElement(parent, "ELocationID")
             self.e_location_id.set("EIdType", "pii")
@@ -195,9 +179,9 @@ class pubMedPoaXML(object):
         self.language = SubElement(parent, "Language")
         self.language.text = self.elife_language
 
-    def set_author_list(self, parent, poa_article, contrib_type = None):
+    def set_author_list(self, parent, poa_article, contrib_type=None):
         # If contrib_type is None, all contributors will be added regardless of their type
-        
+
         if self.contributors is None:
             # Create the XML element on first use
             self.contributors = SubElement(parent, "AuthorList")
@@ -211,23 +195,23 @@ class pubMedPoaXML(object):
             if  (contributor.surname == "" or contributor.surname is None) \
             and (contributor.collab == "" or contributor.collab is None):
                 continue
-                
+
             self.person_name = SubElement(self.contributors, "Author")
-  
+
             if contributor.given_name:
                 self.given_name = SubElement(self.person_name, "FirstName")
                 self.given_name.text = contributor.given_name
-            
+
             if contributor.surname:
                 self.surname = SubElement(self.person_name, "LastName")
                 self.surname.text = contributor.surname
-            
+
             if contributor.collab:
                 self.collective_name = SubElement(self.person_name, "CollectiveName")
                 self.collective_name.text = contributor.collab
-            
+
             # Add each affiliation for multiple affiliation support
-            non_blank_aff_count = len(filter(lambda aff: aff.text != "", contributor.affiliations))             
+            non_blank_aff_count = len(filter(lambda aff: aff.text != "", contributor.affiliations))
             for aff in contributor.affiliations:
                 if aff.text != "":
                     if non_blank_aff_count == 1:
@@ -238,15 +222,15 @@ class pubMedPoaXML(object):
                         self.affiliation_info = SubElement(self.person_name, "AffiliationInfo")
                         self.affiliation = SubElement(self.affiliation_info, "Affiliation")
                         self.affiliation.text = aff.text
-                
+
             if contributor.orcid:
                 self.orcid = SubElement(self.person_name, "Identifier")
                 self.orcid.set("Source", "ORCID")
                 self.orcid.text = contributor.orcid
 
-    def set_group_list(self, parent, poa_article, contrib_type = None):
+    def set_group_list(self, parent, poa_article, contrib_type=None):
         # If contrib_type is None, all contributors will be added regardless of their type
-        
+
         if self.groups is None:
             # Create the XML element on first use
             self.groups = SubElement(parent, "GroupList")
@@ -260,7 +244,7 @@ class pubMedPoaXML(object):
             if  (contributor.surname == "" or contributor.surname is None) \
             and (contributor.collab == "" or contributor.collab is None):
                 continue
-                
+
             # Set the GroupName value
             if contributor.group_author_key:
                 # The contributor has a contrib-id contrib-id-type="group-author-key"
@@ -270,7 +254,7 @@ class pubMedPoaXML(object):
                         and collab_contrib.group_author_key == contributor.group_author_key):
                         # Set the individual GroupName to the collab name
                         self.group_name_text = collab_contrib.collab
-    
+
             # Find existing group with the same name or create it if not exists
             self.group = None
             for group in self.groups.findall('./Group'):
@@ -279,30 +263,30 @@ class pubMedPoaXML(object):
                         # Matched an existing group tag, use it
                         self.group = group
                         break
-                    
+
             if self.group is None:
                 # Create a new group
                 self.group = SubElement(self.groups, "Group")
-                
+
                 # Set the GroupName of the group
                 self.group_name = SubElement(self.group, "GroupName")
-                self.group_name.text = self.group_name_text   
-            
+                self.group_name.text = self.group_name_text
+
             # Add the individual to the group
             individual = SubElement(self.group, "IndividualName")
-  
+
             if contributor.given_name:
                 self.given_name = SubElement(individual, "FirstName")
                 self.given_name.text = contributor.given_name
-          
+
             if contributor.surname:
                 self.surname = SubElement(individual, "LastName")
                 self.surname.text = contributor.surname
-        
+
         # Remove a completely empty GroupList element, if empty
         if len(self.groups) <= 0:
             parent.remove(self.groups)
-  
+
     def set_publication_type(self, parent, poa_article):
         if poa_article.articleType:
             self.publication_type = SubElement(parent, "PublicationType")
@@ -310,8 +294,8 @@ class pubMedPoaXML(object):
                 self.publication_type.text = "EDITORIAL"
             elif poa_article.articleType == "correction":
                 self.publication_type.text = "PUBLISHED ERRATUM"
-            elif (poa_article.articleType == "research-article" 
-               or poa_article.articleType == "discussion" 
+            elif (poa_article.articleType == "research-article"
+               or poa_article.articleType == "discussion"
                or poa_article.articleType == "article-commentary"):
                 self.publication_type.text = "JOURNAL ARTICLE"
 
@@ -335,23 +319,23 @@ class pubMedPoaXML(object):
 
     def set_date(self, parent, a_date, date_type):
         if a_date:
-           self.date = SubElement(parent, "PubDate")
-           self.date.set("PubStatus", date_type)
-           year = SubElement(self.date, "Year")
-           year.text = str(a_date.tm_year)
-           month = SubElement(self.date, "Month")
-           month.text = str(a_date.tm_mon).zfill(2)
-           day = SubElement(self.date, "Day")
-           day.text = str(a_date.tm_mday).zfill(2)
+            self.date = SubElement(parent, "PubDate")
+            self.date.set("PubStatus", date_type)
+            year = SubElement(self.date, "Year")
+            year.text = str(a_date.tm_year)
+            month = SubElement(self.date, "Month")
+            month.text = str(a_date.tm_mon).zfill(2)
+            day = SubElement(self.date, "Day")
+            day.text = str(a_date.tm_mday).zfill(2)
 
     def set_history(self, parent, poa_article):
         self.history = SubElement(parent, "History")
-        
+
         for date_type in self.date_types:
             date = poa_article.get_date(date_type)
             if date:
                 self.set_date(self.history, date.date, date_type)
-                
+
         # If the article is VoR and is was ever PoA, then set the aheadofprint history date
         if poa_article.is_poa is False and poa_article.was_ever_poa is True:
             date_value_type = "epub"
@@ -359,7 +343,7 @@ class pubMedPoaXML(object):
             date = poa_article.get_date(date_value_type)
             if date:
                 self.set_date(self.history, date.date, date_type)
-                
+
     def set_abstract(self, parent, poa_article):
 
         tag_name = 'Abstract'
@@ -383,7 +367,7 @@ class pubMedPoaXML(object):
     def set_object_list(self, parent, poa_article):
         # Keywords and others go in Object tags
         self.object_list = SubElement(parent, "ObjectList")
-        
+
         # Add related article data for correction articles
         if poa_article.articleType == "correction":
             for related_article in poa_article.related_articles:
@@ -400,29 +384,29 @@ class pubMedPoaXML(object):
                 # Convert the research organism
                 research_organism_converted = self.convert_research_organism(research_organism)
                 self.set_object(self.object_list, "keyword", "value", research_organism_converted)
-        
+
         # Add article categories
         for article_category in poa_article.article_categories:
-            
+
             if article_category.lower().strip() == 'computational and systems biology':
                 # Edge case category needs special treatment
-                categories = ['Computational biology','Systems biology']
+                categories = ['Computational biology', 'Systems biology']
             else:
                 # Break on "and" and capitalise the first letter
                 categories = article_category.split('and')
-                
+
             for category in categories:
                 category = category.strip().lower()
                 self.set_object(self.object_list, "keyword", "value", category)
-                
+
         # Add keywords
         for keyword in poa_article.author_keywords:
             self.set_object(self.object_list, "keyword", "value", keyword)
-                
+
         # Finally, do not leave an empty ObjectList tag, if present
         if len(self.object_list) <= 0:
             parent.remove(self.object_list)
-        
+
     def convert_research_organism(self, research_organism):
         # Lower case except for the first letter followed by a dot by a space
         research_organism_converted = research_organism.lower()
@@ -437,12 +421,12 @@ class pubMedPoaXML(object):
         except UnicodeEncodeError:
             pass
         return research_organism_converted
-        
+
     def set_object(self, parent, object_type, param_name, param):
         # e.g.  <Object Type="keyword"><Param Name="value">human</Param></Object>
         self.object = SubElement(parent, "Object")
         self.object.set("Type", object_type)
-        self.param= SubElement(self.object, "Param")
+        self.param = SubElement(self.object, "Param")
         self.param.set("Name", param_name)
         self.param.text = param
         return self.object
@@ -466,42 +450,43 @@ class pubMedPoaXML(object):
             reparsed.insertBefore(doctype, reparsed.documentElement)
 
         #return reparsed.toprettyxml(indent="\t", encoding = encoding)
-        return reparsed.toxml(encoding = encoding)
+        return reparsed.toxml(encoding=encoding)
 
 def build_pubmed_xml_for_articles(poa_articles):
     """
     Given a list of article article objects,
     and then generate pubmed XML from them
     """
-    
-    # test the XML generator 
+
+    # test the XML generator
     eXML = pubMedPoaXML(poa_articles)
     prettyXML = eXML.prettyXML()
-    
+
     # Write to file
     f = open(settings.TMP_DIR + os.sep + eXML.elife_doi_batch_id + '.xml', "wb")
     f.write(prettyXML)
     f.close()
-    
+
+    return prettyXML
     #print prettyXML
 
 if __name__ == '__main__':
-    
+
     article_xmls = [#"generated_xml_output/elife_poa_e02935.xml"
                     #,"generated_xml_output/Feature.xml"
                     "generated_xml_output/elife02935.xml"
-                    ,"generated_xml_output/elife04024.xml"
-                    ,"generated_xml_output/elife04034.xml"
-                    ,"generated_xml_output/elife04037.xml"
-                    ,"generated_xml_output/elife04105.xml"
-                    ,"generated_xml_output/elife04180.xml"
-                    ,"generated_xml_output/elife04586.xml"
-                    ,"generated_xml_output/elife_poa_e00662.xml"
-                    ,"generated_xml_output/elife_poa_e02923.xml"
+                    , "generated_xml_output/elife04024.xml"
+                    , "generated_xml_output/elife04034.xml"
+                    , "generated_xml_output/elife04037.xml"
+                    , "generated_xml_output/elife04105.xml"
+                    , "generated_xml_output/elife04180.xml"
+                    , "generated_xml_output/elife04586.xml"
+                    , "generated_xml_output/elife_poa_e00662.xml"
+                    , "generated_xml_output/elife_poa_e02923.xml"
                     ]
-    
+
     poa_articles = build_articles_from_article_xmls(article_xmls)
-    
+
     # Pretend an article object was PoA'ed for testing
     for article in poa_articles:
         if (article.doi == '10.7554/eLife.03528'
@@ -518,9 +503,8 @@ if __name__ == '__main__':
             article.add_date(date_instance)
         if article.doi == '10.7554/eLife.02923':
             article.version = 2
-    
-    build_pubmed_xml_for_articles(poa_articles)
 
+    xml_content = build_pubmed_xml_for_articles(poa_articles)
 
 
 

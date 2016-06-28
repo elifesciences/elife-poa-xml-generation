@@ -9,6 +9,5 @@ install:
 # command to run tests
 before_script:
   - cp example-settings.py settings.py
-  - cd tests
-script: lettuce
+script: coverage run -m unittest discover tests "*_test.py"
 after_success: coveralls
