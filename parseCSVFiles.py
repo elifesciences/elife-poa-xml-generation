@@ -452,6 +452,9 @@ def get_datasets(article_id):
 @memoize
 def index_funding_table():
     """
+    Rows in the funding CSV are to be uniquely identified by three column values
+    article_id + author_id + funder_position
+    This will return a three dimensional dict with those hierarchies
     """
     table_type = "funding"
 
@@ -478,21 +481,22 @@ def index_funding_table():
             article_index[article_id][author_id] = {}
 
         article_index[article_id][author_id][funder_position] = data_row
-        
+
     #print article_index
     return article_index
 
-@memoize
-def get_funding_ids():
+def get_funding_ids(article_id):
     """
-    Flatten the funding table keys into a list of tuples
+    Return unding table keys as a list of tuples
+    for a particular article_id
     """
     funding_ids = []
 
     for key, value in index_funding_table().iteritems():
-        for key_2, value_2 in value.iteritems():
-            for key_3, value_3 in value_2.iteritems():
-                funding_ids.append((key, key_2, key_3))
+        if key == article_id:
+            for key_2, value_2 in value.iteritems():
+                for key_3, value_3 in value_2.iteritems():
+                    funding_ids.append((key, key_2, key_3))
 
     return funding_ids
 
@@ -510,6 +514,15 @@ def get_funder(article_id, author_id, funder_position):
                                      COLUMN_HEADINGS["funder"])
     return attribute
 
+def get_award_id(article_id, author_id, funder_position):
+    attribute = get_funding_attribute(article_id, author_id, funder_position,
+                                     COLUMN_HEADINGS["award_id"])
+    return attribute
+
+def get_funder_identifier(article_id, author_id, funder_position):
+    attribute = get_funding_attribute(article_id, author_id, funder_position,
+                                     COLUMN_HEADINGS["funder_identifier"])
+    return attribute
 
 
 ## conversion functions
@@ -734,13 +747,11 @@ if __name__ == "__main__":
         email = get_author_email(test_article_id, author_id)
         print author_postion, email
 
-    funder_ids = get_funding_ids()
-    for funder_id in funder_ids:
-        if test_article_id == funder_id[0]:
-            funder = get_funder(
-                article_id = funder_id[0],
-                author_id = funder_id[1],
-                funder_position = funder_id[2])
-            print str(funder)
+    funder_ids = get_funding_ids(test_article_id)
+    for (article_id, author_id, funder_position) in funder_ids:
+        funder_identifier = get_funder_identifier(article_id, author_id, funder_position)
+        funder = get_funder(article_id, author_id, funder_position)
+        award_id = get_award_id(article_id, author_id, funder_position)
+        print ", ".join([funder_position, funder_identifier, funder, award_id])
 
 
