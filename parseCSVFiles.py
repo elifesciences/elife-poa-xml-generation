@@ -448,6 +448,70 @@ def get_datasets(article_id):
         attribute = None
     return attribute
 
+# funding
+@memoize
+def index_funding_table():
+    """
+    """
+    table_type = "funding"
+
+    logger.info("in index_funding_table")
+    path = get_xls_path(table_type)
+
+    # get the data and the row of colnames
+    data_rows = get_xls_data_rows(table_type)
+    col_names = get_xls_col_names(table_type)
+
+    # logger.info("data_rows: " + str(data_rows))
+    logger.info("col_names: " + str(col_names))
+
+    article_index = {}
+    for data_row in data_rows:
+        article_id = get_cell_value('poa_m_ms_no', col_names, data_row)
+        author_id = get_cell_value(COLUMN_HEADINGS["author_id"], col_names, data_row)
+        funder_position = get_cell_value(COLUMN_HEADINGS["funder_position"], col_names, data_row)
+
+        # Crude multidimentional dict builder
+        if article_id not in article_index:
+            article_index[article_id] = {}
+        if author_id not in article_index[article_id]:
+            article_index[article_id][author_id] = {}
+
+        article_index[article_id][author_id][funder_position] = data_row
+        
+    #print article_index
+    return article_index
+
+@memoize
+def get_funding_ids():
+    """
+    Flatten the funding table keys into a list of tuples
+    """
+    funding_ids = []
+
+    for key, value in index_funding_table().iteritems():
+        for key_2, value_2 in value.iteritems():
+            for key_3, value_3 in value_2.iteritems():
+                funding_ids.append((key, key_2, key_3))
+
+    return funding_ids
+
+def get_funding_attribute(article_id, author_id, funder_position, attribute_name):
+    funding_article_index = index_funding_table()
+
+    data_row = funding_article_index[str(article_id)][str(author_id)][str(funder_position)]
+
+    col_names = get_xls_col_names("funding")
+    attribute = get_cell_value(attribute_name, col_names, data_row)
+    return attribute
+
+def get_funder(article_id, author_id, funder_position):
+    attribute = get_funding_attribute(article_id, author_id, funder_position,
+                                     COLUMN_HEADINGS["funder"])
+    return attribute
+
+
+
 ## conversion functions
 def get_elife_doi(article_id):
     """
@@ -647,7 +711,7 @@ def parse_group_authors(group_authors):
 
 if __name__ == "__main__":
 
-    test_article_id = "1856"
+    test_article_id = "12717"
 
     logger.info("about to start the test program")
     subjects = get_subjects(test_article_id)
@@ -669,4 +733,14 @@ if __name__ == "__main__":
         author_postion = get_author_position(test_article_id, author_id)
         email = get_author_email(test_article_id, author_id)
         print author_postion, email
+
+    funder_ids = get_funding_ids()
+    for funder_id in funder_ids:
+        if test_article_id == funder_id[0]:
+            funder = get_funder(
+                article_id = funder_id[0],
+                author_id = funder_id[1],
+                funder_position = funder_id[2])
+            print str(funder)
+
 
