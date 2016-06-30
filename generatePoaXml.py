@@ -209,6 +209,9 @@ class eLife2XML(object):
         if len(poa_article.research_organisms) > 0:
             self.set_kwd_group_research_organism(self.article_meta, poa_article)
 
+        if len(poa_article.funding_awards) > 0:
+            self.set_funding_group(self.article_meta, poa_article)
+
     def set_article_datasets(self, parent, poa_article):
         self.dataro_num = 0
         self.set_article_datasets_header(parent)
@@ -450,6 +453,19 @@ class eLife2XML(object):
             self.author_affs[aff_id] = affiliation
 
         return aff_id
+    
+    def get_contrib_par_ids(self, poa_article, auth_id):
+        """
+        In order to set xref tags for authors that link to funding award id
+        traverse the article data to match values
+        """
+        par_ids = []
+        for index, award in enumerate(poa_article.funding_awards):
+            par_id = "par-" + str(index + 1)
+            for contributor in award.principal_award_recipients:
+                if contributor.auth_id == auth_id:
+                    par_ids.append(par_id)
+        return par_ids
 
     def compare_aff(self, aff1, aff2):
         # Compare two affiliations by comparing the object attributes
@@ -487,11 +503,7 @@ class eLife2XML(object):
                 self.collab = SubElement(self.contrib, "collab")
                 self.collab.text = contributor.collab
             else:
-                self.name = SubElement(self.contrib, "name")
-                self.surname = SubElement(self.name, "surname")
-                self.surname.text = contributor.surname
-                self.given_name = SubElement(self.name, "given-names")
-                self.given_name.text = contributor.given_name
+                self.set_name(self.contrib, contributor)
 
             if contrib_type == "editor":
                 self.role = SubElement(self.contrib, "role")
@@ -523,6 +535,12 @@ class eLife2XML(object):
                 self.xref.set("rid", rid)
                 self.xref.text = "*"
 
+            # Funding award group xref tags
+            for par_id in self.get_contrib_par_ids(poa_article, contributor.auth_id):
+                self.xref = SubElement(self.contrib, "xref")
+                self.xref.set("ref-type", "other")
+                self.xref.set("rid", par_id)
+
             # Contributor conflict xref tag logic
             if contributor.conflict:
                 rid = "conf" + str(self.conflict_count + 1)
@@ -544,6 +562,13 @@ class eLife2XML(object):
             for key, value in self.author_affs.iteritems():
                 aff_id = "aff" + str(key)
                 self.set_aff(self.contrib_group, value, contrib_type, aff_id)
+
+    def set_name(self, parent, contributor):
+        self.name = SubElement(parent, "name")
+        self.surname = SubElement(self.name, "surname")
+        self.surname.text = contributor.surname
+        self.given_name = SubElement(self.name, "given-names")
+        self.given_name.text = contributor.given_name
 
     def set_aff(self, parent, affiliation, contrib_type, aff_id=None):
         self.aff = SubElement(parent, "aff")
@@ -620,6 +645,41 @@ class eLife2XML(object):
         for author_keyword in poa_article.author_keywords:
             kwd = SubElement(self.kwd_group, "kwd")
             kwd.text = author_keyword
+
+    def set_funding_group(self, parent, poa_article):
+        # funding-group
+        self.funding_group = SubElement(parent, "funding-group")
+        for index, award in enumerate(poa_article.funding_awards):
+            par_id = "par-" + str(index + 1)
+            self.set_award_group(self.funding_group, award, par_id)
+
+    def set_award_group(self, parent, award, par_id):
+        award_group = SubElement(parent, "award-group")
+        award_group.set("id", par_id)
+        if award.institution_name or award.institution_id:
+            self.set_funding_source(award_group, award.institution_id, award.institution_name)
+        for award_id in award.award_ids:
+            self.award_id = SubElement(award_group, "award-id")
+            self.award_id.text = award_id
+        if len(award.principal_award_recipients) > 0:
+            self.set_principal_award_recipients(award_group, award)
+
+
+    def set_funding_source(self, parent, institution_id, institution_name):
+        self.funding_source = SubElement(parent, "funding-source")
+        self.institution_wrap = SubElement(self.funding_source, "institution-wrap")
+        if institution_id:
+            self.institution_id =  SubElement(self.institution_wrap, "institution-id")
+            self.institution_id.set("institution-id-type", "FundRef")
+            self.institution_id.text = "http://dx.doi.org/10.13039/" + institution_id
+        if institution_name:
+            self.institution =  SubElement(self.institution_wrap, "institution")
+            self.institution.text = institution_name
+
+    def set_principal_award_recipients(self, parent, award):
+        self.principal_award_recipient = SubElement(parent, "principal-award-recipient")
+        for contributor in award.principal_award_recipients:
+            self.set_name(self.principal_award_recipient, contributor)
 
     def set_volume(self, parent, poa_article):
         if poa_article.volume:
@@ -811,9 +871,14 @@ class eLifeFundingAward():
         self.award_ids = []
         self.institution_name = None
         self.institution_id = None
+        self.principal_award_recipients = []
 
     def add_award_id(self, award_id):
         self.award_ids.append(award_id)
+
+    def add_principal_award_recipient(self, contributor):
+        # Accepts an instance of eLifePOSContributor
+        self.principal_award_recipients.append(contributor)
 
     def get_funder_identifier(self):
         # Funder identifier is the unique id found in the institution_id DOI
@@ -925,6 +990,7 @@ class eLifePOA():
         self.related_articles = []
         self.version = None
         self.datasets = []
+        self.funding_awards = []
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
@@ -971,6 +1037,10 @@ class eLifePOA():
             return filter(lambda d: str(d.dataset_type) == dataset_type, self.datasets)
         else:
             return self.datasets
+
+    def add_funding_award(self, funding_award):
+        self.funding_awards.append(funding_award)
+
 
 class ElifeDocumentType(minidom.DocumentType):
     """

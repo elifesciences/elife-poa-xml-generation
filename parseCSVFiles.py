@@ -487,7 +487,7 @@ def index_funding_table():
 
 def get_funding_ids(article_id):
     """
-    Return unding table keys as a list of tuples
+    Return funding table keys as a list of tuples
     for a particular article_id
     """
     funding_ids = []

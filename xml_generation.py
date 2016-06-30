@@ -312,6 +312,53 @@ def set_editor_info(article, article_id):
         logger.error("could not set editor")
         return False
 
+def set_funding(article, article_id):
+    """
+    Instantiate one eLifeFundingAward for each funding award
+    Add principal award recipients in the order of author position for the article
+    Finally add the funding objects to the article in the order of funding position
+    """
+    logger.info("in set_funding")
+    try:
+        # Query for all funding award data keys
+        funder_ids = get_funding_ids(article_id)
+
+        # Keep track of funding awards by position in a dict
+        funding_awards = {}
+
+        # First pass, build the funding awards
+        for (article_id, author_id, funder_position) in funder_ids:
+            #print (article_id, author_id, funder_position)
+            funder_identifier = get_funder_identifier(article_id, author_id, funder_position)
+            funder = get_funder(article_id, author_id, funder_position)
+            award_id = get_award_id(article_id, author_id, funder_position)
+
+            if funder_position not in funding_awards.keys():
+                # Initialise the object values
+                funding_awards[funder_position] = eLifeFundingAward()
+                if funder:
+                    funding_awards[funder_position].institution_name = funder
+                if funder_identifier:
+                    funding_awards[funder_position].institution_id = funder_identifier
+                if award_id and award_id.strip() != "":
+                    funding_awards[funder_position].add_award_id(award_id)
+
+        # Second pass, add the primary award recipients in article author order
+        for position, award in funding_awards.iteritems():
+            for contrib in article.contributors:
+                for (article_id, author_id, funder_position) in funder_ids:
+                    if position == funder_position and contrib.auth_id == author_id:
+                        funding_awards[position].add_principal_award_recipient(contrib)
+
+        # Add funding awards to the article object, sorted by position
+        for position, award in sorted(funding_awards.iteritems()):
+            article.add_funding_award(award)
+
+        return True
+    except:
+        logger.error("could not set funding")
+        return False
+
 def write_xml(article_id, xml, dir=''):
     f = open(dir + os.sep + 'elife_poa_e' + str(int(article_id)).zfill(5) + '.xml', "wb")
     f.write(xml.prettyXML())
@@ -333,7 +380,8 @@ def build_article_for_article(article_id):
     # Run each of the below functions to build the article object components
     article_set_functions = [set_title, set_abstract, set_articleType, set_license,
                             set_dates, set_ethics, set_datasets, set_categories,
-                            set_organsims, set_author_info, set_editor_info, set_keywords]
+                            set_organsims, set_author_info, set_editor_info, set_keywords,
+                            set_funding]
     for set_function in article_set_functions:
         if not set_function(article, article_id):
             error_count = error_count + 1
