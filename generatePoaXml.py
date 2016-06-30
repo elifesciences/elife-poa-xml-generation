@@ -674,7 +674,7 @@ class eLife2XML(object):
             self.institution_id.text = "http://dx.doi.org/10.13039/" + institution_id
         if institution_name:
             self.institution =  SubElement(self.institution_wrap, "institution")
-            self.institution.text = institution_name
+            self.institution.text = entity_to_unicode(institution_name)
 
     def set_principal_award_recipients(self, parent, award):
         self.principal_award_recipient = SubElement(parent, "principal-award-recipient")
