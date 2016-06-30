@@ -338,7 +338,7 @@ def set_funding(article, article_id):
                 funding_awards[funder_position] = eLifeFundingAward()
                 if funder:
                     funding_awards[funder_position].institution_name = funder
-                if funder_identifier:
+                if funder_identifier and funder_identifier.strip() != "":
                     funding_awards[funder_position].institution_id = funder_identifier
                 if award_id and award_id.strip() != "":
                     funding_awards[funder_position].add_award_id(award_id)
