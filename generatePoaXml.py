@@ -1187,6 +1187,17 @@ def convert_to_xml_string(s):
     s = escape_unmatched_angle_brackets(s)
     return s
 
+def clean_funder(funder):
+    """
+    Remove extra content from funder names
+    separated by | character
+    and anything in parentheses
+    """
+    funder = funder.split('|')[-1]
+    funder = re.sub(r"\(.*\)", "", funder)
+    funder = funder.rstrip().lstrip()
+    return funder
+
 def append_minidom_xml_to_elementtree_xml(parent, xml, recursive=False, attributes=None):
     """
     Recursively,
