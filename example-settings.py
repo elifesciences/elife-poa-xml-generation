@@ -64,7 +64,8 @@ XLS_COLUMN_HEADINGS = {"author_position" : "poa_a_seq",
 					"award_id" : "poa_grant_ref_no",
 					"funder_position" : "poa_funder_order",
 					"funder" : "poa_funder",
-					"funder_identifier" : "poa_fund_ref_id"
+					"funder_identifier" : "poa_fund_ref_id",
+					"funding_note" : "poa_m_funding_note"
 				}
 
 # xml writing settings

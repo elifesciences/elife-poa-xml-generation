@@ -320,6 +320,9 @@ def set_funding(article, article_id):
     """
     logger.info("in set_funding")
     try:
+        # Set the funding note from the manuscript level
+        article.funding_note = get_funding_note(article_id)
+
         # Query for all funding award data keys
         funder_ids = get_funding_ids(article_id)
 

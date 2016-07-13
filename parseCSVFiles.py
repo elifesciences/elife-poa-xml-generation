@@ -524,6 +524,10 @@ def get_funder_identifier(article_id, author_id, funder_position):
                                      COLUMN_HEADINGS["funder_identifier"])
     return attribute
 
+def get_funding_note(article_id):
+    attribute = get_article_attributes(article_id, "manuscript",
+                                       COLUMN_HEADINGS["funding_note"])[0]
+    return attribute
 
 ## conversion functions
 def get_elife_doi(article_id):

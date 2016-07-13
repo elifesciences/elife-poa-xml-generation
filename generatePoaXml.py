@@ -209,7 +209,7 @@ class eLife2XML(object):
         if len(poa_article.research_organisms) > 0:
             self.set_kwd_group_research_organism(self.article_meta, poa_article)
 
-        if len(poa_article.funding_awards) > 0:
+        if len(poa_article.funding_awards) > 0 or poa_article.funding_note:
             self.set_funding_group(self.article_meta, poa_article)
 
     def set_article_datasets(self, parent, poa_article):
@@ -652,6 +652,9 @@ class eLife2XML(object):
         for index, award in enumerate(poa_article.funding_awards):
             par_id = "par-" + str(index + 1)
             self.set_award_group(self.funding_group, award, par_id)
+        if poa_article.funding_note:
+            self.funding_statement = SubElement(self.funding_group, "funding-statement")
+            self.funding_statement.text = poa_article.funding_note
 
     def set_award_group(self, parent, award, par_id):
         award_group = SubElement(parent, "award-group")
@@ -991,6 +994,7 @@ class eLifePOA():
         self.version = None
         self.datasets = []
         self.funding_awards = []
+        self.funding_note = None
 
     def add_contributor(self, contributor):
         self.contributors.append(contributor)
