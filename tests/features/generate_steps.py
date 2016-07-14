@@ -6,7 +6,7 @@ import json
 from xml.etree import ElementTree
 
 # Default XLS_FILES for using in tests when required
-XLS_FILES = {"authors" : "poa_author.csv", "license" : "poa_license.csv", "manuscript" : "poa_manuscript.csv", "received" : "poa_received.csv", "subjects" : "poa_subject_area.csv", "organisms": "poa_research_organism.csv", "abstract": "poa_abstract.csv", "title": "poa_title.csv", "keywords": "poa_keywords.csv", "group_authors": "poa_group_authors.csv"}
+XLS_FILES = {"authors" : "poa_author.csv", "license" : "poa_license.csv", "manuscript" : "poa_manuscript.csv", "received" : "poa_received.csv", "subjects" : "poa_subject_area.csv", "organisms": "poa_research_organism.csv", "abstract": "poa_abstract.csv", "title": "poa_title.csv", "keywords": "poa_keywords.csv", "group_authors": "poa_group_authors.csv" , "datasets": "poa_datasets.csv", "funding": "poa_funding.csv"}
 
 @step(u'I have the string (\S+)')
 def i_have_the_string_string(step, string):
@@ -229,7 +229,7 @@ def i_build_poa_xml_for_article(step):
     
 @step(u'I build POA article for article')
 def i_build_poa_article_for_article(step):
-    world.article, error_count = build_article_for_article(int(world.article_id))
+    world.article, error_count, error_messages = build_article_for_article(int(world.article_id))
     assert world.article is not None, \
         "Got article %s" % world.article
 

@@ -448,6 +448,87 @@ def get_datasets(article_id):
         attribute = None
     return attribute
 
+# funding
+@memoize
+def index_funding_table():
+    """
+    Rows in the funding CSV are to be uniquely identified by three column values
+    article_id + author_id + funder_position
+    This will return a three dimensional dict with those hierarchies
+    """
+    table_type = "funding"
+
+    logger.info("in index_funding_table")
+    path = get_xls_path(table_type)
+
+    # get the data and the row of colnames
+    data_rows = get_xls_data_rows(table_type)
+    col_names = get_xls_col_names(table_type)
+
+    # logger.info("data_rows: " + str(data_rows))
+    logger.info("col_names: " + str(col_names))
+
+    article_index = {}
+    for data_row in data_rows:
+        article_id = get_cell_value('poa_m_ms_no', col_names, data_row)
+        author_id = get_cell_value(COLUMN_HEADINGS["author_id"], col_names, data_row)
+        funder_position = get_cell_value(COLUMN_HEADINGS["funder_position"], col_names, data_row)
+
+        # Crude multidimentional dict builder
+        if article_id not in article_index:
+            article_index[article_id] = {}
+        if author_id not in article_index[article_id]:
+            article_index[article_id][author_id] = {}
+
+        article_index[article_id][author_id][funder_position] = data_row
+
+    #print article_index
+    return article_index
+
+def get_funding_ids(article_id):
+    """
+    Return funding table keys as a list of tuples
+    for a particular article_id
+    """
+    funding_ids = []
+
+    for key, value in index_funding_table().iteritems():
+        if key == article_id:
+            for key_2, value_2 in value.iteritems():
+                for key_3, value_3 in value_2.iteritems():
+                    funding_ids.append((key, key_2, key_3))
+
+    return funding_ids
+
+def get_funding_attribute(article_id, author_id, funder_position, attribute_name):
+    funding_article_index = index_funding_table()
+
+    data_row = funding_article_index[str(article_id)][str(author_id)][str(funder_position)]
+
+    col_names = get_xls_col_names("funding")
+    attribute = get_cell_value(attribute_name, col_names, data_row)
+    return attribute
+
+def get_funder(article_id, author_id, funder_position):
+    attribute = get_funding_attribute(article_id, author_id, funder_position,
+                                     COLUMN_HEADINGS["funder"])
+    return attribute
+
+def get_award_id(article_id, author_id, funder_position):
+    attribute = get_funding_attribute(article_id, author_id, funder_position,
+                                     COLUMN_HEADINGS["award_id"])
+    return attribute
+
+def get_funder_identifier(article_id, author_id, funder_position):
+    attribute = get_funding_attribute(article_id, author_id, funder_position,
+                                     COLUMN_HEADINGS["funder_identifier"])
+    return attribute
+
+def get_funding_note(article_id):
+    attribute = get_article_attributes(article_id, "manuscript",
+                                       COLUMN_HEADINGS["funding_note"])[0]
+    return attribute
+
 ## conversion functions
 def get_elife_doi(article_id):
     """
@@ -647,7 +728,7 @@ def parse_group_authors(group_authors):
 
 if __name__ == "__main__":
 
-    test_article_id = "1856"
+    test_article_id = "12717"
 
     logger.info("about to start the test program")
     subjects = get_subjects(test_article_id)
@@ -669,4 +750,12 @@ if __name__ == "__main__":
         author_postion = get_author_position(test_article_id, author_id)
         email = get_author_email(test_article_id, author_id)
         print author_postion, email
+
+    funder_ids = get_funding_ids(test_article_id)
+    for (article_id, author_id, funder_position) in funder_ids:
+        funder_identifier = get_funder_identifier(article_id, author_id, funder_position)
+        funder = get_funder(article_id, author_id, funder_position)
+        award_id = get_award_id(article_id, author_id, funder_position)
+        print ", ".join([funder_position, funder_identifier, funder, award_id])
+
 
