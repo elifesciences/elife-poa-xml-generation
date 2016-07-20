@@ -2,7 +2,7 @@ import os
 from generatePoaXml import *
 import settings
 from elifetools import parseJATS as parser
-from bs4 import BeautifulSoup
+import re
 
 """
 Parse PoA XML file and can instantiate a eLifePOA object from the data
@@ -278,38 +278,16 @@ def build_related_articles(related_articles):
     return article_list
 
 def remove_tag(tag_name, string):
-
     """
-    Remove unwanted tags from the string, keeping the contents it surrounds,
-    parsing it as HTML, then only keep the body paragraph contents
-    tag_name if ending in * can match tags starting with a value,
-    e.g. mml:*   will remove any tag with name starting with mml:
+    Remove open and close tags - the tags themselves only - using
+    a non-greedy angle bracket pattern match
     """
-    if string is None:
-        return None
+    if not string:
+        return string
+    p = re.compile('</?' + tag_name + '.*?>')
+    string = p.sub('', string)
+    return string
 
-    soup = BeautifulSoup(string)
-
-    tags = soup.find_all(True)
-    for tag in tags:
-        if tag_name.endswith('*'):
-            # Wildcard match capability
-            if tag.name.startswith(tag_name[0:-1]):
-                tag.unwrap()
-        else:
-            # Exact match
-            if tag.name == tag_name:
-                tag.unwrap()
-
-    # If the abstract starts with a tag, and has only one p tag
-    #   then it will not be enclosed in a p tag
-    if hasattr(soup.body.p, "children") and len(soup.find_all('p')) == 1:
-        return "".join(map(unicode, soup.body.p.children)) or None
-    if hasattr(soup.body, "children"):
-        # No p tag or more than one p tag, use all the children
-        return "".join(map(unicode, soup.body.children)) or None
-    else:
-        return None
 
 def clean_abstract(abstract):
     """
