@@ -19,6 +19,7 @@ class TestParsePoaXml(unittest.TestCase):
         self.passes.append('elife-04637-v2.xml')
         self.passes.append('elife-15743-v1.xml')
         self.passes.append('elife-02043-v2.xml')
+        self.passes.append('elife-14003.xml')
 
     def test_parse(self):
         for xml_file_name in self.passes:
