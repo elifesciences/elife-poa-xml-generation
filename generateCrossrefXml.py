@@ -304,7 +304,7 @@ class crossrefXML(object):
 
     def set_abstract(self, parent, poa_article):
         if poa_article.abstract:
-            abstract = '<p>' + poa_article.abstract + '</p>'
+            abstract = poa_article.abstract
             self.set_abstract_tag(parent, abstract, type="abstract")
 
     def set_digest(self, parent, poa_article):
