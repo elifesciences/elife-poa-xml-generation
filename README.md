@@ -99,3 +99,7 @@ Live code issues are listed as issues in the [git repo for this project](https:/
 2013-12-30 robust reviewed script ready.
 2013-12-09 inital batch of code ready to review.
 2013-11-26 first proof of concept.
+
+# Copyright & Licence
+
+Copyright 2016 eLife Sciences. Licensed under the [MIT license](LICENSE).
