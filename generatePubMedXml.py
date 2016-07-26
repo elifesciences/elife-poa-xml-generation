@@ -201,6 +201,10 @@ class pubMedPoaXML(object):
             if contributor.given_name:
                 self.given_name = SubElement(self.person_name, "FirstName")
                 self.given_name.text = contributor.given_name
+            elif contributor.surname:
+                # Empty given_name but has a surname
+                self.given_name = SubElement(self.person_name, "FirstName")
+                self.given_name.set("EmptyYN", "Y")
 
             if contributor.surname:
                 self.surname = SubElement(self.person_name, "LastName")
@@ -278,6 +282,10 @@ class pubMedPoaXML(object):
             if contributor.given_name:
                 self.given_name = SubElement(individual, "FirstName")
                 self.given_name.text = contributor.given_name
+            elif contributor.surname:
+                # Empty given_name but has a surname
+                self.given_name = SubElement(individual, "FirstName")
+                self.given_name.set("EmptyYN", "Y")
 
             if contributor.surname:
                 self.surname = SubElement(individual, "LastName")
