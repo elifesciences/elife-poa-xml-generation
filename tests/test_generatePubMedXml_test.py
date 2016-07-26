@@ -21,11 +21,12 @@ class TestGeneratePubMedXml(unittest.TestCase):
         self.passes.append(('elife-08206-v3.xml', 3, 'elife-2016-05-13-142852-PubMed.xml'))
         self.passes.append(('elife-15743-v1.xml',1, 'elife-2016-05-13-143615-PubMed.xml'))
         self.passes.append(('elife-02043-v2.xml', 2, 'elife-2016-07-20-221916-PubMed.xml'))
+        self.passes.append(('elife-13410-v1.xml', 1, 'elife-2016-07-26-011009-PubMed.xml'))
 
     def clean_pubmed_xml_for_comparison(self, xml_content):
         if ('<ELocationID EIdType="doi">10.7554/eLife.00003</ELocationID>' in xml_content
              or '<ELocationID EIdType="doi">10.7554/eLife.12717</ELocationID>' in xml_content):
-            xml_content = re.sub(ur'<PubDate PubStatus="aheadofprint">.*</PubDate>',
+            xml_content = re.sub(ur'<PubDate PubStatus="aheadofprint">.*?</PubDate>',
                                  '', xml_content)
         xml_content = re.sub(ur'<!--.*-->', '', xml_content)
         return xml_content
