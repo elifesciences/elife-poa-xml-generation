@@ -362,9 +362,10 @@ class pubMedPoaXML(object):
             tag_converted_abstract = replace_tags(tag_converted_abstract, 'bold', 'b')
             tag_converted_abstract = replace_tags(tag_converted_abstract, 'underline', 'u')
             tag_converted_abstract = tag_converted_abstract.replace('<p>', '').replace('</p>', '')
-            #tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
+            tag_converted_abstract = xml_escape_ampersand(tag_converted_abstract)
+            tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
             tagged_string = '<' + tag_name + '>' + tag_converted_abstract + '</' + tag_name + '>'
-            reparsed = minidom.parseString(xml_escape_ampersand(tagged_string).encode('utf-8'))
+            reparsed = minidom.parseString(tagged_string.encode('utf-8'))
 
             root_xml_element = append_minidom_xml_to_elementtree_xml(
                 parent, reparsed
