@@ -323,18 +323,19 @@ class crossrefXML(object):
             attributes_text = ' abstract-type="executive-summary" '
 
         tag_converted_abstract = abstract
+        tag_converted_abstract = xml_escape_ampersand(tag_converted_abstract)
+        tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
         tag_converted_abstract = replace_tags(tag_converted_abstract, 'p', 'jats:p')
         tag_converted_abstract = replace_tags(tag_converted_abstract, 'italic', 'jats:italic')
         tag_converted_abstract = replace_tags(tag_converted_abstract, 'bold', 'jats:bold')
         tag_converted_abstract = replace_tags(tag_converted_abstract, 'underline', 'jats:underline')
         tag_converted_abstract = replace_tags(tag_converted_abstract, 'sub', 'jats:sub')
         tag_converted_abstract = replace_tags(tag_converted_abstract, 'sup', 'jats:sup')
-        #tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
 
         tagged_string = '<' + tag_name + namespaces + attributes_text + '>'
         tagged_string += tag_converted_abstract
         tagged_string += '</' + tag_name + '>'
-        reparsed = minidom.parseString(xml_escape_ampersand(tagged_string).encode('utf-8'))
+        reparsed = minidom.parseString(tagged_string.encode('utf-8'))
 
         recursive = False
         root_xml_element = append_minidom_xml_to_elementtree_xml(
@@ -512,12 +513,13 @@ class crossrefXML(object):
         tag_name = 'subtitle'
         # Use <i> tags, not <italic> tags, <b> tags not <bold>
         if component.subtitle:
-            tag_converted_string = replace_tags(component.subtitle, 'italic', 'i')
+            tag_converted_string = xml_escape_ampersand(component.subtitle)
+            tag_converted_string = escape_unmatched_angle_brackets(tag_converted_string)
+            tag_converted_string = replace_tags(tag_converted_string, 'italic', 'i')
             tag_converted_string = replace_tags(tag_converted_string, 'bold', 'b')
             tag_converted_string = replace_tags(tag_converted_string, 'underline', 'u')
-            tag_converted_string = escape_unmatched_angle_brackets(tag_converted_string)
             tagged_string = '<' + tag_name + '>' + tag_converted_string + '</' + tag_name + '>'
-            reparsed = minidom.parseString(xml_escape_ampersand(tagged_string).encode('utf-8'))
+            reparsed = minidom.parseString(tagged_string.encode('utf-8'))
 
             root_xml_element = append_minidom_xml_to_elementtree_xml(
                 parent, reparsed
