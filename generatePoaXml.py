@@ -1151,7 +1151,8 @@ def escape_unmatched_angle_brackets(s):
                     '<u>', '</u>',
                     '<underline>', '</underline>',
                     '<b>', '</b>',
-                    '<bold>', '</bold>']
+                    '<bold>', '</bold>',
+                    '<p>', '</p>']
 
     # Split string on tags
     tags = re.split('(<.*?>)', s)
