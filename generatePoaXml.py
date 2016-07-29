@@ -1174,6 +1174,10 @@ def escape_unmatched_angle_brackets(s):
                     val = val.replace('<', '&lt;', 1)
                 elif val.count('<') != val.count('>') and val.count('>') > 0:
                     val = val.replace('>', '&gt;', 1)
+            if val.count('<') == val.count('>') and val not in allowed_tags:
+                # Send it through again in case there are nested unmatched tags
+                val = escape_unmatched_angle_brackets(val)
+
         tags[i] = val
 
     return ''.join(tags)

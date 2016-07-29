@@ -23,6 +23,7 @@ class TestGenerateCrossrefXml(unittest.TestCase):
         self.passes.append(('elife-04637-v2.xml', 'elife-crossref-04637-20160513134549.xml'))
         self.passes.append(('elife-02043-v2.xml', 'elife-crossref-02043-20160728135127.xml'))
         self.passes.append(('elife-16988-v1.xml', 'elife-crossref-16988-20160728133801.xml'))
+        self.passes.append(('elife-12444-v2.xml', 'elife-crossref-12444-20160729011053.xml'))
 
     def clean_crossref_xml_for_comparison(self, xml_content):
         # For now running a test on a PoA article ignore the
