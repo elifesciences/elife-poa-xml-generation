@@ -446,7 +446,7 @@ class pubMedPoaXML(object):
 
     def prettyXML(self):
         publicId = '-//NLM//DTD PubMed 2.6//EN'
-        systemId = 'http://www.ncbi.nlm.nih.gov:80/entrez/query/static/PubMed.dtd'
+        systemId = 'https://www.ncbi.nlm.nih.gov/entrez/query/static/PubMed.dtd'
         encoding = 'utf-8'
         namespaceURI = None
         qualifiedName = "ArticleSet"
