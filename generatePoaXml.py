@@ -1193,6 +1193,7 @@ def convert_to_xml_string(s):
     s = replace_tags(s)
     s = replace_tags(s, 'u', 'underline')
     s = replace_tags(s, 'b', 'bold')
+    s = replace_tags(s, 'em', 'italic')
     s = escape_unmatched_angle_brackets(s)
     return s
 

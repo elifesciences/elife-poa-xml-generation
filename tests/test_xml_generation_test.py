@@ -47,6 +47,7 @@ class TestXmlGeneration(unittest.TestCase):
         self.passes.append((12717, 'elife_poa_e12717.xml'))
         self.passes.append((14874, 'elife_poa_e14874.xml'))
         self.passes.append((14997, 'elife_poa_e14997.xml'))
+        self.passes.append((21598, 'elife_poa_e21598.xml'))
 
         self.pub_date = []
         self.pub_date.append((3, time.strptime("20121113", "%Y%m%d")))
