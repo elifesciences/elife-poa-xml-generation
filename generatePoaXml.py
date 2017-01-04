@@ -1103,7 +1103,23 @@ def entity_to_unicode(s):
     Quick convert unicode HTML entities to unicode characters
     using a regular expression replacement
     """
+    # Selected character replacements that have been seen
+    replacements = []
+    replacements.append((r"&alpha;", u"\u03b1"))
+    replacements.append((r"&beta;", u"\u03b2"))
+    replacements.append((r"&gamma;", u"\u03b3"))
+    replacements.append((r"&delta;", u"\u03b4"))
+    replacements.append((r"&epsilon;", u"\u03b5"))
+    replacements.append((r"&ordm;", u"\u00ba"))
+    replacements.append((r"&iuml;", u"\u00cf"))
+    replacements.append((r"&ldquo;", '"'))
+    replacements.append((r"&rdquo;", '"'))
+
+    # First, replace numeric entities with unicode
     s = re.sub(r"&#x(....);", repl, s)
+    # Second, replace some specific entities specified in the list
+    for entity, replacement in replacements:
+        s = re.sub(entity, replacement, s)
     return s
 
 def xml_escape_ampersand(s):
