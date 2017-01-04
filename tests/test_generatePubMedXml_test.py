@@ -30,6 +30,7 @@ class TestGeneratePubMedXml(unittest.TestCase):
             xml_content = re.sub(ur'<PubDate PubStatus="aheadofprint">.*?</PubDate>',
                                  '', xml_content)
         xml_content = re.sub(ur'<!--.*-->', '', xml_content)
+        xml_content = re.sub(ur'<Volume>.*</Volume>', '', xml_content)
         return xml_content
 
     def read_file_content(self, file_name):
