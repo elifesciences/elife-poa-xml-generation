@@ -647,6 +647,7 @@ def parse_datasets(datasets_content):
     # Decode escaped angle brackets
     logger.info("datasets is " + str(datasets_content))
     datasets_xml = unserialise_angle_brackets(datasets_content)
+    datasets_xml = xml_escape_ampersand(datasets_xml)
     logger.info("datasets is " + str(datasets_xml))
 
     # Parse XML

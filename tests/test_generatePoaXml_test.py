@@ -42,6 +42,28 @@ class TestGeneratePoaXml(unittest.TestCase):
             self.assertEqual(generatePoaXml.entity_to_unicode(
                 string_input), string_output)
 
+    def test_xml_escape_ampersand(self):
+        self.passes = []
+        self.passes.append(('',
+                           u''))
+        self.passes.append(('a',
+                           u'a'))
+        self.passes.append(('another & another & another',
+                           u'another &amp; another &amp; another'))
+        self.passes.append(('a&a',
+                           u'a&amp;a'))
+        self.passes.append(('a&amp;&a',
+                           u'a&amp;&amp;a'))
+        self.passes.append(('a&#x0117;a',
+                           u'a&#x0117;a'))
+        self.passes.append(('fake link http://example.org/?a=b&amp',
+                           u'fake link http://example.org/?a=b&amp;amp'))
+        self.passes.append(('CUT&RUN is performed',
+                           u'CUT&amp;RUN is performed'))
+
+        for string_input, string_output in self.passes:
+            self.assertEqual(generatePoaXml.xml_escape_ampersand(
+                string_input), string_output)
 
 if __name__ == '__main__':
     unittest.main()
