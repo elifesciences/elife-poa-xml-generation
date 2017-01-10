@@ -1127,7 +1127,7 @@ def xml_escape_ampersand(s):
     Quick convert unicode ampersand characters not associated with
     a numbered entity or not starting with allowed characters to a plain &amp;
     """
-    start_with_match = "[\#|lt|gt|amp]"
+    start_with_match = "(\#x(....);|lt;|gt;|amp;)"
     # The pattern below is match & that is not immediately followed by #
     s = re.sub(r"&(?!" + start_with_match + ")", '&amp;', s)
     return s
