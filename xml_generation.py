@@ -333,7 +333,7 @@ def set_funding(article, article_id):
         for (article_id, author_id, funder_position) in funder_ids:
             #print (article_id, author_id, funder_position)
             funder_identifier = get_funder_identifier(article_id, author_id, funder_position)
-            funder = clean_funder(get_funder(article_id, author_id, funder_position))
+            funder = decode_cp1252(clean_funder(get_funder(article_id, author_id, funder_position)))
             award_id = get_award_id(article_id, author_id, funder_position)
 
             if funder_position not in funding_awards.keys():
