@@ -208,7 +208,7 @@ def set_author_info(article, article_id):
 
             first_name = decode_cp1252(get_author_first_name(article_id, author_id))
             last_name = decode_cp1252(get_author_last_name(article_id, author_id))
-            middle_name = get_author_middle_name(article_id, author_id)
+            middle_name = decode_cp1252(get_author_middle_name(article_id, author_id))
             #initials = middle_name_initials(middle_name)
             if middle_name.strip() != "":
                 # Middle name add to the first name / given name
@@ -282,9 +282,9 @@ def set_editor_info(article, article_id):
     try:
         author_type = "editor"
 
-        first_name = get_me_first_nm(article_id)
-        last_name = get_me_last_nm(article_id)
-        middle_name = get_me_middle_nm(article_id)
+        first_name = decode_cp1252(get_me_first_nm(article_id))
+        last_name = decode_cp1252(get_me_last_nm(article_id))
+        middle_name = decode_cp1252(get_me_middle_nm(article_id))
         #initials = middle_name_initials(middle_name)
         if middle_name.strip() != "":
             # Middle name add to the first name / given name
