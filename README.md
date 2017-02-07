@@ -46,6 +46,8 @@ To test run the scripts `generateCrossrefXml.py` and `generatePubMedXml.py` at t
 
 After running these scripts successfully, there should be new XML deposit files in the `tmp` directory.
 
+The PubMed deposit has a few options with regard to Publish on Accept (PoA) articles, which can be deposited at PubMed as being "[Epub ahead of print]", and to deposit a replacement of a previous deposit setting the `<Replaces>` tag in the deposit. These values are set from external sources, such as the file name or an external data store, before the final PubMed deposit is generated. Reviewing the code itself will be required to understand these concepts.
+
 ### Others
 
 There are some other functions, such as repackaging article zip files into a new format, decapitating PDF files, and some FTP transfer function, not documented here yet.
