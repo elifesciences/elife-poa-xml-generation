@@ -17,9 +17,10 @@ Examples of input and outbox can be found in the test cases.
 ## Installation
 
 Create virtualenv, activate it and install required libraries
-    `virtualenv -venv`
-    `source venv/bin/activate`
-    `pip install -r requirements.txt`
+
+    virtualenv -venv
+    source venv/bin/activate
+    pip install -r requirements.txt
 
 Copy the `exmple-settings.py` to a new file named `settings.py`.
 
@@ -30,16 +31,18 @@ You should be able to run the automated tests at this point.
 ### XML generation
 
 To use the CSV data to article XML generation function, in the `settings.py` file you need to set the `XLS_PATH` to be the directory where the CSV files are stored. If you do not have any CSV files yet (and are just testing this project) there are sample CSV files in the automated tests you can use; in your `settings.py` file set it as
-    `XLS_PATH = "tests/test_data/"`
+
+    XLS_PATH = "tests/test_data/"
 
 Run the following and you should get some XML files produced in the `generated_xml_output` directory (the default output folder name)
-    `python xml_generation.py`
+
+    python xml_generation.py
 
 ### CrossRef and PubMed deposit generation
 
 To test run the scripts `generateCrossrefXml.py` and `generatePubMedXml.py` at this time, edit the XML filenames in the `article_xmls[]` list at the bottom of the file when `__main__()` is run. You can also point these to some automated test data to try them out, for example, set it as
 
-    `article_xmls = ["tests/test_data/elife-02935-v2.xml"]`
+    article_xmls = ["tests/test_data/elife-02935-v2.xml"]
 
 After running these scripts successfully, there should be new XML deposit files in the `tmp` directory.
 
@@ -55,15 +58,15 @@ See `requirements.txt`.
 
 You can run the full automated test suite from the base folder with:
 
-    `python -m unittest discover tests`
+    python -m unittest discover tests
 
 or you can run tests with coverage:
 
-    `coverage run -m unittest discover tests`
+    coverage run -m unittest discover tests
 
 and then view the coverage report:
 
-    `coverage report -m`
+    coverage report -m
 
 # Copyright & Licence
 
