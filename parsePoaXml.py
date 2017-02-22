@@ -354,7 +354,7 @@ def build_article_from_xml(article_xml_filename, detail="brief"):
     contributors = build_contributors(author_contributors, contrib_type)
 
     contrib_type = "author non-byline"
-    authors = parser.authors(soup, contrib_type, detail)
+    authors = parser.authors_non_byline(soup, detail)
     contributors_non_byline = build_contributors(authors, contrib_type)
     article.contributors = contributors + contributors_non_byline
 

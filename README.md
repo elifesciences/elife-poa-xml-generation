@@ -5,40 +5,76 @@
 
 # Background
 
-This is a project to create XML files that conform to the output we expect for delivery to HighWire for the publish on accept project.
+This project creates JATS XML files for Publish on Accept (PoA) articles. It is centred around using a set of CSV data files as input, although an intermediary data object could be populated with data from other sources.
+
+Also concerning the publication of PoA articles, it can transform the files in a zip package into the desired publishable format. It decapitates the cover page from a PDF file, and rezips other files into a new supplementary zip file.
+
+The can also create CrossRef and PubMed deposits from an XML file input. An XML parser (``parsePoaXml.py``) can produce an article object using XML as the input (as opposed to from CSV data). From that article a CrossRef or PubMed batch deposit file is produced.
+
+Examples of input and outbox can be found in the test cases.
 
 
-## Goal
+## Installation
 
-The goal is to have a functioning pipeline in place to delivery XML to HW before the end of December 2013.
+Create virtualenv, activate it and install required libraries
 
-## Quickstart
+    virtualenv -venv
+    source venv/bin/activate
+    pip install -r requirements.txt
 
-- set paths in settings.py
-- run `$ python xml_generation.py`
+Copy the `exmple-settings.py` to a new file named `settings.py`.
 
-## Resources and project planning.
+You should be able to run the automated tests at this point.
 
-- [Overview of project resources](https://github.com/elifesciences/elifesciences-wiki/wiki/Elife-POA-XML-Project).
-- [Links to useful documentation on XML generation in Python](./RESOURCES.md)
+## Configuration
+
+### XML generation
+
+To use the CSV data to article XML generation function, in the `settings.py` file you need to set the `XLS_PATH` to be the directory where the CSV files are stored. If you do not have any CSV files yet (and are just testing this project) there are sample CSV files in the automated tests you can use; in your `settings.py` file set it as
+
+    XLS_PATH = "tests/test_data/"
+
+Run the following and you should get some XML files produced in the `generated_xml_output` directory (the default output folder name)
+
+    python xml_generation.py
+
+### CrossRef and PubMed deposit generation
+
+To test run the scripts `generateCrossrefXml.py` and `generatePubMedXml.py` at this time, edit the XML filenames in the `article_xmls[]` list at the bottom of the file when `__main__()` is run. You can also point these to some automated test data to try them out, for example, set it as
+
+    article_xmls = ["tests/test_data/elife-02935-v2.xml"]
+
+After running these scripts successfully, there should be new XML deposit files in the `tmp` directory.
+
+The PubMed deposit has a few options with regard to Publish on Accept (PoA) articles, which can be deposited at PubMed as being "[Epub ahead of print]", and to deposit a replacement of a previous deposit setting the `<Replaces>` tag in the deposit. These values are set from external sources, such as the file name or an external data store, before the final PubMed deposit is generated. Reviewing the code itself will be required to understand these concepts.
+
+### Others
+
+There are some other functions, such as repackaging article zip files into a new format, decapitating PDF files, and some FTP transfer function, not documented here yet.
 
 ## Project dependencies
 
-	$ pip install elementtree  
-	$ pip install xlrd
-	$ pip install gitpython
-	$ pip install requests
-	$ pip install lxml
-	$ pip install PIL==1.1.7
-	$ pip install PyPDF2==1.20
-	$ pip install reportlab==3.0
-	$ pip install wsgiref==0.1.2 
+See `requirements.txt`.
 
-[Lettuce][let] for testing.
-	
-	$ pip install lettuce
-	
-[let]: http://packages.python.org/lettuce/
+## Testing
+
+You can run the full automated test suite from the base folder with:
+
+    python -m unittest discover tests
+
+or you can run tests with coverage:
+
+    coverage run -m unittest discover tests
+
+and then view the coverage report:
+
+    coverage report -m
+
+# Copyright & Licence
+
+Copyright 2016 eLife Sciences. Licensed under the [MIT license](LICENSE).
+
+# Older readme notes below!
 
 ## Project outline 
 
@@ -67,7 +103,7 @@ your own path structure. It will look for the following information:
 	- `XLS_FILES` a dict giving a label to the files that will be processed in the XLS read pahse.
 	- `XLS_COLUMN_HEADINGS` a dict listing column heading names of interest in the XLS files that we will process.
 
-#### Obtaining XLS fils to process
+#### Obtaining XLS files to process
 
 These files are generated out of the EJP system via a set of SQL queries. We do not store this data in this repository. Please contact @nathanlisgo to obtain a set for processing. We are currently procssing the following files. These files are versioned. The root of the filename gives an indication of what data we expect in these files. You should obtain the following files:
 

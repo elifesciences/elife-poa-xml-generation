@@ -1,5 +1,7 @@
 .venv
+venv/*
 generated_xml_output/*
+!generated_xml_output/.keepme
 *.pyc
 *.log
 made_ftp_ready_on/20*
