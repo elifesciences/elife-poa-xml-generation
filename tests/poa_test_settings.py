@@ -25,7 +25,7 @@ XLS_FILES = {
     "ethics": "poa_ethics.csv"
             }
 
-OVERFLOW_XLS_FILES = ["abstract", "title"]
+OVERFLOW_XLS_FILES = ["abstract", "title", "ethics"]
 
 
 XLS_COLUMN_HEADINGS = {
