@@ -19,7 +19,8 @@ XLS_FILES = 	{"authors" : "poa_author.csv",
 				 "keywords": "poa_keywords.csv",
 				 "group_authors": "poa_group_authors.csv",
 				 "datasets": "poa_datasets.csv",
-				 "funding": "poa_funding.csv"
+				 "funding": "poa_funding.csv",
+				 "ethics": "poa_ethics.csv"
                  }
 
 # Special files that allow quotation marks in their final column: column 3
