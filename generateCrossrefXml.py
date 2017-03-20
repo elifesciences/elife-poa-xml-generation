@@ -547,6 +547,7 @@ class crossrefXML(object):
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         mime_types['application/docx'] = (
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        mime_types['application/xml'] = 'application/xml'
 
         mime_types['chemical/pdb'] = 'chemical/x-pdb'
 
@@ -568,6 +569,7 @@ class crossrefXML(object):
         mime_types['video/mpg'] = 'video/mpeg'
         mime_types['video/mov'] = 'video/quicktime'
         mime_types['video/wmv'] = 'video/x-ms-wmv'
+        mime_types['video/gif'] = 'image/gif'
 
         return mime_types.get(jats_mime_type.lower())
 
