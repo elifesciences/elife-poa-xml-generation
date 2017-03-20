@@ -435,7 +435,7 @@ class crossrefXML(object):
 
                 if ref.volume:
                     self.volume = SubElement(self.citation, 'volume')
-                    self.volume.text = ref.volume
+                    self.volume.text = ref.volume[0:31]
 
                 if ref.fpage:
                     self.first_page = SubElement(self.citation, 'first_page')
