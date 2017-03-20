@@ -331,6 +331,7 @@ class crossrefXML(object):
         tag_converted_abstract = replace_tags(tag_converted_abstract, 'underline', 'jats:underline')
         tag_converted_abstract = replace_tags(tag_converted_abstract, 'sub', 'jats:sub')
         tag_converted_abstract = replace_tags(tag_converted_abstract, 'sup', 'jats:sup')
+        tag_converted_abstract = replace_tags(tag_converted_abstract, 'sc', 'jats:sc')
 
         tagged_string = '<' + tag_name + namespaces + attributes_text + '>'
         tagged_string += tag_converted_abstract
@@ -435,7 +436,7 @@ class crossrefXML(object):
 
                 if ref.volume:
                     self.volume = SubElement(self.citation, 'volume')
-                    self.volume.text = ref.volume
+                    self.volume.text = ref.volume[0:31]
 
                 if ref.fpage:
                     self.first_page = SubElement(self.citation, 'first_page')
@@ -547,6 +548,7 @@ class crossrefXML(object):
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         mime_types['application/docx'] = (
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+        mime_types['application/xml'] = 'application/xml'
 
         mime_types['chemical/pdb'] = 'chemical/x-pdb'
 
@@ -568,6 +570,7 @@ class crossrefXML(object):
         mime_types['video/mpg'] = 'video/mpeg'
         mime_types['video/mov'] = 'video/quicktime'
         mime_types['video/wmv'] = 'video/x-ms-wmv'
+        mime_types['video/gif'] = 'image/gif'
 
         return mime_types.get(jats_mime_type.lower())
 

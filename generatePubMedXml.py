@@ -363,6 +363,9 @@ class pubMedPoaXML(object):
             tag_converted_abstract = replace_tags(tag_converted_abstract, 'underline', 'u')
             tag_converted_abstract = tag_converted_abstract.replace('<p>', '').replace('</p>', '')
             tag_converted_abstract = xml_escape_ampersand(tag_converted_abstract)
+            not_allowed_tags = ['<sc>', '</sc>']
+            for tagname in not_allowed_tags:
+                tag_converted_abstract = tag_converted_abstract.replace(tagname, '')
             tag_converted_abstract = escape_unmatched_angle_brackets(tag_converted_abstract)
             tagged_string = '<' + tag_name + '>' + tag_converted_abstract + '</' + tag_name + '>'
             reparsed = minidom.parseString(tagged_string.encode('utf-8'))
