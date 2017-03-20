@@ -331,6 +331,7 @@ class crossrefXML(object):
         tag_converted_abstract = replace_tags(tag_converted_abstract, 'underline', 'jats:underline')
         tag_converted_abstract = replace_tags(tag_converted_abstract, 'sub', 'jats:sub')
         tag_converted_abstract = replace_tags(tag_converted_abstract, 'sup', 'jats:sup')
+        tag_converted_abstract = replace_tags(tag_converted_abstract, 'sc', 'jats:sc')
 
         tagged_string = '<' + tag_name + namespaces + attributes_text + '>'
         tagged_string += tag_converted_abstract

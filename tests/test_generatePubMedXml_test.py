@@ -23,6 +23,7 @@ class TestGeneratePubMedXml(unittest.TestCase):
         self.passes.append(('elife-02043-v2.xml', 2, 'elife-2016-07-20-221916-PubMed.xml'))
         self.passes.append(('elife-13410-v1.xml', 1, 'elife-2016-07-26-011009-PubMed.xml'))
         self.passes.append(('elife-16988-v1.xml', 1, 'elife-2016-07-26-172904-PubMed.xml'))
+        self.passes.append(('elife-00666.xml', 1, 'elife-2017-03-20-100252-PubMed.xml'))
 
     def clean_pubmed_xml_for_comparison(self, xml_content):
         if ('<ELocationID EIdType="doi">10.7554/eLife.00003</ELocationID>' in xml_content
