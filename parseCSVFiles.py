@@ -103,11 +103,15 @@ def get_xls_sheet(table_type):
     # For overflow file types, parse again with no quotechar
     if table_type in OVERFLOW_XLS_FILES:
         csvreader = csv.reader(open(path, 'rb'), delimiter=',', quotechar=None)
+        if table_type == "ethics":
+            join_cells_from = 3
+        else:
+            join_cells_from = 2
         for row in csvreader:
             if csvreader.line_num <= DATA_START_ROW:
                 continue
             # Merge cells 3 to the end because any commas will cause extra columns
-            row[2] = ','.join(row[2:])
+            row[join_cells_from] = ','.join(row[join_cells_from:])
             for index, cell in enumerate(row):
                 # Strip leading quotation marks
                 row[index] = cell.lstrip('"').rstrip('"')
@@ -336,9 +340,11 @@ def get_ethics(article_id):
     """
     needs a bit of refinement owing to serilaising of data by EJP
     """
-    attribute = get_article_attributes(article_id, "manuscript",
-                                       COLUMN_HEADINGS["ethics"])[0]
-
+    try:
+        attribute = get_article_attributes(article_id, "ethics",
+                                           COLUMN_HEADINGS["ethics"])[0]
+    except IndexError:
+        attribute = None
     return attribute
 
 # authors table

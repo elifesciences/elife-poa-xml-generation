@@ -21,10 +21,11 @@ XLS_FILES = {
     "title": "poa_title.csv",
     "keywords": "poa_keywords.csv",
     "group_authors": "poa_group_authors.csv",
-    "datasets": "poa_datasets.csv"
+    "datasets": "poa_datasets.csv",
+    "ethics": "poa_ethics.csv"
             }
 
-OVERFLOW_XLS_FILES = ["abstract", "title"]
+OVERFLOW_XLS_FILES = ["abstract", "title", "ethics"]
 
 
 XLS_COLUMN_HEADINGS = {
