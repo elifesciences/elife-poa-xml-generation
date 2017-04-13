@@ -619,6 +619,7 @@ def parse_ethics(ethic):
     # Decode escaped angle brackets
     logger.info("ethic is " + str(ethic))
     ethic_xml = unserialise_angle_brackets(ethic)
+    ethic_xml = xml_escape_ampersand(ethic_xml)
     logger.info("ethic is " + str(ethic_xml))
 
     # Parse XML
