@@ -727,10 +727,11 @@ def parse_group_authors(group_authors):
             author_position = position_and_name[0]
 
             # Strip numbers at the end
-            group_author = position_and_name[1].rstrip("1234567890")
+            if len(position_and_name) > 1:
+                group_author = position_and_name[1].rstrip("1234567890")
 
-            # Finally, add to the dict noting the authors position
-            group_author_dict[author_position] = group_author
+                # Finally, add to the dict noting the authors position
+                group_author_dict[author_position] = group_author
 
     return group_author_dict
 
