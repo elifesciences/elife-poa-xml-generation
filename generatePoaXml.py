@@ -607,24 +607,45 @@ class eLife2XML(object):
             self.fax = SubElement(self.aff, "fax")
             self.fax.text = affiliation.fax
 
+    def do_display_channel(self, poa_article):
+        "decide whether to add a display-channel"
+        if (poa_article.get_display_channel() and
+            poa_article.get_display_channel().strip() != ''):
+            return True
+        return False
+
+    def do_subject_heading(self, poa_article):
+        "decide whether to add subject headings from article_categories"
+        if poa_article.article_categories:
+            for heading in poa_article.article_categories:
+                if heading and heading.strip() != '':
+                    return True
+        return False
+
+    def do_article_categories(self, poa_article):
+        "check whether we will add any article-categories values"
+        return bool(self.do_display_channel(poa_article) or self.do_subject_heading(poa_article))
+
     def set_article_categories(self, parent, poa_article):
         # article-categories
-        if poa_article.get_display_channel() or len(poa_article.article_categories) > 0:
+        if self.do_article_categories(poa_article):
             self.article_categories = SubElement(parent, "article-categories")
 
-            if poa_article.get_display_channel():
+            if self.do_display_channel(poa_article):
                 # subj-group subj-group-type="display-channel"
                 subj_group = SubElement(self.article_categories, "subj-group")
                 subj_group.set("subj-group-type", "display-channel")
                 subject = SubElement(subj_group, "subject")
                 subject.text = poa_article.get_display_channel()
 
-            for article_category in poa_article.article_categories:
-                # subj-group subj-group-type="heading"
-                subj_group = SubElement(self.article_categories, "subj-group")
-                subj_group.set("subj-group-type", "heading")
-                subject = SubElement(subj_group, "subject")
-                subject.text = article_category
+            if self.do_subject_heading(poa_article):
+                for article_category in poa_article.article_categories:
+                    # subj-group subj-group-type="heading"
+                    if article_category and article_category.rstrip().lstrip() != '':
+                        subj_group = SubElement(self.article_categories, "subj-group")
+                        subj_group.set("subj-group-type", "heading")
+                        subject = SubElement(subj_group, "subject")
+                        subject.text = article_category
 
     def set_kwd_group_research_organism(self, parent, poa_article):
         # kwd-group kwd-group-type="research-organism"

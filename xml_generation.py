@@ -71,19 +71,19 @@ def set_articleType(article, article_id):
 
         article_type_index['1'] = {
             'article_type':    'research-article',
-            'display_channel': 'Research article'}
+            'display_channel': 'Research Article'}
         article_type_index['10'] = {
             'article_type':    'research-article',
-            'display_channel': 'Feature article'}
+            'display_channel': 'Feature Article'}
         article_type_index['14'] = {
             'article_type':    'research-article',
-            'display_channel': 'Short report'}
+            'display_channel': 'Short Report'}
         article_type_index['15'] = {
             'article_type':    'research-article',
-            'display_channel': 'Research advance'}
+            'display_channel': 'Research Advance'}
         article_type_index['19'] = {
             'article_type':    'research-article',
-            'display_channel': 'Tools and resources'}
+            'display_channel': 'Tools and Resources'}
 
         article_type = article_type_index[str(articleType_id)]
         article.articleType = article_type['article_type']
