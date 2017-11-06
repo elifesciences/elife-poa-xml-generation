@@ -65,5 +65,48 @@ class TestGeneratePoaXml(unittest.TestCase):
             self.assertEqual(generatePoaXml.xml_escape_ampersand(
                 string_input), string_output)
 
+    def test_do_display_channel(self):
+        "test blank and non-blank values for display channel for whether it gets added to the XML"
+        doi = "10.7554/eLife.00666"
+        title = "Test article"
+        # first example has no display channel or categories
+        poa_article_1 = generatePoaXml.eLifePOA(doi, title)
+        e_xml = generatePoaXml.eLife2XML(poa_article_1)
+        self.assertEqual(e_xml.do_display_channel(poa_article_1), False)
+        self.assertEqual(e_xml.do_subject_heading(poa_article_1), False)
+        self.assertEqual(e_xml.do_article_categories(poa_article_1), False)
+        # second example has a display channel, no categories
+        poa_article_2 = generatePoaXml.eLifePOA(doi, title)
+        poa_article_2.display_channel = 'Display Channel'
+        e_xml = generatePoaXml.eLife2XML(poa_article_1)
+        self.assertEqual(e_xml.do_display_channel(poa_article_2), True)
+        self.assertEqual(e_xml.do_subject_heading(poa_article_2), False)
+        self.assertEqual(e_xml.do_article_categories(poa_article_2), True)
+        # third example has a display channel and categories
+        poa_article_3 = generatePoaXml.eLifePOA(doi, title)
+        poa_article_3.display_channel = 'Display Channel'
+        poa_article_3.add_article_category('Article Category')
+        e_xml = generatePoaXml.eLife2XML(poa_article_3)
+        self.assertEqual(e_xml.do_display_channel(poa_article_3), True)
+        self.assertEqual(e_xml.do_subject_heading(poa_article_3), True)
+        self.assertEqual(e_xml.do_article_categories(poa_article_3), True)
+        # fourth example has a blank strings for display channel and categories
+        poa_article_4 = generatePoaXml.eLifePOA(doi, title)
+        poa_article_4.display_channel = ' '
+        poa_article_4.add_article_category('   ')
+        e_xml = generatePoaXml.eLife2XML(poa_article_4)
+        self.assertEqual(e_xml.do_display_channel(poa_article_4), False)
+        self.assertEqual(e_xml.do_subject_heading(poa_article_4), False)
+        self.assertEqual(e_xml.do_article_categories(poa_article_4), False)
+        # fifth example has None display channel and categories
+        poa_article_5 = generatePoaXml.eLifePOA(doi, title)
+        poa_article_5.display_channel = None
+        poa_article_5.add_article_category(None)
+        e_xml = generatePoaXml.eLife2XML(poa_article_5)
+        self.assertEqual(e_xml.do_display_channel(poa_article_5), False)
+        self.assertEqual(e_xml.do_subject_heading(poa_article_5), False)
+        self.assertEqual(e_xml.do_article_categories(poa_article_5), False)
+
+
 if __name__ == '__main__':
     unittest.main()
