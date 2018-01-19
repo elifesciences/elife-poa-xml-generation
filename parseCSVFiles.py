@@ -675,7 +675,8 @@ def parse_datasets(datasets_content):
                 if node.nodeName == 'authors_text_list' and len(node.childNodes) > 0:
                     text_node = node.childNodes[0]
                     for author_name in text_node.nodeValue.split(','):
-                        dataset.add_author(author_name.lstrip())
+                        if author_name.strip() != '':
+                            dataset.add_author(author_name.lstrip())
 
                 if node.nodeName == 'title':
                     text_node = node.childNodes[0]
