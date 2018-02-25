@@ -17,7 +17,7 @@ def decapitate_pdf_with_error_check(pdf_in, pdf_out_dir):
     # PDF out file name
     pdf_out = pdf_out_dir + pdf_in.split('/')[-1]
     
-    f = subprocess.Popen(["/opt/strip-coverletter/strip-coverletter.sh", pdf_in, pdf_out], \
+    f = subprocess.Popen(["/opt/strip-coverletter/strip-coverletter-docker.sh", pdf_in, pdf_out], \
                          stdout=subprocess.PIPE, \
                          stderr=subprocess.PIPE)
 
