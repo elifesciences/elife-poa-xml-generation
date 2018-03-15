@@ -16,6 +16,7 @@ from git import *
 import settings
 import os
 import shutil
+from func_timeout import func_timeout, FunctionTimedOut
 #from decapitatePDF import decapitate_pdf_with_error_check
 from decapitatePDF2 import decapitate_pdf_with_error_check
 
@@ -59,6 +60,7 @@ output_dir = settings.STAGING_TO_HW_DIR
 hw_ftp_dir = settings.FTP_TO_HW_DIR
 tmp_dir = settings.TMP_DIR
 decap_dir = settings.STAGING_DECAPITATE_PDF_DIR
+PDF_DECAPITATE_TIMEOUT = 120
 
 class manifestXML(object):
 
@@ -373,7 +375,18 @@ def copy_pdf_to_hw_staging_dir(file_title_map, output_dir, doi, current_zipfile)
 			temp_file.write(file)
 			temp_file.close()
 
-	if decapitate_pdf_with_error_check(decap_name_plus_path, decap_dir + "/"):
+	decap_status = None
+	try:
+		# pass the local file path, and the path to a temp dir, to the decapitation script
+		decap_status = func_timeout(
+			PDF_DECAPITATE_TIMEOUT, decapitate_pdf_with_error_check, args=(
+				decap_name_plus_path, decap_dir + "/"))
+	except FunctionTimedOut:
+		decap_status = False
+		timeout_message = "PDF decap did not finish within {x} seconds".format(x=PDF_DECAPITATE_TIMEOUT)
+		logger.error(timeout_message)
+
+	if decap_status:
 		# pass the local file path, and teh path to a temp dir, to the decapiation script
 		try:
 			move_file = open(decap_dir + "/" + decap_name, "rb").read()
