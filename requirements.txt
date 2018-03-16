@@ -5,3 +5,4 @@ PyPDF2==1.20
 elifetools==0.1.7
 coverage==3.7.1
 arrow==0.4.4
+func_timeout==4.3.0
