@@ -223,7 +223,6 @@ class eLife2XML(object):
     def set_article_datasets_header(self, parent):
         self.sec_title = SubElement(parent, "title")
         self.sec_title.text = "Major datasets"
-        self.p = SubElement(parent, "p")
 
     def set_major_datasets(self, parent, poa_article):
         self.p = SubElement(parent, "p")
