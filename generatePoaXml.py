@@ -90,7 +90,7 @@ class eLife2XML(object):
             self.set_fn_group_competing_interest(self.sec, poa_article)
         if len(poa_article.ethics) > 0:
             self.set_fn_group_ethics_information(self.sec, poa_article)
-        if len(poa_article.datasets) > 0:
+        if len(poa_article.datasets) > 0 or poa_article.data_availability:
             self.sec = self.set_section(self.back, "supplementary-material")
             self.sec_title = SubElement(self.sec, "title")
             self.sec_title.text = "Additional Files"
@@ -215,6 +215,7 @@ class eLife2XML(object):
     def set_article_datasets(self, parent, poa_article):
         self.dataro_num = 0
         self.set_article_datasets_header(parent)
+        self.set_data_availability(parent, poa_article)
         if len(poa_article.get_datasets("datasets")) > 0:
             self.set_major_datasets(parent, poa_article)
         if len(poa_article.get_datasets("prev_published_datasets")) > 0:
@@ -223,6 +224,11 @@ class eLife2XML(object):
     def set_article_datasets_header(self, parent):
         self.sec_title = SubElement(parent, "title")
         self.sec_title.text = "Data availability"
+
+    def set_data_availability(self, parent, poa_article):
+        if poa_article.data_availability:
+            p_tag = SubElement(parent, "p")
+            p_tag.text = poa_article.data_availability
 
     def set_major_datasets(self, parent, poa_article):
         self.p = SubElement(parent, "p")
@@ -1001,6 +1007,7 @@ class eLifePOA():
         self.related_articles = []
         self.version = None
         self.datasets = []
+        self.data_availability = None
         self.funding_awards = []
         self.funding_note = None
 
