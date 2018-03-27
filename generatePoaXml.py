@@ -90,11 +90,11 @@ class eLife2XML(object):
             self.set_fn_group_competing_interest(self.sec, poa_article)
         if len(poa_article.ethics) > 0:
             self.set_fn_group_ethics_information(self.sec, poa_article)
-        if len(poa_article.datasets) > 0:
+        if len(poa_article.datasets) > 0 or poa_article.data_availability:
             self.sec = self.set_section(self.back, "supplementary-material")
             self.sec_title = SubElement(self.sec, "title")
             self.sec_title.text = "Additional Files"
-            self.sec = self.set_section(self.sec, "datasets")
+            self.sec = self.set_section(self.sec, "data-availability")
             self.set_article_datasets(self.sec, poa_article)
 
     def set_section(self, parent, sec_type):
@@ -215,6 +215,7 @@ class eLife2XML(object):
     def set_article_datasets(self, parent, poa_article):
         self.dataro_num = 0
         self.set_article_datasets_header(parent)
+        self.set_data_availability(parent, poa_article)
         if len(poa_article.get_datasets("datasets")) > 0:
             self.set_major_datasets(parent, poa_article)
         if len(poa_article.get_datasets("prev_published_datasets")) > 0:
@@ -222,75 +223,68 @@ class eLife2XML(object):
 
     def set_article_datasets_header(self, parent):
         self.sec_title = SubElement(parent, "title")
-        self.sec_title.text = "Major datasets"
+        self.sec_title.text = "Data availability"
+
+    def set_data_availability(self, parent, poa_article):
+        if poa_article.data_availability:
+            p_tag = SubElement(parent, "p")
+            p_tag.text = poa_article.data_availability
 
     def set_major_datasets(self, parent, poa_article):
         self.p = SubElement(parent, "p")
         self.p.text = "The following datasets were generated:"
         self.p = SubElement(parent, "p")
+        specific_use = "isSupplementedBy"
         # Datasets
         for dataset in poa_article.get_datasets("datasets"):
             self.dataro_num = self.dataro_num + 1
-            self.set_dataset(self.p, dataset, self.dataro_num)
+            self.set_dataset(self.p, dataset, self.dataro_num, specific_use)
         return parent
 
     def set_previously_published_datasets(self, parent, poa_article):
         self.p = SubElement(parent, "p")
         self.p.text = "The following previously published datasets were used:"
         self.p = SubElement(parent, "p")
+        specific_use = "references"
         # Datasets
         for dataset in poa_article.get_datasets("prev_published_datasets"):
             self.dataro_num = self.dataro_num + 1
-            self.set_dataset(self.p, dataset, self.dataro_num)
+            self.set_dataset(self.p, dataset, self.dataro_num, specific_use)
         return parent
 
-    def set_dataset(self, parent, dataset, dataro_num):
-        self.related_object = SubElement(parent, "related-object")
-        self.related_object.set('id', 'dataro' + str(dataro_num))
-        self.related_object.set('content-type', 'generated-dataset')
-
-        if dataset.source_id:
-            self.related_object.set('source-id-type', 'uri')
-            self.related_object.set('source-id', dataset.source_id)
+    def set_dataset(self, parent, dataset, dataro_num, specific_use=None):
+        element_citation_tag = SubElement(parent, "element-citation")
+        element_citation_tag.set('id', 'dataset' + str(dataro_num))
+        element_citation_tag.set('publication-type', 'data')
+        if specific_use:
+            element_citation_tag.set('specific-use', specific_use)
 
         if len(dataset.authors) > 0:
+            person_group_tag = SubElement(element_citation_tag, "person-group")
+            person_group_tag.set("person-group-type", "author")
             for author in dataset.authors:
-                self.collab = SubElement(self.related_object, "collab")
+                self.collab = SubElement(person_group_tag, "collab")
                 self.collab.text = author
-                self.collab.tail = ", "
-
-        dataset_tags = []
 
         if dataset.year:
-            self.year = Element("year")
+            self.year = SubElement(element_citation_tag, "year")
             self.year.text = dataset.year
-            dataset_tags.append(self.year)
+            self.year.set("iso-8601-date", dataset.year)
 
         if dataset.title:
-            self.source = Element("source")
+            self.source = SubElement(element_citation_tag, "source")
             self.source.text = dataset.title
-            dataset_tags.append(self.source)
 
         if dataset.source_id:
-            self.ext_link = Element("ext-link")
-            self.ext_link.text = dataset.source_id
-            self.ext_link.set("ext-link-type", "uri")
-            self.ext_link.set("xlink:href", dataset.source_id)
-            dataset_tags.append(self.ext_link)
+            pub_id_tag = SubElement(element_citation_tag, "pub-id")
+            pub_id_tag.text = dataset.source_id
+            pub_id_tag.set("pub-id-type", "uri")
+            pub_id_tag.set("xlink:href", dataset.source_id)
 
         if dataset.license_info:
-            self.comment = Element("comment")
+            self.comment = SubElement(element_citation_tag, "comment")
             self.comment.text = dataset.license_info
-            dataset_tags.append(self.comment)
 
-        # Add tags with <x>,</x> in between them
-        for i, tag in enumerate(dataset_tags):
-            self.related_object.append(tag)
-            if i < len(dataset_tags) - 1:
-                self.x = Element("x")
-                self.x.text = ","
-                self.x.tail = " "
-                self.related_object.append(self.x)
 
 
     def set_title_group(self, parent, poa_article):
@@ -1013,6 +1007,7 @@ class eLifePOA():
         self.related_articles = []
         self.version = None
         self.datasets = []
+        self.data_availability = None
         self.funding_awards = []
         self.funding_note = None
 
