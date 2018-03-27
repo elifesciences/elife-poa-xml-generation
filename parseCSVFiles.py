@@ -700,7 +700,8 @@ def parse_datasets(datasets_content):
     # Parse the data availability statement
     if reparsed.getElementsByTagName('data_availability_textbox'):
         data_availability_node = reparsed.getElementsByTagName('data_availability_textbox')
-        data_availability = entity_to_unicode(data_availability_node[0].childNodes[0].nodeValue)
+        if data_availability_node[0].childNodes:
+            data_availability = entity_to_unicode(data_availability_node[0].childNodes[0].nodeValue)
 
     return datasets, data_availability
 
