@@ -276,10 +276,10 @@ class eLife2XML(object):
             self.source.text = dataset.title
 
         if dataset.source_id:
-            pub_id_tag = SubElement(element_citation_tag, "pub-id")
-            pub_id_tag.text = dataset.source_id
-            pub_id_tag.set("pub-id-type", "uri")
-            pub_id_tag.set("xlink:href", dataset.source_id)
+            ext_link_tag = SubElement(element_citation_tag, "ext-link")
+            ext_link_tag.text = dataset.source_id
+            ext_link_tag.set("ext-link-type", "uri")
+            ext_link_tag.set("xlink:href", dataset.source_id)
 
         if dataset.license_info:
             self.comment = SubElement(element_citation_tag, "comment")
