@@ -150,9 +150,11 @@ def set_datasets(article, article_id):
         datasets = get_datasets(article_id)
         logger.info(datasets)
         if datasets:
-            dataset_objects = parse_datasets(datasets)
+            dataset_objects, data_availability = parse_datasets(datasets)
             for dataset in dataset_objects:
                 article.add_dataset(dataset)
+            if data_availability:
+                article.data_availability = data_availability
         return True
     except:
         logger.error("could not set datasets")

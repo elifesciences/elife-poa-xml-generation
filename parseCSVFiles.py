@@ -650,6 +650,7 @@ def parse_datasets(datasets_content):
     Datasets content is XML with escaped angle brackets
     """
     datasets = []
+    data_availability = None
 
     # Decode escaped angle brackets
     logger.info("datasets is " + str(datasets_content))
@@ -696,7 +697,12 @@ def parse_datasets(datasets_content):
 
             datasets.append(dataset)
 
-    return datasets
+    # Parse the data availability statement
+    if reparsed.getElementsByTagName('data_availability_textbox'):
+        data_availability_node = reparsed.getElementsByTagName('data_availability_textbox')
+        data_availability = entity_to_unicode(data_availability_node[0].childNodes[0].nodeValue)
+
+    return datasets, data_availability
 
 def parse_group_authors(group_authors):
     """
