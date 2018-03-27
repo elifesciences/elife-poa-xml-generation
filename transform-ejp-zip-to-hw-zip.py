@@ -60,7 +60,7 @@ output_dir = settings.STAGING_TO_HW_DIR
 hw_ftp_dir = settings.FTP_TO_HW_DIR
 tmp_dir = settings.TMP_DIR
 decap_dir = settings.STAGING_DECAPITATE_PDF_DIR
-PDF_DECAPITATE_TIMEOUT = 120
+PDF_DECAPITATE_TIMEOUT = 900
 
 class manifestXML(object):
 
