@@ -587,6 +587,12 @@ def unserialise_angle_brackets(escaped_string):
     unserial_xml = unserial_xml.replace(settings.GREATER_THAN_ESCAPE_SEQUENCE, ">")
     return unserial_xml
 
+def escape_angle_brackets(string):
+    "replace angle brackets only for when parsing escaped XML from CSV files"
+    if not string:
+        return string
+    return string.replace('<', '&lt;').replace('>', '&gt;')
+
 def decode_cp1252(str):
     """
     CSV files look to be in CP-1252 encoding (Western Europe)
@@ -654,7 +660,8 @@ def parse_datasets(datasets_content):
 
     # Decode escaped angle brackets
     logger.info("datasets is " + str(datasets_content))
-    datasets_xml = unserialise_angle_brackets(datasets_content)
+    datasets_xml = escape_angle_brackets(datasets_content)
+    datasets_xml = unserialise_angle_brackets(datasets_xml)
     datasets_xml = xml_escape_ampersand(datasets_xml)
     logger.info("datasets is " + str(datasets_xml))
 
