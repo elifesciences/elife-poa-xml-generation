@@ -154,7 +154,7 @@ def set_datasets(article, article_id):
             for dataset in dataset_objects:
                 article.add_dataset(dataset)
             if data_availability:
-                article.data_availability = data_availability
+                article.data_availability = convert_to_xml_string(data_availability)
         return True
     except:
         logger.error("could not set datasets")
