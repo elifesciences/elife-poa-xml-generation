@@ -103,7 +103,7 @@ def get_xls_sheet(table_type):
     # For overflow file types, parse again with no quotechar
     if table_type in OVERFLOW_XLS_FILES:
         csvreader = csv.reader(open(path, 'rb'), delimiter=',', quotechar=None)
-        if table_type == "ethics":
+        if table_type in ["ethics", "datasets"]:
             join_cells_from = 3
         else:
             join_cells_from = 2
