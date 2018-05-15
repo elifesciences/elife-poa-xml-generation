@@ -589,9 +589,10 @@ def unserialise_angle_brackets(escaped_string):
 
 def escape_angle_brackets(string):
     "replace angle brackets only for when parsing escaped XML from CSV files"
-    if not string:
+    try:
+        return string.replace('<', '&lt;').replace('>', '&gt;')
+    except AttributeError:
         return string
-    return string.replace('<', '&lt;').replace('>', '&gt;')
 
 def decode_cp1252(str):
     """
