@@ -1,4 +1,5 @@
 
+import os
 import csv
 from collections import defaultdict
 from generatePoaXml import *
@@ -91,12 +92,54 @@ def get_xls_path(path_type):
     path = XLS_PATH + XLS_FILES[path_type]
     return path
 
+def clean_csv(path):
+    "fix CSV file oddities making it difficult to parse"
+    clean_csv_data = ''
+    with open(path, 'rb') as open_read_file:
+        line = 0
+        prev_line = ''
+        line_content = ''
+        for content in open_read_file:
+            line += 1
+            # add the line if we are done the previous line
+            if line_content == '' and prev_line != '':
+                clean_csv_data += prev_line
+                prev_line = ''
+            # Now analyse each line
+            if line <= DATA_START_ROW:
+                line_content = ''
+                prev_line = content
+            elif content.startswith('"') and content != '"' and content != '"\n':
+                line_content = content
+                if content.endswith('"\n'):
+                    line_content = ''
+                prev_line = content
+            elif content == '"' or content == '"\n':
+                line_content = ''
+                prev_line = prev_line.rstrip()
+                prev_line += content
+            elif not content.startswith('"'):
+                line_content = content
+                prev_line = prev_line.rstrip()
+                prev_line += content.lstrip()
+            else:
+                line_content = ''
+                prev_line += content
+    new_path = os.path.join(settings.TMP_DIR, path.split('/')[-1])
+    #print new_path
+    #print clean_csv_data
+    with open(new_path, 'wb') as open_write_file:
+        open_write_file.write(clean_csv_data)
+    #return path
+    return new_path
+
 ## general functions for getting data from the XLS file
 @memoize
 def get_xls_sheet(table_type):
     logger.info("in get_xls_sheet")
     path = get_xls_path(table_type)
     logger.info(str(path))
+    path = clean_csv(path)
     csvreader = csv.reader(open(path, 'rb'), delimiter=',', quotechar='"')
     sheet = []
     for row in csvreader: sheet.append(row)
