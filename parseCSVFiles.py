@@ -117,7 +117,7 @@ def clean_csv(path):
                 prev_line = content
                 add_line = True
             else:
-                prev_line += prev_line.rstrip() + content
+                prev_line = prev_line.rstrip() + content.lstrip()
 
             if prev_line.rstrip().endswith('"'):
                 add_line = True
