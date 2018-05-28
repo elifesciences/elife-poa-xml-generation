@@ -60,6 +60,8 @@ COLUMN_HEADINGS = settings.XLS_COLUMN_HEADINGS
 
 OVERFLOW_XLS_FILES = settings.OVERFLOW_XLS_FILES
 
+CSV_CLEAN_FILE_LIST = []
+
 def memoize(f):
     """ Memoization decorator for functions taking one or more arguments. """
     class memodict(dict):
@@ -95,12 +97,17 @@ def get_xls_path(path_type):
 def clean_csv(path):
     "fix CSV file oddities making it difficult to parse"
     clean_csv_data = ''
+    new_path = os.path.join(settings.TMP_DIR, path.split(os.sep)[-1])
+    # Return the cleaned file name if it is already cleaned
+    if path in CSV_CLEAN_FILE_LIST:
+        return new_path
     with open(path, 'rb') as open_read_file:
         line = 0
         prev_line = ''
         line_content = ''
         for content in open_read_file:
             line += 1
+            content = decode_cp1252(content)
             # add the line if we are done the previous line
             if line_content == '' and prev_line != '':
                 clean_csv_data += prev_line
@@ -109,12 +116,12 @@ def clean_csv(path):
             if line <= DATA_START_ROW:
                 line_content = ''
                 prev_line = content
-            elif content.startswith('"') and content != '"' and content != '"\n':
+            elif content.startswith('"') and content.rstrip() != '"':
                 line_content = content
-                if content.endswith('"\n'):
+                if content.rstrip().endswith('"'):
                     line_content = ''
                 prev_line = content
-            elif content == '"' or content == '"\n':
+            elif content.rstrip() == '"':
                 line_content = ''
                 prev_line = prev_line.rstrip()
                 prev_line += content
@@ -125,12 +132,15 @@ def clean_csv(path):
             else:
                 line_content = ''
                 prev_line += content
-    new_path = os.path.join(settings.TMP_DIR, path.split('/')[-1])
-    #print new_path
-    #print clean_csv_data
+        # Add the final line
+        clean_csv_data += prev_line
+
     with open(new_path, 'wb') as open_write_file:
-        open_write_file.write(clean_csv_data)
-    #return path
+        open_write_file.write(clean_csv_data.encode('latin-1'))
+    # log file is cleaned in the global to not repeat
+    if path not in CSV_CLEAN_FILE_LIST:
+        CSV_CLEAN_FILE_LIST.append(path)
+
     return new_path
 
 ## general functions for getting data from the XLS file
