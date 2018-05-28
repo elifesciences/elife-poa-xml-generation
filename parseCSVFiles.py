@@ -102,36 +102,25 @@ def clean_csv(path):
     if path in CSV_CLEAN_FILE_LIST:
         return new_path
     with open(path, 'rb') as open_read_file:
-        line = 0
+        line = 1
         prev_line = ''
-        line_content = ''
+        write_line = False
         for content in open_read_file:
-            line += 1
             content = decode_cp1252(content)
             # add the line if we are done the previous line
-            if line_content == '' and prev_line != '':
+            if write_line is True and prev_line != '':
                 clean_csv_data += prev_line
                 prev_line = ''
+                write_line = False
             # Now analyse each line
             if line <= DATA_START_ROW:
-                line_content = ''
                 prev_line = content
-            elif content.startswith('"') and content.rstrip() != '"':
-                line_content = content
-                if content.rstrip().endswith('"'):
-                    line_content = ''
-                prev_line = content
-            elif content.rstrip() == '"':
-                line_content = ''
-                prev_line = prev_line.rstrip()
-                prev_line += content
-            elif not content.startswith('"'):
-                line_content = content
-                prev_line = prev_line.rstrip()
-                prev_line += content.lstrip()
+                write_line = True
             else:
-                line_content = ''
-                prev_line += content
+                prev_line += prev_line.rstrip() + content
+                if content.rstrip().endswith('"'):
+                    write_line = True
+            line += 1
         # Add the final line
         clean_csv_data += prev_line
 
