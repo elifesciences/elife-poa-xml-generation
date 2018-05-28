@@ -2,8 +2,6 @@ import unittest
 import os
 import re
 
-#os.sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 import parseCSVFiles
 import generatePoaXml
 import xml_generation
@@ -11,29 +9,13 @@ from xml_generation import *
 
 # Import test settings last in order to override the regular settings
 import poa_test_settings
-
-def override_settings():
-    # For now need to override settings to use test data
-    xml_generation.settings = poa_test_settings
-    parseCSVFiles.settings = poa_test_settings
-    parseCSVFiles.XLS_PATH = poa_test_settings.XLS_PATH
-    generatePoaXml.settings = poa_test_settings
-
-def create_test_directories():
-    for dir_name in [poa_test_settings.TEST_TEMP_DIR,
-                     poa_test_settings.TARGET_OUTPUT_DIR,
-                     poa_test_settings.TMP_DIR]:
-        try:
-            os.mkdir(dir_name)
-        except OSError:
-            pass
-
+import test_helpers
 
 class TestXmlGeneration(unittest.TestCase):
 
     def setUp(self):
-        override_settings()
-        create_test_directories()
+        test_helpers.override_settings()
+        test_helpers.create_test_directories()
 
         self.passes = []
         self.passes.append((3, 'elife_poa_e00003.xml'))
