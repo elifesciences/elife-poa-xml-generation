@@ -103,14 +103,14 @@ def join_lines(line_one, line_two):
         content = line_one.rstrip() + line_two.lstrip()
     return content
 
-def do_add_line(content, line_number):
+def do_add_line(content, line_number, data_start_row=DATA_START_ROW):
     "decide if the line should be added to the output"
     add_line = False
-    if line_number <= DATA_START_ROW or content.rstrip().endswith('"'):
+    if line_number <= data_start_row or content.rstrip().endswith('"'):
         add_line = True
     return add_line
 
-def flatten_lines(iterable):
+def flatten_lines(iterable, data_start_row=DATA_START_ROW):
     "iterate through an open file and join lines"
     clean_csv_data = ''
     line_number = 1
@@ -123,7 +123,7 @@ def flatten_lines(iterable):
             clean_csv_data += prev_line
             prev_line = ''
         prev_line = join_lines(prev_line, content)
-        add_line = do_add_line(content, line_number)
+        add_line = do_add_line(content, line_number, data_start_row)
         line_number += 1
     # Add the final line
     clean_csv_data += prev_line
