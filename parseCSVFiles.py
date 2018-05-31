@@ -94,6 +94,41 @@ def get_xls_path(path_type):
     path = XLS_PATH + XLS_FILES[path_type]
     return path
 
+def join_lines(line_one, line_two):
+    "join multiple lines together taking into account the header rows"
+    if line_two.lstrip() == '':
+        # keep blank lines found in the headers
+        content = line_two
+    else:
+        content = line_one.rstrip() + line_two.lstrip()
+    return content
+
+def do_add_line(content, line_number):
+    "decide if the line should be added to the output"
+    add_line = False
+    if line_number <= DATA_START_ROW or content.rstrip().endswith('"'):
+        add_line = True
+    return add_line
+
+def flatten_lines(iterable):
+    "iterate through an open file and join lines"
+    clean_csv_data = ''
+    line_number = 1
+    prev_line = ''
+    add_line = False
+    for content in iterable:
+        content = decode_cp1252(content)
+        # add the line based on the previous iteration value
+        if add_line:
+            clean_csv_data += prev_line
+            prev_line = ''
+        prev_line = join_lines(prev_line, content)
+        add_line = do_add_line(content, line_number)
+        line_number += 1
+    # Add the final line
+    clean_csv_data += prev_line
+    return clean_csv_data
+
 def clean_csv(path):
     "fix CSV file oddities making it difficult to parse"
     clean_csv_data = ''
@@ -102,35 +137,12 @@ def clean_csv(path):
     if path in CSV_CLEAN_FILE_LIST:
         return new_path
     with open(path, 'rb') as open_read_file:
-        line = 1
-        prev_line = ''
-        add_line = False
-        for content in open_read_file:
-            content = decode_cp1252(content)
-            # add the line if we are done the previous line
-            if add_line is True and prev_line != '':
-                clean_csv_data += prev_line
-                prev_line = ''
-                add_line = False
-            # Now analyse each line
-            if line <= DATA_START_ROW:
-                prev_line = content
-                add_line = True
-            else:
-                prev_line = prev_line.rstrip() + content.lstrip()
-
-            if prev_line.rstrip().endswith('"'):
-                add_line = True
-            line += 1
-        # Add the final line
-        clean_csv_data += prev_line
-
+        clean_csv_data = flatten_lines(open_read_file)
     with open(new_path, 'wb') as open_write_file:
         open_write_file.write(clean_csv_data.encode('latin-1'))
     # log file is cleaned in the global to not repeat
     if path not in CSV_CLEAN_FILE_LIST:
         CSV_CLEAN_FILE_LIST.append(path)
-
     return new_path
 
 ## general functions for getting data from the XLS file
