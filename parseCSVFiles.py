@@ -1,4 +1,5 @@
 
+import os
 import csv
 from collections import defaultdict
 from generatePoaXml import *
@@ -59,6 +60,8 @@ COLUMN_HEADINGS = settings.XLS_COLUMN_HEADINGS
 
 OVERFLOW_XLS_FILES = settings.OVERFLOW_XLS_FILES
 
+CSV_CLEAN_FILE_LIST = []
+
 def memoize(f):
     """ Memoization decorator for functions taking one or more arguments. """
     class memodict(dict):
@@ -91,12 +94,64 @@ def get_xls_path(path_type):
     path = XLS_PATH + XLS_FILES[path_type]
     return path
 
+def join_lines(line_one, line_two):
+    "join multiple lines together taking into account the header rows"
+    if line_two.lstrip() == '':
+        # keep blank lines found in the headers
+        content = line_two
+    else:
+        content = line_one.rstrip() + line_two.lstrip()
+    return content
+
+def do_add_line(content, line_number, data_start_row=DATA_START_ROW):
+    "decide if the line should be added to the output"
+    add_line = False
+    if line_number <= data_start_row or content.rstrip().endswith('"'):
+        add_line = True
+    return add_line
+
+def flatten_lines(iterable, data_start_row=DATA_START_ROW):
+    "iterate through an open file and join lines"
+    clean_csv_data = ''
+    line_number = 1
+    prev_line = ''
+    add_line = False
+    for content in iterable:
+        content = decode_cp1252(content)
+        # add the line based on the previous iteration value
+        if add_line:
+            clean_csv_data += prev_line
+            prev_line = ''
+        prev_line = join_lines(prev_line, content)
+        add_line = do_add_line(content, line_number, data_start_row)
+        line_number += 1
+    # Add the final line
+    clean_csv_data += prev_line
+    return clean_csv_data
+
+def clean_csv(path):
+    "fix CSV file oddities making it difficult to parse"
+    clean_csv_data = ''
+    new_path = os.path.join(settings.TMP_DIR, path.split(os.sep)[-1])
+    # Return the cleaned file name if it is already cleaned
+    if path in CSV_CLEAN_FILE_LIST:
+        return new_path
+    with open(path, 'rb') as open_read_file:
+        clean_csv_data = flatten_lines(open_read_file)
+    with open(new_path, 'wb') as open_write_file:
+        open_write_file.write(clean_csv_data.encode('latin-1'))
+    # log file is cleaned in the global to not repeat
+    if path not in CSV_CLEAN_FILE_LIST:
+        CSV_CLEAN_FILE_LIST.append(path)
+    return new_path
+
 ## general functions for getting data from the XLS file
 @memoize
 def get_xls_sheet(table_type):
     logger.info("in get_xls_sheet")
     path = get_xls_path(table_type)
     logger.info(str(path))
+    path = clean_csv(path)
     csvreader = csv.reader(open(path, 'rb'), delimiter=',', quotechar='"')
     sheet = []
     for row in csvreader: sheet.append(row)
