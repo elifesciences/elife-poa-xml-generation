@@ -232,7 +232,7 @@ class eLife2XML(object):
             data_availability = xml_escape_ampersand(poa_article.data_availability)
             # XML
             tagged_string = '<' + tag_name + '>' + data_availability + '</' + tag_name + '>'
-            reparsed = minidom.parseString(tagged_string.encode('utf8'))
+            reparsed = minidom.parseString(tagged_string)
             root_xml_element = append_minidom_xml_to_elementtree_xml(
                 parent, reparsed
                 )

@@ -1,0 +1,125 @@
+"Query: POA Datasets"
+"Generated on May 9, 2016"
+
+"poa_m_ms_id","poa_m_ms_no","poa_m_doi","poa_m_dataset_note"
+"15","7","10.7554/eLife.00007","LTLTxmlGTGT
+  LTLTdatasetsGTGT
+    LTLTdatasets_indGTGT0LTLT/datasets_indGTGT
+  LTLT/datasetsGTGT
+  LTLTprev_published_datasetsGTGT
+    LTLTdatasets_indGTGT0LTLT/datasets_indGTGT
+  LTLT/prev_published_datasetsGTGT
+LTLT/xmlGTGT
+"
+"18022","12717","10.7554/eLife.12717","LTLTxmlGTGT
+  LTLTdatasetsGTGT
+    LTLTdatasetGTGT
+      LTLTseq_noGTGT1LTLT/seq_noGTGT
+        LTLTauthors_text_listGTGTShalini Singh, David SoleckiLTLT/authors_text_listGTGT
+        LTLTidGTGThttps://www.ebi.ac.uk/arrayexpress/browse.htmlLTLT/idGTGT
+        LTLTlicense_infoGTGTPublicly available at the EBI European Nucleotide Archive (E-MTAB-3557).LTLT/license_infoGTGTLTLTrepositoryGTGTLTLT/repositoryGTGT
+        LTLTtitleGTGTE-MTAB-3557LTLT/titleGTGT
+        LTLTyearGTGT2015LTLT/yearGTGT
+      LTLT/datasetGTGTLTLTdatasetGTGT
+      LTLTseq_noGTGT2LTLT/seq_noGTGT
+        LTLTauthors_text_listGTGTRosmaninho, Raposo, CastroLTLT/authors_text_listGTGT
+        LTLTidGTGThttps://www.ebi.ac.uk/arrayexpress/browse.htmlLTLT/idGTGT
+        LTLTlicense_infoGTGTPublicly available at the EBI European Nucleotide Archive (E-MTAB-3560).LTLT/license_infoGTGTLTLTrepositoryGTGTLTLT/repositoryGTGT
+        LTLTtitleGTGTE-MTAB-3560LTLT/titleGTGT
+        LTLTyearGTGT2015LTLT/yearGTGT
+      LTLT/datasetGTGT
+    LTLTdatasets_indGTGT1LTLT/datasets_indGTGT
+    LTLTreporting_standards_indGTGT0LTLT/reporting_standards_indGTGT
+  LTLT/datasetsGTGT
+  LTLTprev_published_datasetsGTGT
+    LTLTdatasets_indGTGT0LTLT/datasets_indGTGT
+  LTLT/prev_published_datasetsGTGT
+LTLT/xmlGTGT
+"
+"21090","14874","10.7554/eLife.14874","LTLTxmlGTGT
+  LTLTdatasetsGTGT
+    LTLTdatasets_indGTGT0LTLT/datasets_indGTGT
+  LTLT/datasetsGTGT
+  LTLTprev_published_datasetsGTGT
+    LTLTdatasets_indGTGT0LTLT/datasets_indGTGT
+  LTLT/prev_published_datasetsGTGT
+LTLT/xmlGTGT
+"
+"21092","14997","10.7554/eLife.14997","LTLTxmlGTGT
+  LTLTdata_availability_textboxGTGT&#x2022;Data Availability text <i>"here"</i> &amp; suchLTLT/data_availability_textboxGTGTLTLTdatasetsGTGT
+    LTLTdatasetGTGT
+      LTLTseq_noGTGT1LTLT/seq_noGTGT
+        LTLTauthors_text_listGTGTCembrowski M, Spruston NLTLT/authors_text_listGTGT
+        LTLTidGTGThttp://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?token=adsveykeprejbej&amp;acc=GSE74985LTLT/idGTGT
+        LTLTlicense_infoGTGTGSE74985LTLT/license_infoGTGT
+        LTLTtitleGTGTHipposeq: an RNA-seq based atlas of gene expression in excitatory hippocampal neuronsLTLT/titleGTGT
+        LTLTyearGTGT2016LTLT/yearGTGT
+      LTLT/datasetGTGT
+    LTLTdatasets_indGTGT1LTLT/datasets_indGTGT
+    LTLTreporting_standards_indGTGT0LTLT/reporting_standards_indGTGT
+  LTLT/datasetsGTGT
+  LTLTprev_published_datasetsGTGTLTLTdatasetGTGT
+      LTLTseq_noGTGT1LTLT/seq_noGTGT
+        LTLTauthors_text_listGTGTCembrowski M, Spruston N,LTLT/authors_text_listGTGT
+        LTLTidGTGThttp://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE67403LTLT/idGTGT
+        LTLTlicense_infoGTGTGSE67403LTLT/license_infoGTGT
+        LTLTtitleGTGTSpatial gene expression gradients underlie prominent heterogeneity of CA1 pyramidal neuronsLTLT/titleGTGT
+        LTLTyearGTGT2016LTLT/yearGTGT
+      LTLT/datasetGTGT
+    LTLTdatasets_indGTGT1LTLT/datasets_indGTGT
+  LTLT/prev_published_datasetsGTGT
+LTLT/xmlGTGT
+"
+"30180","21598","10.7554/eLife.21598","LTLTxmlGTGT
+  LTLTdata_availability_textboxGTGTLTLT/data_availability_textboxGTGTLTLTdatasetsGTGT
+    LTLTdatasetGTGT
+      LTLTseq_noGTGT1LTLT/seq_noGTGT
+        LTLTauthors_text_listGTGTSobti M, Smits C, Wong ASW, Ishmukhametov R, Stock D, Sandin S, Stewart AGLTLT/authors_text_listGTGT
+        LTLTidGTGThttp://www.rcsb.org/pdb/LTLT/idGTGT
+        LTLTlicense_infoGTGT5T4OLTLT/license_infoGTGT
+        LTLTtitleGTGTAutoinhibited E. coli ATP synthase state 1LTLT/titleGTGT
+        LTLTyearGTGT2016LTLT/yearGTGT
+      LTLT/datasetGTGTLTLTdatasetGTGT
+      LTLTseq_noGTGT2LTLT/seq_noGTGT
+        LTLTauthors_text_listGTGTSobti M, Smits C, Wong ASW, Ishmukhametov R, Stock D, Sandin S, Stewart AGLTLT/authors_text_listGTGT
+        LTLTidGTGThttps//www.ebi.ac.uk/pdbe/emdb/LTLT/idGTGT
+        LTLTlicense_infoGTGTEMD-8357LTLT/license_infoGTGT
+        LTLTtitleGTGTAutoinhibited E. coli ATP synthase state 1LTLT/titleGTGT
+        LTLTyearGTGT2016LTLT/yearGTGT
+      LTLT/datasetGTGTLTLTdatasetGTGT
+      LTLTseq_noGTGT3LTLT/seq_noGTGT
+        LTLTauthors_text_listGTGTSobti M, Smits C, Wong ASW, Ishmukhametov R, Stock D, Sandin S, Stewart AGLTLT/authors_text_listGTGT
+        LTLTidGTGThttp://www.rcb.org/pdb/LTLT/idGTGT
+        LTLTlicense_infoGTGT5T4PLTLT/license_infoGTGT
+        LTLTtitleGTGTAutoinhibited E. coli ATP synthase state 2LTLT/titleGTGT
+        LTLTyearGTGT2016LTLT/yearGTGT
+      LTLT/datasetGTGTLTLTdatasetGTGT
+      LTLTseq_noGTGT4LTLT/seq_noGTGT
+        LTLTauthors_text_listGTGTSobti M, Smits C, Wong ASW, Ishmukhametov R, Stock D, Sandin S, Stewart AGLTLT/authors_text_listGTGT
+        LTLTidGTGThttps://www.ebi.a.uk/pdbe/emdb/LTLT/idGTGT
+        LTLTlicense_infoGTGTEMD-8358LTLT/license_infoGTGT
+        LTLTtitleGTGTAutoinhibited E. coli ATP synthase state 2LTLT/titleGTGT
+        LTLTyearGTGT2016LTLT/yearGTGT
+      LTLT/datasetGTGTLTLTdatasetGTGT
+      LTLTseq_noGTGT5LTLT/seq_noGTGT
+        LTLTauthors_text_listGTGTSobti M, Smits C, Wong ASW, Ishmukhametov R, Stock D, Sandin S, Stewart AGLTLT/authors_text_listGTGT
+        LTLTidGTGThttp://www.rcsb.or/pdb/LTLT/idGTGT
+        LTLTlicense_infoGTGT5T4QLTLT/license_infoGTGT
+        LTLTtitleGTGTAutoinhibited E. coli ATP synthase state 3LTLT/titleGTGT
+        LTLTyearGTGT2016LTLT/yearGTGT
+      LTLT/datasetGTGTLTLTdatasetGTGT
+      LTLTseq_noGTGT6LTLT/seq_noGTGT
+        LTLTauthors_text_listGTGTSobti M, Smits C, Wong ASW, Ishmukhametov R, Stock D, Sandin S, Stewart AGLTLT/authors_text_listGTGT
+        LTLTidGTGThttps://www.ebi.ac.uk/pdbe/entry/emdb/EMD-8359LTLT/idGTGT
+        LTLTlicense_infoGTGTEMD-8359LTLT/license_infoGTGT
+        LTLTtitleGTGTAutoinhibited E. coli ATP synthase state 3LTLT/titleGTGT
+        LTLTyearGTGT2016LTLT/yearGTGT
+      LTLT/datasetGTGT
+    LTLTdatasets_indGTGT1LTLT/datasets_indGTGT
+    LTLTreporting_standards_indGTGT0LTLT/reporting_standards_indGTGT
+  LTLT/datasetsGTGT
+  LTLTprev_published_datasetsGTGT
+    LTLTdatasets_indGTGT0LTLT/datasets_indGTGT
+  LTLT/prev_published_datasetsGTGT
+LTLT/xmlGTGT
+"
