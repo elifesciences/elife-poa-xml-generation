@@ -94,13 +94,17 @@ def get_xls_path(path_type):
     path = XLS_PATH + XLS_FILES[path_type]
     return path
 
-def join_lines(line_one, line_two):
+def join_lines(line_one, line_two, line_number, data_start_row=DATA_START_ROW):
     "join multiple lines together taking into account the header rows"
-    if line_two.lstrip() == '':
+    if line_number <= data_start_row:
         # keep blank lines found in the headers
         content = line_two
     else:
-        content = line_one.rstrip() + line_two.lstrip()
+        if line_two.lstrip() == '':
+            # blank line outside of the header convert to a space
+            content = line_one.rstrip("\r\n") + ' '
+        else:
+            content = line_one.rstrip("\r\n") + line_two.lstrip()
     return content
 
 def do_add_line(content, line_number, data_start_row=DATA_START_ROW):
@@ -122,7 +126,7 @@ def flatten_lines(iterable, data_start_row=DATA_START_ROW):
         if add_line:
             clean_csv_data += prev_line
             prev_line = ''
-        prev_line = join_lines(prev_line, content)
+        prev_line = join_lines(prev_line, content, line_number, data_start_row)
         add_line = do_add_line(content, line_number, data_start_row)
         line_number += 1
     # Add the final line

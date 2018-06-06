@@ -46,7 +46,12 @@ LTLT/xmlGTGT
 LTLT/xmlGTGT
 "
 "21092","14997","10.7554/eLife.14997","LTLTxmlGTGT
-  LTLTdata_availability_textboxGTGT&#x2022;Data Availability text <i>"here"</i> &amp; suchLTLT/data_availability_textboxGTGTLTLTdatasetsGTGT
+  LTLTdata_availability_textboxGTGT&#x2022;Data Availability text <i>"here"</i> &amp; such
+
+Alpha KY189332-KY189354 and KY366469-KY355487; 
+Beta KY351708-KY366487; 
+Gamma KY351639-KY351707; 
+Delta KY346705-KY346816LTLT/data_availability_textboxGTGTLTLTdatasetsGTGT
     LTLTdatasetGTGT
       LTLTseq_noGTGT1LTLT/seq_noGTGT
         LTLTauthors_text_listGTGTCembrowski M, Spruston NLTLT/authors_text_listGTGT
