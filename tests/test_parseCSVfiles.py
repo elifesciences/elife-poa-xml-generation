@@ -18,9 +18,11 @@ class TestParseCsvFiles(unittest.TestCase):
         test_helpers.create_test_directories()
 
         self.join_lines_passes = []
-        self.join_lines_passes.append(("", "\n", "\n"))
-        self.join_lines_passes.append(("one\n", '"', 'one"'))
-        self.join_lines_passes.append(("one\r\n", '    two', 'onetwo'))
+        self.join_lines_passes.append(("", "\n", 1, "\n"))
+        self.join_lines_passes.append(("", "\n", 10, " "))
+        self.join_lines_passes.append(("one\n", '"', 10, 'one"'))
+        self.join_lines_passes.append(("one\r\n", '    two', 10, 'onetwo'))
+        self.join_lines_passes.append(("\n", "two \n", 10, "two \n"))
 
         self.do_add_line_passes = []
         self.do_add_line_passes.append(("", 1, True)) # blank header row
@@ -40,8 +42,8 @@ class TestParseCsvFiles(unittest.TestCase):
         return os.path.join('tests', 'test_data', 'clean_csv', path)
 
     def test_join_lines(self):
-        for (line_one, line_two, expected) in self.join_lines_passes:
-            content = parseCSVFiles.join_lines(line_one, line_two)
+        for (line_one, line_two, line_number, expected) in self.join_lines_passes:
+            content = parseCSVFiles.join_lines(line_one, line_two, line_number)
             self.assertEqual(
                 content, expected,
                 '{line_one} + {line_two} does not equal {expected}, got {content}'.format(
