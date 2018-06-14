@@ -122,9 +122,9 @@ class eLife2XML(object):
                 fn = SubElement(self.competing_interest, "fn")
                 fn.set("fn-type", "conflict")
                 fn.set("id", id)
-                p = SubElement(fn, "p")
-                p.text = contributor.given_name + " " + contributor.surname + ", "
-                p.text = p.text + contributor.conflict + "."
+                conflict_text = (contributor.given_name + " " + contributor.surname +
+                                 ", " + contributor.conflict + ".")
+                new_tag = append_to_tag(fn, "p", conflict_text)
                 # increment
                 conflict_count = conflict_count + 1
         if poa_article.conflict_default:
@@ -227,15 +227,7 @@ class eLife2XML(object):
 
     def set_data_availability(self, parent, poa_article):
         if poa_article.data_availability:
-            tag_name = 'p'
-            # Escape any unescaped ampersands
-            data_availability = xml_escape_ampersand(poa_article.data_availability)
-            # XML
-            tagged_string = '<' + tag_name + '>' + data_availability + '</' + tag_name + '>'
-            reparsed = minidom.parseString(tagged_string)
-            root_xml_element = append_minidom_xml_to_elementtree_xml(
-                parent, reparsed
-                )
+            new_tag = append_to_tag(parent, "p", poa_article.data_availability)
 
     def set_major_datasets(self, parent, poa_article):
         self.p = SubElement(parent, "p")
@@ -301,18 +293,8 @@ class eLife2XML(object):
         root_tag_name = 'title-group'
         tag_name = 'article-title'
         root_xml_element = Element(root_tag_name)
-        # Escape any unescaped ampersands
-        title = xml_escape_ampersand(poa_article.title)
-
-        # XML
-        tagged_string = '<' + tag_name + '>' + title + '</' + tag_name + '>'
-        reparsed = minidom.parseString(tagged_string)
-
-        root_xml_element = append_minidom_xml_to_elementtree_xml(
-            root_xml_element, reparsed
-            )
-
-        parent.append(root_xml_element)
+        new_tag = append_to_tag(root_xml_element, tag_name, poa_article.title)
+        parent.append(new_tag)
 
     def set_journal_title_group(self, parent):
         """
@@ -422,17 +404,7 @@ class eLife2XML(object):
         root_tag_name = 'abstract'
         tag_name = 'p'
         root_xml_element = Element(root_tag_name)
-        # Escape any unescaped ampersands
-        abstract = xml_escape_ampersand(poa_article.abstract)
-
-        # XML
-        tagged_string = '<' + tag_name + '>' + abstract + '</' + tag_name + '>'
-        reparsed = minidom.parseString(tagged_string)
-
-        root_xml_element = append_minidom_xml_to_elementtree_xml(
-            root_xml_element, reparsed
-            )
-
+        new_tag = append_to_tag(root_xml_element, tag_name, poa_article.abstract)
         parent.append(root_xml_element)
 
     def get_aff_id(self, affiliation):
@@ -654,8 +626,9 @@ class eLife2XML(object):
         title = SubElement(self.kwd_group, "title")
         title.text = "Research organism"
         for research_organism in poa_article.research_organisms:
-            kwd = SubElement(self.kwd_group, "kwd")
-            kwd.text = research_organism
+            tag_name = 'kwd'
+            parent_tag = self.kwd_group
+            new_tag = append_to_tag(parent_tag, tag_name, research_organism)
 
     def set_kwd_group_author_keywords(self, parent, poa_article):
         # kwd-group kwd-group-type="author-keywords"
@@ -1232,6 +1205,7 @@ def convert_to_xml_string(s):
     s = replace_tags(s, 'u', 'underline')
     s = replace_tags(s, 'b', 'bold')
     s = replace_tags(s, 'em', 'italic')
+    s = replace_tags(s, 'i', 'italic')
     s = escape_unmatched_angle_brackets(s)
     return s
 
@@ -1245,6 +1219,18 @@ def clean_funder(funder):
     funder = re.sub(r"\(.*\)", "", funder)
     funder = funder.rstrip().lstrip()
     return funder
+
+def append_to_tag(parent, tag_name, string):
+    "method to retain inline tagging when adding to a parent tag"
+    # Escape any unescaped ampersands
+    escaped_string = xml_escape_ampersand(string)
+    # XML
+    tagged_string = '<' + tag_name + '>' + escaped_string + '</' + tag_name + '>'
+    reparsed = minidom.parseString(tagged_string)
+    root_xml_element = append_minidom_xml_to_elementtree_xml(
+        parent, reparsed
+        )
+    return root_xml_element
 
 def append_minidom_xml_to_elementtree_xml(parent, xml, recursive=False, attributes=None):
     """
