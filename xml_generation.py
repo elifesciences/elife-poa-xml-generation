@@ -238,7 +238,7 @@ def set_author_info(article, article_id):
 
             conflict = get_author_conflict(article_id, author_id)
             if conflict.strip() != "":
-                author.set_conflict(conflict)
+                author.set_conflict(convert_to_xml_string(conflict))
 
             orcid = get_author_orcid(article_id, author_id)
             if orcid.strip() != "":

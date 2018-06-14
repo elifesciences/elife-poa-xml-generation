@@ -122,9 +122,9 @@ class eLife2XML(object):
                 fn = SubElement(self.competing_interest, "fn")
                 fn.set("fn-type", "conflict")
                 fn.set("id", id)
-                p = SubElement(fn, "p")
-                p.text = contributor.given_name + " " + contributor.surname + ", "
-                p.text = p.text + contributor.conflict + "."
+                conflict_text = (contributor.given_name + " " + contributor.surname +
+                                 ", " + contributor.conflict + ".")
+                new_tag = self.append_to_tag(fn, "p", conflict_text)
                 # increment
                 conflict_count = conflict_count + 1
         if poa_article.conflict_default:
@@ -141,6 +141,18 @@ class eLife2XML(object):
             p = SubElement(fn, "p")
             p.text = conflict_text
             conflict_count = conflict_count + 1
+
+    def append_to_tag(self, parent, tag_name, string):
+        "method to retain inline tagging when adding to a parent tag"
+        # Escape any unescaped ampersands
+        escaped_string = xml_escape_ampersand(string)
+        # XML
+        tagged_string = '<' + tag_name + '>' + escaped_string + '</' + tag_name + '>'
+        reparsed = minidom.parseString(tagged_string)
+        root_xml_element = append_minidom_xml_to_elementtree_xml(
+            parent, reparsed
+            )
+        return root_xml_element
 
     def set_fn_group_ethics_information(self, parent, poa_article):
         self.competing_interest = SubElement(parent, "fn-group")
