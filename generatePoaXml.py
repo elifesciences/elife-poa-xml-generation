@@ -654,8 +654,16 @@ class eLife2XML(object):
         title = SubElement(self.kwd_group, "title")
         title.text = "Research organism"
         for research_organism in poa_article.research_organisms:
-            kwd = SubElement(self.kwd_group, "kwd")
-            kwd.text = research_organism
+            tag_name = 'kwd'
+            parent_tag = self.kwd_group
+            # Escape any unescaped ampersands
+            kwd = xml_escape_ampersand(research_organism)
+            # XML
+            tagged_string = '<' + tag_name + '>' + kwd + '</' + tag_name + '>'
+            reparsed = minidom.parseString(tagged_string)
+            root_xml_element = append_minidom_xml_to_elementtree_xml(
+                parent_tag, reparsed
+                )
 
     def set_kwd_group_author_keywords(self, parent, poa_article):
         # kwd-group kwd-group-type="author-keywords"
@@ -1232,6 +1240,7 @@ def convert_to_xml_string(s):
     s = replace_tags(s, 'u', 'underline')
     s = replace_tags(s, 'b', 'bold')
     s = replace_tags(s, 'em', 'italic')
+    s = replace_tags(s, 'i', 'italic')
     s = escape_unmatched_angle_brackets(s)
     return s
 

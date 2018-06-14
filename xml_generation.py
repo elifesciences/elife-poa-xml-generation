@@ -177,7 +177,7 @@ def set_organsims(article, article_id):
         research_organisms = get_organisms(article_id)
         for research_organism in research_organisms:
             if research_organism.strip() != "":
-                article.add_research_organism(research_organism)
+                article.add_research_organism(convert_to_xml_string(research_organism))
         return True
     except:
         logger.error("could not set organisms")
