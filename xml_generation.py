@@ -84,6 +84,9 @@ def set_articleType(article, article_id):
         article_type_index['19'] = {
             'article_type':    'research-article',
             'display_channel': 'Tools and Resources'}
+        article_type_index['21'] = {
+            'article_type':    'research-article',
+            'display_channel': 'Scientific Correspondence'}
 
         article_type = article_type_index[str(articleType_id)]
         article.articleType = article_type['article_type']
