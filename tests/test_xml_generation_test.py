@@ -1,6 +1,7 @@
 import unittest
 import os
 import re
+from mock import patch
 
 import parseCSVFiles
 import generatePoaXml
@@ -86,6 +87,35 @@ class TestXmlGeneration(unittest.TestCase):
                                                       os.sep + xml_file_name)
             compare_to_xml = self.read_uncommented_xml(poa_test_settings.XLS_PATH + xml_file_name)
             self.assertEqual(generated_xml, compare_to_xml)
+
+    @patch('xml_generation.get_articleType')
+    def invoke_set_article_type(self, article_id, article_type_id, fake_get_article_type):
+        "reuseable actions to instantiate an article and set the article_type"
+        fake_get_article_type.return_value = article_type_id
+        doi = get_elife_doi(article_id)
+        article = generatePoaXml.eLifePOA(doi, title=None)
+        set_articleType(article, article_id)
+        return article
+
+    def test_set_article_type_1(self):
+        "explicitly test some article type values"
+        article_id = 99999
+        article_type_id = 1
+        expected_article_type = 'research-article'
+        expected_display_channel = 'Research Article'
+        article = self.invoke_set_article_type(article_id, article_type_id)
+        self.assertEqual(article.articleType, expected_article_type)
+        self.assertEqual(article.display_channel, expected_display_channel)
+
+    def test_set_article_type_21(self):
+        "explicitly test some article type values"
+        article_id = 99999
+        article_type_id = 21
+        expected_article_type = 'research-article'
+        expected_display_channel = 'Scientific Correspondence'
+        article = self.invoke_set_article_type(article_id, article_type_id)
+        self.assertEqual(article.articleType, expected_article_type)
+        self.assertEqual(article.display_channel, expected_display_channel)
 
 if __name__ == '__main__':
     unittest.main()
